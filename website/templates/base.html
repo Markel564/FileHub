@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title> {% block title %}{% endblock%}</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+{% block styles %}
+
+
+{% endblock %}
+<link rel="stylesheet" href="../static/css/style_base.css">
+</head>
+<body>
+<div class="header">
+    <h1>{{user_name}}</h1>
+</div>
+{% block content %}
+
+
+{% endblock %}
+
+
+{% with messages = get_flashed_messages(with_categories = true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+        {% if category == 'error' %}
+            <div class = "alert alert-danger alert-dismissible fade show" role = "alert">
+                {{message}}
+                <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true"></span>
+                  </button>
+                  
+            </div>
+        {% else %}
+            <div class = "alert alert-success alert-dismissible fade show" role = "alert">
+                {{message}}
+                <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true"></span>
+                  </button>
+                  
+            </div>
+        {% endif %}
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

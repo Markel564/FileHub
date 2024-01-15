@@ -1,0 +1,4 @@
+api_token: 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
+bind_address: ::0
+bind_port: 5000
+filter: all

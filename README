@@ -1,0 +1,6 @@
+INSTRUCTIONS
+
+echo "api_token: your_access_token" > config.yml
+echo "bind_address: ::0" >> config.yml
+echo "bind_port: 5000" >> config.yml
+echo "filter: all" >> config.yml
