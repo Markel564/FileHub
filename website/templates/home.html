@@ -3,12 +3,14 @@
 {% block title %}Home{% endblock %}
 
 {% block styles %}<link rel="stylesheet" href="../static/css/style_home.css">{% endblock %}
+{% block js %} <script src="../static/js/home.js" defer></script>{% endblock %}
+
 {% block content %} 
 
 
   <br />
 <div class ="top-options">
-  <input class="form-control mr-sm-2" type="search" placeholder="Search repository" aria-label="Search">
+  <input class="form-control mr-sm-2" type="search" placeholder="Search repository" aria-label="Search" data-search>
   <button class="btn btn-add-repo">ADD REPOSITORY</button>
   <button class="btn btn-view-invites">VIEW INVITATIONS</button>
 </div>
@@ -27,6 +29,11 @@
         <strong>Info!</strong> You don't have any repositories yet.
     </div>
   {% endif %}
+
+  <div class="no-results">
+     <h1>No results found</h1>
+     <img src="../static/images/sad-face.svg" alt="No results found" class="img-no-results">
+  </div>
 </div>
 
 {% endblock %}

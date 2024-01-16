@@ -1,6 +1,4 @@
 
-
-
 .top-options {
     display: flex;
     align-items: center;
@@ -15,13 +13,14 @@
 .btn {
     padding: 10px 20px; 
     font-size: 1rem; 
-    font-weight: bold; /* Makes the text bold */
-    text-transform: uppercase; /* Uppercase button text */
-    border-radius: 5px; /* Rounded corners */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow */
-    transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transition for hover effects */
-    cursor: pointer; /* Changes cursor to pointer on hover */
+    font-weight: bold; 
+    text-transform: uppercase; 
+    border-radius: 5px; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
+    transition: background-color 0.3s, box-shadow 0.3s; 
+    cursor: pointer; 
   }
+
 /* BUTTON to add repositories */
 .btn-add-repo {
     background-color: #950740;
@@ -38,8 +37,8 @@
 
 /* Hover effect for both buttons */
 .btn:hover {
-    background-color: #a50b50; /* Slightly lighter shade for hover */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Larger shadow for depth effect */
+    background-color: #a50b50; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); 
   }
   
   /* Styles for the search input */
@@ -55,6 +54,68 @@
 .container{
     width: 60vw;
     background-color: #4e4050;
-    border-top-right-radius: 50px; 
-    border-top-left-radius: 50px;
+    border-radius: 50px;
+    padding: 30px;
+}
+
+
+.repository{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 25px; 
+    background-color: #1a1a1d;
+    width: 50vw; 
+    margin: 30px auto;
+    border-radius: 25px;
+    background-color: #d9d9d9;
+}
+
+
+.repository .no-results h1{
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #1a1a1d;
+}
+
+.repository h1:hover{
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.delete-repo{
+  height: 25px;
+  width: auto;
+}
+
+.delete-repo:hover{
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+/* for non-searched elements dissapear */
+.hide {
+  display: none;
+}
+
+.no-results{
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 25px; 
+  background-color: #1a1a1d;
+  width: 50vw; 
+  margin: 30px auto;
+  border-radius: 25px;
+  background-color: #d9d9d9;
+
+}
+.no-results h1 {
+  flex: 1; 
+  margin-bottom: 30px; 
+}
+.img-no-results{
+  height: 100px;
+  width: auto;
 }
