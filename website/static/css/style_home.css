@@ -1,0 +1,60 @@
+
+
+
+.top-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px; 
+    background-color: #1a1a1d;
+    width: 50vw; 
+    margin: 20px auto;
+}
+
+
+.btn {
+    padding: 10px 20px; 
+    font-size: 1rem; 
+    font-weight: bold; /* Makes the text bold */
+    text-transform: uppercase; /* Uppercase button text */
+    border-radius: 5px; /* Rounded corners */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+    transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transition for hover effects */
+    cursor: pointer; /* Changes cursor to pointer on hover */
+  }
+/* BUTTON to add repositories */
+.btn-add-repo {
+    background-color: #950740;
+    color: white;
+    border: none;
+}
+
+/* BUTTON to see invitations to other repositories */
+.btn-view-invites {
+    background-color: #950740;
+    color: white;
+    border: none;
+}
+
+/* Hover effect for both buttons */
+.btn:hover {
+    background-color: #a50b50; /* Slightly lighter shade for hover */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Larger shadow for depth effect */
+  }
+  
+  /* Styles for the search input */
+  .form-control {
+    border: 2px solid #ccc; /* Adds border to the input */
+    border-radius: 5px; /* Rounded corners for the input */
+    padding: 5px 10px; /* Padding inside the input */
+    margin-right: 10px; /* Adds margin to the right of the input */
+    width: 21vw;
+  }
+
+
+.container{
+    width: 60vw;
+    background-color: #4e4050;
+    border-top-right-radius: 50px; 
+    border-top-left-radius: 50px;
+}

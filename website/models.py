@@ -16,7 +16,7 @@ class User(db.Model, UserMixin):
     name = db.Column(db.String(100),nullable=False)
     username = db.Column(db.String(100), nullable=False, unique=True)
     email = db.Column(db.String(100), nullable=True, unique=True) 
-    avatar_url = db.Column(db.String(255)) 
+    avatar_url = db.Column(db.String(255), nullable = False, unique=False) 
     repositories = db.relationship('Repository', backref='owner', lazy=True)
 
 

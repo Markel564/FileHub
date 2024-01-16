@@ -13,9 +13,15 @@
 <link rel="stylesheet" href="../static/css/style_base.css">
 </head>
 <body>
-<div class="header">
-    <h1>{{user_name}}</h1>
+<div class="header-container">
+    <div class="header">
+        <h1>{{user_name}}</h1>
+    </div>
+    <div class="user-image">
+        <img class ="profile-pic" src="{{avatar}}" alt="Profile">
+    </div>
 </div>
+
 {% block content %}
 
 
