@@ -13,22 +13,8 @@
 <link rel="stylesheet" href="../static/css/style_base.css">
 </head>
 <body>
-<div class="header-container">
-    <div class="header">
-        <h1>{{user_name}}</h1>
-    </div>
-    <div class="user-image">
-        <img class ="profile-pic" src="{{avatar}}" alt="Profile">
-    </div>
-</div>
 
-{% block content %}
-
-
-{% endblock %}
-
-
-{% with messages = get_flashed_messages(with_categories = true) %}
+    {% with messages = get_flashed_messages(with_categories = true) %}
     {% if messages %}
     {% for category, message in messages %}
         {% if category == 'error' %}
@@ -50,7 +36,27 @@
         {% endif %}
     {% endfor %}
     {% endif %}
-    {% endwith %}
+{% endwith %}
+
+
+<div class="header-container">
+    <div class="header">
+        <h1>{{user_name}}</h1>
+    </div>
+    <div class="user-image">
+        <img class ="profile-pic" src="{{avatar}}" alt="Profile">
+    </div>
+</div>
+
+
+
+{% block content %}
+
+
+{% endblock %}
+
+
+
 
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, flash, request, jsonify, session
+from flask import Blueprint, render_template, flash, request, jsonify, session, redirect, url_for
 from . import db
-from .models import User
+from .models import User, Repository
 import yaml
 views = Blueprint('views', __name__)
 from github import Github
@@ -9,26 +9,67 @@ from github import Github
 @views.route('/', methods=['GET','POST'])
 def home():
 
-    add_user()
-    
-    # get the user from the database
-    user_id = session.get('user_id')
-    user = User.query.filter_by(id=user_id).first()
-    
-    # get the user's repositories
-    repositories = get_repos()
-    return render_template("home.html", user_name=user.username, avatar=user.avatar_url, repositories=repositories)
+    if request.method == 'GET':
+        if not add_user():  # error with the api token
+            return render_template("error.html")
+        
+        
+        # get the user from the database
+        user_id = session.get('user_id')
+        user = User.query.filter_by(id=user_id).first()
+        
+        # get the user's repositories
+        repositories = get_repos()
+        return render_template("home.html", user_name=user.username, avatar=user.avatar_url, repositories=repositories)
+
+    if request.method == 'POST':
+
+        data = request.get_json()  # Get JSON data from the request
+        
+        if data is None:
+            return render_template("error_generic.html")
+        
+        repo_name = data.get('repo_name')
+        type_message = data.get('type')
 
 
+        user_id = session.get('user_id')
+        user = User.query.filter_by(id=user_id).first()
+        repositories = get_repos()
 
+        if type_message == "eliminate":
+            
+            info_content = '''
+            <div class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <span class="close-btn">&times;</span>
+                        <h2>Are you sure you want to delete this repository?</h2>
+                    </div>
+                    <div class="modal-body">
+                        <p>The contents of the repository will be lost.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn remove">Remove</button>
+                        <button class="btn back">Back</button>
+                    </div>
+                </div>
+            </div>
+            '''
+            return render_template('delete-info.html', info_content=info_content)
+
+
+        return render_template("error.html")
 
 
 def add_user():
     with open("config.yml", 'r') as f:
         conf = yaml.load(f, Loader=yaml.SafeLoader)
 
-    g = Github(conf['api_token'])
-    
+    try:
+        g = Github(conf['api_token'])
+    except:
+        return False
 
     id = g.get_user().id
     session['user_id'] = id
@@ -44,14 +85,15 @@ def add_user():
         new_user = User(id=id, g=conf['api_token'], name=name, username=username, email=email, avatar_url=avatar)
         db.session.add(new_user)
         db.session.commit()
-        # flash(f'Account created for {name}!', category='success')
+        get_repos()
+
     else:
         print (f"Account already exists for {name}")
-        # flash(f'Account already exists for {name}!', category='success')
 
-    get_repos()
+
     print (f"Authenticated as {user.login}")
 
+    return True
 
 
 def get_repos():
@@ -71,5 +113,13 @@ def get_repos():
     repositories = []
     for repo in repos:
         repositories.append(repo.name)
+
+    # add the repositories to the db
+    for repo in repositories:
+        if not Repository.query.filter_by(name=repo).first():
+            print (f"ADDED --> {repo}")
+            new_repo = Repository(name=repo, user_id=user_id)
+            db.session.add(new_repo)
+            db.session.commit()
     
     return repositories

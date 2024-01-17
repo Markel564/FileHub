@@ -98,6 +98,23 @@
   display: none;
 }
 
+
+/* for info-container */
+.show-info{
+  display: block;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  height: 24vh;
+  width: 24vw;
+  transform: translate(-50%, -50%);
+  background-color: #c3073f;
+  padding: 20px; /* Add padding for better visibility */
+  z-index: 999; /* Ensure it's on top of other elements */
+  border: 1px solid #ccc; /* Add a border if desired */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Add a shadow for depth */
+}
+
 .no-results{
   display: none;
   flex-direction: column;

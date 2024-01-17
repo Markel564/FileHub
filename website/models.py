@@ -21,7 +21,10 @@ class User(db.Model, UserMixin):
 
 
 class Repository(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), primary_key=True)
+    path = db.Column(db.String(255), nullable=True, unique=True)
+    isCloned = db.Column(db.Boolean, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-
+    # comits, branches, pulls??
+    # files, folders
 

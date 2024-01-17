@@ -2,24 +2,32 @@
 
 {% block title %}Home{% endblock %}
 
-{% block styles %}<link rel="stylesheet" href="../static/css/style_home.css">{% endblock %}
-{% block js %} <script src="../static/js/home.js" defer></script>{% endblock %}
+{% block styles %}
+<link rel="stylesheet" href="../static/css/style_home.css">
+<link rel="stylesheet" href="../static/css/style_delete-info.css">
+{% endblock %}
+
+{% block js %}
+<script src="../static/js/home.js" defer></script>
+{% endblock %}
 
 {% block content %} 
 
 
-  <br />
+<br />
 <div class ="top-options">
   <input class="form-control mr-sm-2" type="search" placeholder="Search repository" aria-label="Search" data-search>
   <button class="btn btn-add-repo">ADD REPOSITORY</button>
   <button class="btn btn-view-invites">VIEW INVITATIONS</button>
 </div>
 
+<div id="info-container" class="hide">
+</div>
 
 <div class="container">
   {% if repositories %}
     {% for repository in repositories %}
-        <div class="repository">
+        <div class="repository" data-repo-name="{{ repository }}">
             <h1>{{ repository }}</h1>    
             <img src="../static/images/trash-bin.svg" alt="Delete repository" class="delete-repo">    
         </div>
