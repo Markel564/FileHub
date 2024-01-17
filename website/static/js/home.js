@@ -72,6 +72,82 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
     });
+
+
+    // function for delete repository confirmation
+    document.addEventListener("DOMContentLoaded", function () {
+        
+        let data = {
+            value: "OK",
+            type: ""
+        };
+
+        // Function to send the POST request for elimination
+        function PostRequestEliminate() {
+            data.type = "eliminate-confirm";
+
+            fetch("your-api-endpoint-url", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            .then(function (response) {
+                if (response.ok) {
+                    return response.json(); 
+                } else {
+                    throw new Error("Network response was not ok");
+                }
+            })
+            .then(function (responseData) {
+                console.log("POST request for elimination successful:", responseData);
+            })
+            .catch(function (error) {
+                console.error("Fetch error for elimination:", error);
+            });
+        }
+
+        // for request cancel
+        function PostRequestCancel() {
+            
+            data.type = "eliminate-cancel";
+
+            fetch("your-api-endpoint-url", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            .then(function (response) {
+                if (response.ok) {
+                    return response.json(); 
+                } else {
+                    throw new Error("Network response was not ok");
+                }
+            })
+            .then(function (responseData) {
+                console.log("POST request  successful:", responseData);
+            })
+            .catch(function (error) {
+                console.error("Fetch error", error);
+            });
+        }
+
+
+        var removeButton = document.querySelector(".remove");
+        var backButton = document.querySelector(".back");
+
+        removeButton.addEventListener("click", function () {
+            console.log("Eliminate")
+            PostRequestEliminate();
+        });
+
+        backButton.addEventListener("click", function () {
+            PostRequestCancel();
+        });
+    });
 });
 
 

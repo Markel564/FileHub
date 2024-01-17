@@ -39,7 +39,12 @@ def home():
             # LUEGO DE ELIMINAR EL REPO, QUITARLO DE LA BASE DE DATOS
             return render_template('delete-info.html') 
 
+        elif type_message == "eliminate-confirm":
+            return render_template("error.html")
 
+        elif type_message == "eliminate-cancel":
+            return render_template("error.html")
+            
         return render_template("generic_error.html")
 
 
