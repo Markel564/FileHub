@@ -27,39 +27,20 @@ def home():
         data = request.get_json()  # Get JSON data from the request
         
         if data is None:
-            return render_template("error_generic.html")
+            return render_template("generic_error.html")
         
         repo_name = data.get('repo_name')
         type_message = data.get('type')
 
 
-        user_id = session.get('user_id')
-        user = User.query.filter_by(id=user_id).first()
-        repositories = get_repos()
-
         if type_message == "eliminate":
             
-            info_content = '''
-            <div class="modal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <span class="close-btn">&times;</span>
-                        <h2>Are you sure you want to delete this repository?</h2>
-                    </div>
-                    <div class="modal-body">
-                        <p>The contents of the repository will be lost.</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn remove">Remove</button>
-                        <button class="btn back">Back</button>
-                    </div>
-                </div>
-            </div>
-            '''
-            return render_template('delete-info.html', info_content=info_content)
+            session['repo_to_remove'] = repo_name
+            # LUEGO DE ELIMINAR EL REPO, QUITARLO DE LA BASE DE DATOS
+            return render_template('delete-info.html') 
 
 
-        return render_template("error.html")
+        return render_template("generic_error.html")
 
 
 def add_user():
