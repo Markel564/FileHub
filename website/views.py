@@ -4,15 +4,18 @@ from .models import User, Repository
 import yaml
 views = Blueprint('views', __name__)
 from github import Github
+from github import Auth
+from git import Repo
 
 
 @views.route('/', methods=['GET','POST'])
 def home():
 
     if request.method == 'GET':
+
         if not add_user():  # error with the api token
             return render_template("error.html")
-        
+
         
         # get the user from the database
         user_id = session.get('user_id')
@@ -29,23 +32,32 @@ def home():
         if data is None:
             return render_template("generic_error.html")
         
-        repo_name = data.get('repo_name')
         type_message = data.get('type')
 
+        print (type_message)
 
         if type_message == "eliminate":
-            
+
+            repo_name = data.get('repo_name')
             session['repo_to_remove'] = repo_name
             # LUEGO DE ELIMINAR EL REPO, QUITARLO DE LA BASE DE DATOS
-            return render_template('delete-info.html') 
+            return jsonify({"status": "ok"})
 
         elif type_message == "eliminate-confirm":
-            return render_template("error.html")
+
+            
+            ack = delete_repo()
+
+            if ack:
+                return jsonify({"status": "ok"})
+            
+            return jsonify({"status": "error"})
 
         elif type_message == "eliminate-cancel":
-            return render_template("error.html")
+              
+            return jsonify({"status": "ok"})
             
-        return render_template("generic_error.html")
+        return jsonify({"status": "error"})
 
 
 def add_user():
@@ -53,7 +65,9 @@ def add_user():
         conf = yaml.load(f, Loader=yaml.SafeLoader)
 
     try:
-        g = Github(conf['api_token'])
+        auth = Auth.Token(conf['api_token'])
+        g = Github(auth=auth, base_url="https://api.github.com")
+
     except:
         return False
 
@@ -91,7 +105,10 @@ def get_repos():
     # obtain the user from the database
     user_id = session.get('user_id')
     user = User.query.filter_by(id=user_id).first()
+
     g = Github(user.g)
+
+    
 
     user = g.get_user()
     repos = user.get_repos()
@@ -109,3 +126,39 @@ def get_repos():
             db.session.commit()
     
     return repositories
+
+
+def delete_repo():
+    """
+    Delete the repo from the github account and from the database
+    """
+
+    # obtain the user from the database
+    user_id = session.get('user_id')
+    user = User.query.filter_by(id=user_id).first()
+    
+    if not user:
+        return False
+    
+    g = Github(user.g)
+    user = g.get_user()
+
+    repo_name = session.get('repo_to_remove')
+    # search for the repo in the database
+    repo = Repository.query.filter_by(name=repo_name).first()
+    if repo is None:
+        return False
+    
+
+    repo = user.get_repo(repo_name)
+    repo.delete()
+    print (f"DELETED --> {repo_name}")
+
+    # delete the repo from the database
+    repo = Repository.query.filter_by(name=repo_name).first()
+    db.session.delete(repo)
+    db.session.commit()
+
+    session['repo_to_remove'] = None
+
+    return True

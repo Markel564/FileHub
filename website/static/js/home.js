@@ -5,8 +5,7 @@ const repositoryElements = document.querySelectorAll(".repository");
 searchInput.addEventListener("input", (e) => {
     // Obtain the names of the repositories
     repositoryElements.forEach((element) => {
-        const repositoryName = element.querySelector("h1").textContent;
-        console.log(repositoryName); 
+        const repositoryName = element.querySelector("h1").textContent; 
     });
 
     // Value of input
@@ -38,15 +37,17 @@ searchInput.addEventListener("input", (e) => {
 
 
 
-// function to delete a repository
+// function to deleting a repository
 document.addEventListener("DOMContentLoaded", function () {
-    // Select the elements with the "delete-repo" class
+    
+
+    // create a post request when the recycle bin is clicked
     var deleteButtons = document.querySelectorAll(".delete-repo");
     deleteButtons.forEach(function (button) {
         button.addEventListener("click", function () {
             // Get the repository name from the data attribute
             var repoName = this.closest('.repository').getAttribute("data-repo-name");
-
+            
             // Create a POST request
             fetch("/", {
                 method: "POST",
@@ -57,97 +58,37 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .then(function (response) {
                 if (response.ok) {
-                    return response.text(); 
+                    return response.json(); 
                 } else {
                     throw new Error("Network response was not ok");
                 }
             })
             .then(function (data) {
-                var errorContainer = document.getElementById("info-container");
-                errorContainer.classList.toggle("show-info");
-                errorContainer.innerHTML = data;
+                if (data.status == "ok"){
+                    var errorContainer = document.getElementById("info-container");
+                    
+                    var state = false; 
+                    function toggleState() {
+                        
+                        if (state){ // if state is true, then hide the modal
+                            errorContainer.classList.remove("show-info");
+                            errorContainer.classList.add("hide")
+                        }else{
+                            errorContainer.classList.remove("hide");
+                            errorContainer.classList.add("show-info");
+                        }
+                    }
+                    
+                    toggleState();
+                }
+                    
             })
             .catch(function (error) {
                 console.error("Fetch error:", error);
             });
         });
     });
-
-
-    // function for delete repository confirmation
-    document.addEventListener("DOMContentLoaded", function () {
-        
-        let data = {
-            value: "OK",
-            type: ""
-        };
-
-        // Function to send the POST request for elimination
-        function PostRequestEliminate() {
-            data.type = "eliminate-confirm";
-
-            fetch("your-api-endpoint-url", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
-            })
-            .then(function (response) {
-                if (response.ok) {
-                    return response.json(); 
-                } else {
-                    throw new Error("Network response was not ok");
-                }
-            })
-            .then(function (responseData) {
-                console.log("POST request for elimination successful:", responseData);
-            })
-            .catch(function (error) {
-                console.error("Fetch error for elimination:", error);
-            });
-        }
-
-        // for request cancel
-        function PostRequestCancel() {
-            
-            data.type = "eliminate-cancel";
-
-            fetch("your-api-endpoint-url", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
-            })
-            .then(function (response) {
-                if (response.ok) {
-                    return response.json(); 
-                } else {
-                    throw new Error("Network response was not ok");
-                }
-            })
-            .then(function (responseData) {
-                console.log("POST request  successful:", responseData);
-            })
-            .catch(function (error) {
-                console.error("Fetch error", error);
-            });
-        }
-
-
-        var removeButton = document.querySelector(".remove");
-        var backButton = document.querySelector(".back");
-
-        removeButton.addEventListener("click", function () {
-            console.log("Eliminate")
-            PostRequestEliminate();
-        });
-
-        backButton.addEventListener("click", function () {
-            PostRequestCancel();
-        });
-    });
+    
 });
 
 

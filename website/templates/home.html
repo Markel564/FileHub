@@ -9,6 +9,7 @@
 
 {% block js %}
 <script src="../static/js/home.js" defer></script>
+<script src="../static/js/delete-info.js" defer></script>
 {% endblock %}
 
 {% block content %} 
@@ -21,8 +22,28 @@
   <button class="btn btn-view-invites">VIEW INVITATIONS</button>
 </div>
 
+<!-- delete-info -->
 <div id="info-container" class="hide">
+    <div id="modal-content" class="modal-content">
+      <div class="modal-row">
+        <img src="../static/images/exclamation.svg" alt="Exclamation mark" class="img-exclamation">
+      </div>
+      <div class="modal-row">
+        <h2>ARE YOU SURE YOU WANT TO DELETE THIS REPOSITORY?</h2>
+      </div>
+      <div class="modal-row">
+        <p>The contents of the repository will be lost</p>
+      </div>
+      <div class="modal-row">
+        <div class="modal-footer">
+          <button class="btn remove" id="remove">Remove</button>
+          <button class="btn back" id="back">Back</button>
+        </div>
+      </div>
+    </div>
 </div>
+
+
 
 <div class="container">
   {% if repositories %}
