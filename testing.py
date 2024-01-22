@@ -5,6 +5,7 @@ Main file for github code
 
 from github import Github
 from github import Auth
+import github
 from datetime import datetime
 from git import Repo
 import os
@@ -23,6 +24,7 @@ def initialize_github():
 def delete_repo(name):
 
     g = initialize_github()
+    print (g)
     user = g.get_user()
     repo = user.get_repo(name)
     repo.delete()

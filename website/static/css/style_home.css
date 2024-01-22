@@ -35,11 +35,11 @@
     border: none;
 }
 
-/* Hover effect for both buttons */
+
 .btn:hover {
     background-color: #a50b50; 
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); 
-  }
+}
   
   /* Styles for the search input */
   .form-control {

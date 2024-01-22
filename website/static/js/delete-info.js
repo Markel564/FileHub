@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             }
             toggleState();
+            window.location.replace("/");
         }
     })
     .catch(function (error) {

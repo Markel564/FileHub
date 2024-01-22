@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Add{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="../static/css/style_add.css">
+{% endblock %}
+
+{% block js %}
+<script src="../static/js/add.js" defer></script>
+{% endblock %}
+
+{% block content %}
+
+<div class="new_repository">
+    <div class="content">
+        <h2>NEW REPOSITORY</h2>
+        <form>
+            <div class="form-group">
+                <input type="text" id="project-name" placeholder="Project Name">
+            </div>
+            <div class="form-group">
+                <textarea id="description" placeholder="Description"></textarea>
+            </div>
+            <div class="form-group" id="path-selector">
+                <input type="text" id="local-path" placeholder="Local Path">
+                <button type="button" class="choose-btn">CHOOSE</button>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="add-readme">
+                <label for="add-readme">Add README</label>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="make-private">
+                <label for="make-private">Make private</label>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="create-btn">CREATE</button>
+                <button type="button" class="back-btn">BACK</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

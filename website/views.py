@@ -6,6 +6,7 @@ views = Blueprint('views', __name__)
 from github import Github
 from github import Auth
 from git import Repo
+import github
 
 
 @views.route('/', methods=['GET','POST'])
@@ -34,7 +35,6 @@ def home():
         
         type_message = data.get('type')
 
-        print (type_message)
 
         if type_message == "eliminate":
 
@@ -56,9 +56,25 @@ def home():
         elif type_message == "eliminate-cancel":
               
             return jsonify({"status": "ok"})
+
+        elif type_message =="add":
+            return jsonify({"status": "ok"})
+
+
             
         return jsonify({"status": "error"})
 
+@views.route('/add', methods=['GET','POST'])
+def add():
+
+    if request.method == 'GET':
+        # get the user's name and photo
+        user_id = session.get('user_id')
+        user = User.query.filter_by(id=user_id).first()
+        return render_template("add.html", user_name=user.username, avatar=user.avatar_url)
+    
+    else:
+        pass
 
 def add_user():
     with open("config.yml", 'r') as f:
@@ -136,29 +152,31 @@ def delete_repo():
     # obtain the user from the database
     user_id = session.get('user_id')
     user = User.query.filter_by(id=user_id).first()
-    
+
     if not user:
         return False
-    
-    g = Github(user.g)
-    user = g.get_user()
 
-    repo_name = session.get('repo_to_remove')
-    # search for the repo in the database
-    repo = Repository.query.filter_by(name=repo_name).first()
-    if repo is None:
+    try:
+        g = github.Github(user.g)
+        user = g.get_user()
+
+        repo_name = session.get('repo_to_remove')
+        # search for the repo in the database
+        repo = Repository.query.filter_by(name=repo_name).first()
+        if repo is None:
+            return False
+
+
+        repo = user.get_repo(repo_name)
+        repo.delete()
+
+        # delete the repo from the database
+        repo = Repository.query.filter_by(name=repo_name).first()
+        db.session.delete(repo)
+        db.session.commit()
+
+        session['repo_to_remove'] = None
+
+        return True
+    except github.GithubException as e:
         return False
-    
-
-    repo = user.get_repo(repo_name)
-    repo.delete()
-    print (f"DELETED --> {repo_name}")
-
-    # delete the repo from the database
-    repo = Repository.query.filter_by(name=repo_name).first()
-    db.session.delete(repo)
-    db.session.commit()
-
-    session['repo_to_remove'] = None
-
-    return True

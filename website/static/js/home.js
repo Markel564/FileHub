@@ -1,12 +1,10 @@
 const searchInput = document.querySelector("[data-search")
 const repositoryElements = document.querySelectorAll(".repository");
+const addRepoButton = document.querySelector("#addRepo");
 
 // function to search for a repository
 searchInput.addEventListener("input", (e) => {
-    // Obtain the names of the repositories
-    repositoryElements.forEach((element) => {
-        const repositoryName = element.querySelector("h1").textContent; 
-    });
+
 
     // Value of input
     const value = e.target.value.toLowerCase();
@@ -36,8 +34,36 @@ searchInput.addEventListener("input", (e) => {
 });
 
 
+// function to add a repository
+addRepoButton.addEventListener("click", () => {
+    // Create a POST request
+    fetch("/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ type: "add" }),
+    })
+    .then(function (response) {
+        if (response.ok) {
+            return response.json(); 
+        } else {
+            throw new Error("Network response was not ok");
+        }
+    })
+    .then(function (data) {
+        if (data.status == "ok"){
+            window.location.replace("/add");
+        }
+    })
+    .catch(function (error) {
+        console.error("Fetch error:", error);
+    });
+});
 
-// function to deleting a repository
+
+
+// function to deleting a repository (does not delete, rather shows up confirmation modal)
 document.addEventListener("DOMContentLoaded", function () {
     
 
