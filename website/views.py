@@ -7,6 +7,7 @@ from github import Github
 from github import Auth
 from git import Repo
 import github
+import os
 
 
 @views.route('/', methods=['GET','POST'])
@@ -24,6 +25,9 @@ def home():
         
         # get the user's repositories
         repositories = get_repos()
+        
+
+
         return render_template("home.html", user_name=user.username, avatar=user.avatar_url, repositories=repositories)
 
     if request.method == 'POST':
@@ -73,8 +77,53 @@ def add():
         user = User.query.filter_by(id=user_id).first()
         return render_template("add.html", user_name=user.username, avatar=user.avatar_url)
     
-    else:
-        pass
+    else: # POST
+        
+
+        data = request.get_json()  
+
+        if data is None:
+            return render_template("generic_error.html")
+        
+        type_message = data.get('type')
+
+        if type_message == "back":
+            return jsonify({"status": "ok"})
+
+        elif type_message == "create":
+            
+            print ("CREATING REPO")
+            
+            
+            project_name = data.get('projectName')
+            project_description = data.get('projectDescription')
+
+            path = data.get('path') 
+
+            isPrivate = data.get('private')
+            isReadme = data.get('readme')
+
+            # check if there are no other repos with the same name
+            repo = Repository.query.filter_by(name=project_name).first()
+            if repo is not None:
+                print ("duplicate")
+                return jsonify({"status": "errorDuplicate"})
+            
+            # check if the path is valid
+            if not os.path.isdir(path):
+                print ("invalid path")
+                return jsonify({"status": "errorPath"})
+            
+            
+
+
+
+            return jsonify({"status": "ok"})
+
+
+
+
+
 
 def add_user():
     with open("config.yml", 'r') as f:
