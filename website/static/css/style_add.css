@@ -61,10 +61,6 @@
   align-items: center;
   }
   
-#local-path + .choose-btn {
-  margin-left: 10px; 
-  white-space: nowrap; 
-}
 
 .checkbox-group {
   margin-bottom: 15px;
@@ -93,7 +89,7 @@
 }
 
 
-.back-btn:hover, .choose-btn:hover, .create-btn:hover {
+.back-btn:hover, .create-btn:hover {
     cursor: pointer;
     opacity: 0.8;
 }

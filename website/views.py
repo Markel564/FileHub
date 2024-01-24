@@ -79,7 +79,6 @@ def add():
     
     else: # POST
         
-
         data = request.get_json()  
 
         if data is None:
@@ -92,33 +91,37 @@ def add():
 
         elif type_message == "create":
             
-            print ("CREATING REPO")
+
             
-            
+
+
             project_name = data.get('projectName')
             project_description = data.get('projectDescription')
-
-            path = data.get('path') 
-
+            readme = data.get('readme')
             isPrivate = data.get('private')
-            isReadme = data.get('readme')
 
+            
             # check if there are no other repos with the same name
+            
             repo = Repository.query.filter_by(name=project_name).first()
+
+            print (repo)
             if repo is not None:
-                print ("duplicate")
                 return jsonify({"status": "errorDuplicate"})
-            
-            # check if the path is valid
-            if not os.path.isdir(path):
-                print ("invalid path")
-                return jsonify({"status": "errorPath"})
-            
-            
 
 
 
-            return jsonify({"status": "ok"})
+            ack = add_repo(project_name, project_description, readme, isPrivate)
+            
+            if ack:
+                flash("Repository created successfully", category='success')
+                return jsonify({"status": "ok"})
+
+            return jsonify({"status": "errorCreation"})
+
+
+
+            
 
 
 
@@ -145,15 +148,13 @@ def add_user():
     email = user.email
     avatar = user.avatar_url
 
+    # if not in the database, add it
     if not User.query.filter_by(id=id).first():
         print (f"Creating account for {name}")
         new_user = User(id=id, g=conf['api_token'], name=name, username=username, email=email, avatar_url=avatar)
         db.session.add(new_user)
         db.session.commit()
         get_repos()
-
-    else:
-        print (f"Account already exists for {name}")
 
 
     print (f"Authenticated as {user.login}")
@@ -229,3 +230,41 @@ def delete_repo():
         return True
     except github.GithubException as e:
         return False
+
+
+
+def add_repo(project_name, project_description, readme, isPrivate):
+    """
+    Add the repo to github account and database
+    """
+
+    user_id = session.get('user_id')
+    user = User.query.filter_by(id=user_id).first()
+
+    if not user:
+        return False
+
+    try:
+
+        g = github.Github(user.g)
+        user = g.get_user()
+
+        # create the repo
+        repo = user.create_repo(project_name, description=project_description, private=isPrivate)
+        
+
+        # add the repo to the database
+        new_repo = Repository(name=project_name, user_id=user_id)
+        db.session.add(new_repo)
+        db.session.commit()
+
+        # create the readme file
+        if readme:
+            repo.create_file("README.md", "Initial commit", "This is the initial commit", branch="main")
+            
+        return True
+    
+    except github.GithubException as e:
+        return False
+
+        

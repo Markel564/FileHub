@@ -33,52 +33,35 @@ backButton.addEventListener("click", () => {
 })
 
 
-// function to choose a directory and display the path in the input field
-chooseButton.addEventListener('click', async function() {
-    try {
-        const directoryHandle = await window.showDirectoryPicker();
-        const directoryPath = directoryHandle.name;
-        // it is not possible to display the full path for security reasons, so a relative path is displayed
-        localPathInput.value = '../' + directoryPath + "/"; //string that will be displayed in the input field
-        
-    } catch (error) {
-        console.error(error);
-    }
-});
-
 
 // function to create a new directory
-createButton.addEventListener("click", () => {
-
-    console.log("create button clicked");
-    // get the values 
+createButton.addEventListener("click", (event) => {
+    
+    event.preventDefault();
+    // get the values
     const projectName = document.querySelector("#project-name").value;
     if (projectName == ""){
         alert("Project name not selected");
         return;
     }
     const projectDescription = document.querySelector("#description").value;
-    // obtain readme (true or false)
     const readme = document.querySelector("#add-readme").checked;
     const privated = document.querySelector("#make-private").checked;
-
-    const localPath = localPathInput.value;
-    // eliminate the relative path
-    localPath = localPath.replace("../", "");
-    localPath = localPath.replace("/", "");
-    if (localPath == ""){
-        alert("Path not selected");
-        return;
-    }
+    
     fetch("/add", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ type: "create", projectName: projectName, projectDescription: projectDescription, 
-        path: localPath, readme: readme, private: privated}),
+        body: JSON.stringify({  type: "create", 
+                                projectName: projectName, 
+                                projectDescription: projectDescription, 
+                                readme: readme, 
+                                private: privated 
+                            }),
     })
     .then(function (response) {
+        console.log(response.status);
         if (response.ok) {
             return response.json(); 
         } else {
@@ -92,6 +75,9 @@ createButton.addEventListener("click", () => {
         }
         else if (data.status == "errorDuplicate"){
             alert("Project name already exists");
+        }
+        else if (data.status == "errorCreation"){
+            window.location.replace("/error");
         }
     })
     .catch(function (error) {
