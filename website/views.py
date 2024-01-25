@@ -1,15 +1,23 @@
-from flask import Blueprint, render_template, flash, request, jsonify, session, redirect, url_for
+"""
+This section contains the views of the website
+
+Each view is a function for a specific route
+
+The views are:
+
+    - home: the main page of the website where the user can see his/her repositories
+    - add: page that allows the user to add a new repository
+
+"""
+
+from flask import Blueprint, render_template, flash, request, jsonify, session, redirect
 from . import db
 from .models import User, Repository
-import yaml
 views = Blueprint('views', __name__)
-from github import Github
-from github import Auth
-from git import Repo
-import github
 import os
+from .pythonCode import add_user, get_repos, delete_repo, add_repo
 
-
+# HOME PAGE
 @views.route('/', methods=['GET','POST'])
 def home():
 
@@ -18,6 +26,7 @@ def home():
         if not add_user():  # error with the api token
             return render_template("error.html")
 
+
         
         # get the user from the database
         user_id = session.get('user_id')
@@ -25,31 +34,34 @@ def home():
         
         # get the user's repositories
         repositories = get_repos()
+
+        if not repositories:
+            return render_template("error.html")
         
-
-
+        # render template with the user's name, photo and repositories
         return render_template("home.html", user_name=user.username, avatar=user.avatar_url, repositories=repositories)
 
     if request.method == 'POST':
 
-        data = request.get_json()  # Get JSON data from the request
+        data = request.get_json()  # Get JSON data from the request (done through js)
         
-        if data is None:
-            return render_template("generic_error.html")
+        if data is None: # if no data was sent
+            return jsonify({"status": "error"})
         
         type_message = data.get('type')
 
 
         if type_message == "eliminate":
-
-            repo_name = data.get('repo_name')
+            
+            # we save the repo name to delete it later
+            repo_name = data.get('repo_name') 
             session['repo_to_remove'] = repo_name
-            # LUEGO DE ELIMINAR EL REPO, QUITARLO DE LA BASE DE DATOS
+
             return jsonify({"status": "ok"})
 
         elif type_message == "eliminate-confirm":
 
-            
+            # delete the repository
             ack = delete_repo()
 
             if ack:
@@ -58,16 +70,18 @@ def home():
             return jsonify({"status": "error"})
 
         elif type_message == "eliminate-cancel":
-              
+            
+            # js handles cancelation (just eliminates the pop screen)
             return jsonify({"status": "ok"})
 
         elif type_message =="add":
+
+            # js handles the redirection to /add
             return jsonify({"status": "ok"})
 
-
-            
         return jsonify({"status": "error"})
 
+# ADD page
 @views.route('/add', methods=['GET','POST'])
 def add():
 
@@ -87,14 +101,13 @@ def add():
         type_message = data.get('type')
 
         if type_message == "back":
+
+            # js handles the redirection to /
             return jsonify({"status": "ok"})
 
         elif type_message == "create":
             
-
-            
-
-
+            # get the data from the POST request
             project_name = data.get('projectName')
             project_description = data.get('projectDescription')
             readme = data.get('readme')
@@ -102,15 +115,12 @@ def add():
 
             
             # check if there are no other repos with the same name
-            
             repo = Repository.query.filter_by(name=project_name).first()
 
-            print (repo)
             if repo is not None:
                 return jsonify({"status": "errorDuplicate"})
 
-
-
+            # create the repo
             ack = add_repo(project_name, project_description, readme, isPrivate)
             
             if ack:
@@ -121,150 +131,7 @@ def add():
 
 
 
-            
 
 
-
-
-
-
-def add_user():
-    with open("config.yml", 'r') as f:
-        conf = yaml.load(f, Loader=yaml.SafeLoader)
-
-    try:
-        auth = Auth.Token(conf['api_token'])
-        g = Github(auth=auth, base_url="https://api.github.com")
-
-    except:
-        return False
-
-    id = g.get_user().id
-    session['user_id'] = id
-    user = g.get_user()
-    
-    name = user.name
-    username = user.login
-    email = user.email
-    avatar = user.avatar_url
-
-    # if not in the database, add it
-    if not User.query.filter_by(id=id).first():
-        print (f"Creating account for {name}")
-        new_user = User(id=id, g=conf['api_token'], name=name, username=username, email=email, avatar_url=avatar)
-        db.session.add(new_user)
-        db.session.commit()
-        get_repos()
-
-
-    print (f"Authenticated as {user.login}")
-
-    return True
-
-
-def get_repos():
-    """
-    Get all the repos of the authenticated user
-
-    returns a list with the names of the repos
-    """
-    # obtain the user from the database
-    user_id = session.get('user_id')
-    user = User.query.filter_by(id=user_id).first()
-
-    g = Github(user.g)
-
-    
-
-    user = g.get_user()
-    repos = user.get_repos()
-
-    repositories = []
-    for repo in repos:
-        repositories.append(repo.name)
-
-    # add the repositories to the db
-    for repo in repositories:
-        if not Repository.query.filter_by(name=repo).first():
-            print (f"ADDED --> {repo}")
-            new_repo = Repository(name=repo, user_id=user_id)
-            db.session.add(new_repo)
-            db.session.commit()
-    
-    return repositories
-
-
-def delete_repo():
-    """
-    Delete the repo from the github account and from the database
-    """
-
-    # obtain the user from the database
-    user_id = session.get('user_id')
-    user = User.query.filter_by(id=user_id).first()
-
-    if not user:
-        return False
-
-    try:
-        g = github.Github(user.g)
-        user = g.get_user()
-
-        repo_name = session.get('repo_to_remove')
-        # search for the repo in the database
-        repo = Repository.query.filter_by(name=repo_name).first()
-        if repo is None:
-            return False
-
-
-        repo = user.get_repo(repo_name)
-        repo.delete()
-
-        # delete the repo from the database
-        repo = Repository.query.filter_by(name=repo_name).first()
-        db.session.delete(repo)
-        db.session.commit()
-
-        session['repo_to_remove'] = None
-
-        return True
-    except github.GithubException as e:
-        return False
-
-
-
-def add_repo(project_name, project_description, readme, isPrivate):
-    """
-    Add the repo to github account and database
-    """
-
-    user_id = session.get('user_id')
-    user = User.query.filter_by(id=user_id).first()
-
-    if not user:
-        return False
-
-    try:
-
-        g = github.Github(user.g)
-        user = g.get_user()
-
-        # create the repo
-        repo = user.create_repo(project_name, description=project_description, private=isPrivate)
-        
-
-        # add the repo to the database
-        new_repo = Repository(name=project_name, user_id=user_id)
-        db.session.add(new_repo)
-        db.session.commit()
-
-        # create the readme file
-        if readme:
-            repo.create_file("README.md", "Initial commit", "This is the initial commit", branch="main")
-            
-        return True
-    
-    except github.GithubException as e:
-        return False
 
         
