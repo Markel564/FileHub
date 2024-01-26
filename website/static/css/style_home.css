@@ -41,14 +41,14 @@
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); 
 }
   
-  /* Styles for the search input */
-  .form-control {
-    border: 2px solid #ccc; /* Adds border to the input */
-    border-radius: 5px; /* Rounded corners for the input */
-    padding: 5px 10px; /* Padding inside the input */
-    margin-right: 10px; /* Adds margin to the right of the input */
-    width: 21vw;
-  }
+
+.form-control {
+  border: 2px solid #ccc; 
+  border-radius: 5px; 
+  padding: 5px 10px; 
+  margin-right: 10px; 
+  width: 21vw;
+}
 
 
 .container{
@@ -56,6 +56,7 @@
     background-color: #4e4050;
     border-radius: 50px;
     padding: 30px;
+    margin-bottom: 30px;
 }
 
 
@@ -69,6 +70,11 @@
     margin: 30px auto;
     border-radius: 25px;
     background-color: #d9d9d9;
+}
+
+.repository:hover{
+    cursor: pointer;
+    opacity: 0.8;
 }
 
 
