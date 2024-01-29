@@ -50,7 +50,7 @@
   {% if repositories %}
     {% for repository in repositories %}
         <div class="repository" data-repo-name="{{ repository }}">
-            <h1>{{ repository }}</h1>    
+            <h1 class="repository-name">{{ repository }}</h1>    
             <img src="../static/images/trash-bin.svg" alt="Delete repository" class="delete-repo">    
         </div>
     {% endfor %}

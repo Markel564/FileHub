@@ -79,7 +79,10 @@ def home():
             # js handles the redirection to /add
             return jsonify({"status": "ok"})
 
+
         return jsonify({"status": "error"})
+
+
 
 # ADD page
 @views.route('/add', methods=['GET','POST'])
@@ -128,8 +131,40 @@ def add():
                 return jsonify({"status": "ok"})
 
             return jsonify({"status": "errorCreation"})
+        
+        
 
 
+# REPO page
+@views.route('/repo', methods=['GET','POST'])
+def repo():
+
+    if request.method == 'GET':
+        
+        data = request.get_json()
+
+        type_message = data.get('type')
+
+        if type_message == "repo":
+            repo = data.get('repo_name')
+            
+            # check if the repo exists
+            repo_to_check = Repository.query.filter_by(name=repo).first()
+
+            if repo_to_check is None:
+                return jsonify({"status": "errorNoRepo"})
+
+            
+            # get the user's name and photo
+            user_id = session.get('user_id')
+            user = User.query.filter_by(id=user_id).first()
+            
+            return render_template("repo.html", repo=repo, user_name=user.username, avatar=user.avatar_url)
+    
+    else:
+
+        pass
+            
 
 
 

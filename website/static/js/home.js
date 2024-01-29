@@ -1,6 +1,7 @@
 const searchInput = document.querySelector("[data-search")
 const repositoryElements = document.querySelectorAll(".repository");
 const addRepoButton = document.querySelector("#addRepo");
+const repositories = document.querySelectorAll('.repository-name');
 
 // function to search for a repository
 searchInput.addEventListener("input", (e) => {
@@ -118,3 +119,31 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+
+
+// function to move to the repository page
+repositories.forEach(repository => {
+    repository.addEventListener("click", () => {
+        // obtain the repository name
+        const repositoryName = repository.textContent.trim();
+        fetch("/repo", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({type: "repo", repo_name: repositoryName }),
+        })
+        .then(function (response) {
+            if (response.ok) {
+                return response.json(); 
+            } else {
+                throw new Error("Network response was not ok");
+            }
+        }).then(function (data) {
+            console.log(data)
+            if (data.status == "ok"){
+                window.location.replace("/repo");
+            }
+        })
+    });
+  });
