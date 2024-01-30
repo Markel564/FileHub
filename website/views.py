@@ -39,7 +39,7 @@ def home():
             return render_template("error.html")
         
         # render template with the user's name, photo and repositories
-        return render_template("home.html", user_name=user.username, avatar=user.avatar_url, repositories=repositories)
+        return render_template("home.html", header_name=user.username, avatar=user.avatar_url, repositories=repositories)
 
     if request.method == 'POST':
 
@@ -79,6 +79,17 @@ def home():
             # js handles the redirection to /add
             return jsonify({"status": "ok"})
 
+        elif type_message == "repo":
+            
+            session.pop('repo_to_view', None) # delete the old repo to view
+            
+            session['repo_to_view'] = data.get('repo_name')
+            repo_to_check = Repository.query.filter_by(name=session['repo_to_view']).first()
+
+            if repo_to_check is None:
+                return jsonify({"status": "errorNoRepo"})
+            
+            return jsonify({"status": "ok"})
 
         return jsonify({"status": "error"})
 
@@ -92,7 +103,7 @@ def add():
         # get the user's name and photo
         user_id = session.get('user_id')
         user = User.query.filter_by(id=user_id).first()
-        return render_template("add.html", user_name=user.username, avatar=user.avatar_url)
+        return render_template("add.html", header_name=user.username, avatar=user.avatar_url)
     
     else: # POST
         
@@ -141,25 +152,16 @@ def repo():
 
     if request.method == 'GET':
         
-        data = request.get_json()
+        repoName = session.get('repo_to_view')
 
-        type_message = data.get('type')
-
-        if type_message == "repo":
-            repo = data.get('repo_name')
+        if repoName is None:
+            return render_template("generic_error.html")
+        
+        # get the user's name and photo
+        user_id = session.get('user_id')
+        user = User.query.filter_by(id=user_id).first()
             
-            # check if the repo exists
-            repo_to_check = Repository.query.filter_by(name=repo).first()
-
-            if repo_to_check is None:
-                return jsonify({"status": "errorNoRepo"})
-
-            
-            # get the user's name and photo
-            user_id = session.get('user_id')
-            user = User.query.filter_by(id=user_id).first()
-            
-            return render_template("repo.html", repo=repo, user_name=user.username, avatar=user.avatar_url)
+        return render_template("repo.html", repo=repoName, header_name=repoName, avatar=user.avatar_url)
     
     else:
 

@@ -126,8 +126,8 @@ repositories.forEach(repository => {
     repository.addEventListener("click", () => {
         // obtain the repository name
         const repositoryName = repository.textContent.trim();
-        fetch("/repo", {
-            method: "GET",
+        fetch("/", {
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
