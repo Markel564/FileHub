@@ -80,3 +80,13 @@
     width: 80px;
     height: 80px;
 }
+
+
+
+.container{
+  width: 60vw;
+  background-color: #4e4050;
+  border-radius: 50px;
+  padding: 30px;
+  margin-bottom: 30px;
+}

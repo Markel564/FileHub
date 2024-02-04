@@ -50,7 +50,8 @@ def add_repo(project_name, project_description, readme, isPrivate=False):
         # create the readme file with default text
         if readme:
             repo.create_file("README.md", "Initial commit", "New Repository Created!", branch="main")
-            
+        
+        g.close()
         return True
     
     except github.GithubException as e:

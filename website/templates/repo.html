@@ -33,6 +33,24 @@
     </button>
 </div>
 
+<div class = container>
 
+    {% if folders %}
+        
+    {% endif %}
+
+    {% if files %}
+        
+    {% endif %}
+
+    {% if not folders and not files %}
+        <div class="alert alert-info" role="alert">
+            <strong>Info!</strong> This repository is empty.
+        </div>
+    {% endif %}
+     
+
+
+</div>
 
 {% endblock %}

@@ -58,4 +58,5 @@ def add_user():
 
     print (f"Authenticated as {user.login}")
 
+    g.close()
     return True

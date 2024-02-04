@@ -36,6 +36,7 @@ def delete_repo():
         repo = Repository.query.filter_by(name=repo_name).first()
         # if the repository is not in the database, return False
         if repo is None:
+            g.close()
             return False
 
         # delete the repo from the user's github account
@@ -50,6 +51,7 @@ def delete_repo():
         # remove the repo to be deleted from the session
         session['repo_to_remove'] = None
         
+        g.close()
         return True
     except github.GithubException as e:
         return False

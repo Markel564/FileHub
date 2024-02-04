@@ -54,4 +54,5 @@ def get_repos():
         
         return False
     
+    g.close()
     return repositories

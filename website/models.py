@@ -25,6 +25,34 @@ class Repository(db.Model):
     path = db.Column(db.String(255), nullable=True, unique=True)
     isCloned = db.Column(db.Boolean, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    files = db.relationship('File', backref='repository', lazy=True)
+    folders = db.relationship('Folder', backref='repository', lazy=True)
     # comits, branches, pulls??
     # files, folders
+
+class Folder(db.Model):
+    name = db.Column(db.String(100), primary_key=True)
+    repository_name = db.Column(db.String(100), db.ForeignKey('repository.name'), nullable=False)
+    repository = db.relationship('Repository', backref='folders', lazy=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', backref='folders', lazy=True)
+    files = db.relationship('File', backref='folder', lazy=True)
+    last_updated = db.Column(db.DateTime(timezone=True), nullable=False, default=func.now())
+    folder_father = db.Column(db.String(100), db.ForeignKey('folder.name'), nullable=True)
+    folders = db.relationship('Folder', backref='folder', lazy=True)
+
+
+
+class File(db.Model):
+    name = db.Column(db.String(100), primary_key=True)
+    # path = db.Column(db.String(255), nullable=False)
+    repository_name = db.Column(db.String(100), db.ForeignKey('repository.name'), nullable=False)
+    repository = db.relationship('Repository', backref='files', lazy=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', backref='files', lazy=True)
+    folder_name = db.Column(db.String(100), db.ForeignKey('folder.name'), nullable=True)
+    folder = db.relationship('Folder', backref='files', lazy=True)
+    last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
+
+
 

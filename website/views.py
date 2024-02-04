@@ -15,7 +15,7 @@ from . import db
 from .models import User, Repository
 views = Blueprint('views', __name__)
 import os
-from .pythonCode import add_user, get_repos, delete_repo, add_repo
+from .pythonCode import add_user, get_repos, delete_repo, add_repo, get_files_and_folders
 
 # HOME PAGE
 @views.route('/', methods=['GET','POST'])
@@ -160,8 +160,15 @@ def repo():
         # get the user's name and photo
         user_id = session.get('user_id')
         user = User.query.filter_by(id=user_id).first()
-            
-        return render_template("repo.html", repo=repoName, header_name=repoName, avatar=user.avatar_url)
+
+        files, folders = get_files_and_folders(repoName)
+
+        print (files, folders)
+        if not files and not folders:
+            return render_template("error.html")
+
+        files, folders = None, None
+        return render_template("repo.html", repo=repoName, header_name=repoName, avatar=user.avatar_url, files=files, folders=folders)
     
     else:
 
