@@ -19,7 +19,7 @@ def get_files_and_folders(repoName):
     try:
 
         # authenticate the user
-        g = github.Github(user.g)
+        g = github.Github(user.githubG)
         user = g.get_user()
 
         # get the repo

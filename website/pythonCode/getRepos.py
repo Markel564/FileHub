@@ -28,25 +28,21 @@ def get_repos():
     try:
 
         # authenticate the user
-        g = Github(user.g)
+        g = Github(user.githubG)
 
 
         user = g.get_user()
         # get the user's repos (do not mistake with the function get_repos() used to get the repos from the database)!
         # This one is from the github api to obtain the repos from the user's account
-        repos = user.get_repos()
+        repositories = user.get_repos()
 
-        # create a list with the names of the repos
-        repositories = []
-        for repo in repos:
-            repositories.append(repo.name)
 
         # add the repositories to the db
         for repo in repositories:
             # if one repository from GitHub account is not in the database, add it
-            if not Repository.query.filter_by(name=repo).first():
+            if not Repository.query.filter_by(name=repo.name).first():
                 print (f"ADDED --> {repo} to db")
-                new_repo = Repository(name=repo, user_id=user_id)
+                new_repo = Repository(name=repo.name, lastUpdated=repo.updated_at)
                 db.session.add(new_repo)
                 db.session.commit()
     

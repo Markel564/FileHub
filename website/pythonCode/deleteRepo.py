@@ -27,7 +27,7 @@ def delete_repo():
 
     try:
         # authenticate the user
-        g = github.Github(user.g)
+        g = github.Github(user.githubG)
         user = g.get_user()
 
         # get the repo to be deleted previously saved in the session
