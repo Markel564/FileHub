@@ -86,13 +86,13 @@ def home():
             
             session.pop('repo_to_view', None) # delete the old repo to view
             
-            session['repo_to_view'] = data.get('repo_name')
-            repo_to_check = Repository.query.filter_by(name=session['repo_to_view']).first()
+            repoName = data.get('repo_name')
+            repo_to_check = Repository.query.filter_by(name=repoName).first()
 
             if repo_to_check is None:
                 return jsonify({"status": "errorNoRepo"})
             
-            return jsonify({"status": "ok"})
+            return jsonify({"status": "ok", "repoName": repoName})
 
         return jsonify({"status": "error"})
 
@@ -150,12 +150,11 @@ def add():
 
 
 # REPO page
-@views.route('/repo', methods=['GET','POST'])
-def repo():
+@views.route('/<repoName>', methods=['GET','POST'])
+def repo(repoName):
 
     if request.method == 'GET':
         
-        repoName = session.get('repo_to_view')
 
         if repoName is None:
             return render_template("generic_error.html")
