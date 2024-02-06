@@ -140,6 +140,7 @@ repositories.forEach(repository => {
                 throw new Error("Network response was not ok");
             }
         }).then(function (data) {
+            repoName = data.repoName;
             if (data.status == "ok"){
                 window.location.replace(repoName);
             }

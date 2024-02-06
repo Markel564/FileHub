@@ -16,6 +16,7 @@ from .models import User, Repository
 views = Blueprint('views', __name__)
 import os
 from .pythonCode import add_user, get_repos, delete_repo, add_repo, load_files_and_folders, get_files_and_folders
+from datetime import datetime
 
 # HOME PAGE
 @views.route('/', methods=['GET','POST'])
@@ -170,9 +171,13 @@ def repo(repoName):
 
         files, folders = get_files_and_folders(repoName)
 
-        print (f"FILES: {files}")
-        print (f"FOLDERS: {folders}")
-        return render_template("repo.html", repo=repoName, header_name=repoName, avatar=user.avatarUrl, files=files, folders=folders)
+        last_updated = Repository.query.filter_by(name=repoName).first().lastUpdated
+        
+        #  change the date format to a more readable one
+        last_updated = reformat_date(last_updated)
+
+
+        return render_template("repo.html", repo=repoName, header_name=repoName, avatar=user.avatarUrl, files=files, folders=folders, last_updated=last_updated)
     
     else:
 
@@ -180,6 +185,78 @@ def repo(repoName):
             
 
 
+def reformat_date(last_updated):
 
+    # if the date is None, return None
+    if last_updated is None:
+        return None
+
+    # if the date is None, return None
+    if last_updated is None:
+        return None
+    
+    # if the number of years is +1, return years
+    if (datetime.now() - last_updated).days > 365:
+        years = round((datetime.now() - last_updated).days // 365, 0)
+        if years == 1:
+            return "1 year ago"
+        return str(years) + " years ago"
+
+    # if the number of months is +1, return months
+    elif (datetime.now() - last_updated).days > 30:
+        months = round((datetime.now() - last_updated).days // 30, 0)
+        if months == 1:
+            return "1 month ago"
+        return str(months) + " months ago"
+
+    # if the number of weeks is +1, return weeks
+    elif (datetime.now() - last_updated).days > 7:
+        weeks = round((datetime.now() - last_updated).days // 7, 0)
+        if weeks == 1:
+            return "1 week ago"
+        return str(weeks) + " weeks ago"
+
+    # if the number of days is +1, return days
+    elif (datetime.now() - last_updated).days > 1:
+        days = round((datetime.now() - last_updated).days, 0)
+        if days == 1:
+            return "1 day ago"
+        return str(days) + " days ago"
+
+    # if the number of hours is +1, return hours
+    elif (datetime.now() - last_updated).seconds > 3600:
+        hours = round((datetime.now() - last_updated).seconds // 3600, 0)
+        if hours == 1:
+            return "1 hour ago"
+        return str(hours) + " hours ago"
+
+    # if the number of minutes is +1, return minutes
+    elif (datetime.now() - last_updated).seconds > 60:
+        minutes = round((datetime.now() - last_updated).seconds // 60, 0)
+        if minutes == 1:
+            return "1 minute ago"
+        return str(minutes) + " minutes ago"
+    
+    else:
+        seconds = round((datetime.now() - last_updated).seconds, 0)
+        if seconds == 1:
+            return "1 second ago"
+        return str(seconds) + " seconds ago"
+    
+    
+
+
+    
+    
+        
+
+    
+ 
+    
+    
+        
+    
+
+        
 
             
