@@ -1,14 +1,26 @@
-"""
-Main file for github code
-
-"""
-
 from github import Github
 from github import Auth
 import github
 from datetime import datetime
 from git import Repo
 import os
+
+
+from sqlalchemy import create_engine, MetaData
+
+engine = create_engine('sqlite:///database.db', echo=True)
+
+metadata = MetaData()
+metadata.reflect(bind=engine)
+
+def see_database():
+
+    for table in metadata.tables.values():
+        print(f"Table: {table.name}")
+        for foreign_key in table.foreign_keys:
+            print(f"  - Foreign Key: {foreign_key}")
+        for column in table.columns:
+            print(f"  - Column: {column.name}, Type: {column.type}")
 
 def initialize_github():
     # returns a Github object
@@ -21,15 +33,29 @@ def initialize_github():
 
 
 
-def delete_repo(name):
-
+def see_repo(name, path="", parent_folder=""):
     g = initialize_github()
-    print (g)
     user = g.get_user()
     repo = user.get_repo(name)
-    repo.delete()
-    print (f"REPO {name} DELETED")
+    
+    # Get the contents of the current path within the repo
+    contents = repo.get_contents(path)
 
+    for content in contents:
+        if content.type == "dir":
+            # Get the name of the directory
+            directory_name = content.name
+
+            # Determine the full path of the directory
+            full_path = content.path
+
+
+            # Print the directory name and its parent folder
+            print(f"Directory: {directory_name}, Path: {full_path}")
+
+            # Recursively call see_repo for the subdirectory
+            see_repo(name, path=full_path, parent_folder=directory_name)
+    
     return True
 
     
@@ -37,4 +63,5 @@ def delete_repo(name):
 if __name__ == "__main__":
     
 
-    delete_repo("test")
+    # see_repo("IoT_project")
+    see_database()

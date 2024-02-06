@@ -10,6 +10,7 @@ from github import Github, Auth
 import github
 import yaml
 from flask import session
+from .getRepos import get_repos
 
 
 def add_user():
@@ -31,8 +32,10 @@ def add_user():
 
     except:
         # if the user is not authenticated, return False
+        print ("SOSOOSOOS")
         return False
 
+    
     # get the user's information
     id = g.get_user().id
     # save the user's id in the session
@@ -43,13 +46,15 @@ def add_user():
     name = user.name
     username = user.login
     email = user.email
-    avatar = user.avatarUrl
+    avatar = user.avatar_url
 
+    
     # if user is not in the database (first time loading website), we add it
     if not User.query.filter_by(id=id).first():
+        
         print (f"Creating account for {name}")
         # add user to database
-        new_user = User(id=id, githubG=conf['api_token'], name=name, username=username, email=email, avatar_url=avatar)
+        new_user = User(id=id, githubG=conf['api_token'], name=name, username=username, email=email, avatarUrl=avatar)
         db.session.add(new_user)
         db.session.commit()
         # load the user's repos to the database

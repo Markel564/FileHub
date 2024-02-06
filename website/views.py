@@ -15,7 +15,7 @@ from . import db
 from .models import User, Repository
 views = Blueprint('views', __name__)
 import os
-from .pythonCode import add_user, get_repos, delete_repo, add_repo, get_files_and_folders
+from .pythonCode import add_user, get_repos, delete_repo, add_repo, load_files_and_folders, get_files_and_folders
 
 # HOME PAGE
 @views.route('/', methods=['GET','POST'])
@@ -23,9 +23,12 @@ def home():
 
     if request.method == 'GET':
 
+        
         if not add_user():  # error with the api token
+            
             return render_template("error.html")
 
+        
 
         
         # get the user from the database
@@ -39,7 +42,7 @@ def home():
             return render_template("error.html")
         
         # render template with the user's name, photo and repositories
-        return render_template("home.html", header_name=user.username, avatar=user.avatar_url, repositories=repositories)
+        return render_template("home.html", header_name=user.username, avatar=user.avatarUrl, repositories=repositories)
 
     if request.method == 'POST':
 
@@ -103,7 +106,7 @@ def add():
         # get the user's name and photo
         user_id = session.get('user_id')
         user = User.query.filter_by(id=user_id).first()
-        return render_template("add.html", header_name=user.username, avatar=user.avatar_url)
+        return render_template("add.html", header_name=user.username, avatar=user.avatarUrl)
     
     else: # POST
         
@@ -161,14 +164,16 @@ def repo():
         user_id = session.get('user_id')
         user = User.query.filter_by(id=user_id).first()
 
+        if not load_files_and_folders(repoName):
+            return jsonify({"status": "error"})
+
+    
+
         files, folders = get_files_and_folders(repoName)
 
-        print (files, folders)
-        if not files and not folders:
-            return render_template("error.html")
-
-        files, folders = None, None
-        return render_template("repo.html", repo=repoName, header_name=repoName, avatar=user.avatar_url, files=files, folders=folders)
+        print (f"FILES: {files}")
+        print (f"FOLDERS: {folders}")
+        return render_template("repo.html", repo=repoName, header_name=repoName, avatar=user.avatarUrl, files=files, folders=folders)
     
     else:
 

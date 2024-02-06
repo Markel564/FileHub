@@ -45,10 +45,28 @@ def get_repos():
                 new_repo = Repository(name=repo.name, lastUpdated=repo.updated_at)
                 db.session.add(new_repo)
                 db.session.commit()
+
+        # if all of a sudden there is a repo deleted from the github account,
+        # we delete it from the database as well
+        # repos = Repository.query.all()
+        # # print (f"REPOS IN DB: {repos}")
+        # for repo in repos:
+        #     print (f"REPO: {repo.name}")
+        #     # see if the repo is in the user's account
+        #     response = user.get_repo(repo.name)
+
+        #     if response.status_code == 404: # if the repo is not in the user's account
+        #                                     # that means it has been deleted
+        #         print (f"DELETED --> {repo.name} from db")
+        #         db.session.delete(repo)
+        #         db.session.commit()
+        #         continue
+        # close the connection
+        
+        g.close()
+        repo_names = [repo.name for repo in repositories]
+        return repo_names
     
     except github.GithubException as e:
-        
+        print (f"Error: {e}")
         return False
-    
-    g.close()
-    return repositories
