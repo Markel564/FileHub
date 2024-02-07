@@ -40,27 +40,37 @@ def load_files_and_folders(repoName):
         # get the contents of the repo
 
         contents = repo.get_contents("")
+    
 
-        files = []
-        folders = []
 
         for content_file in contents:
             if content_file.type == "file":
-                files.append(content_file.name)
+ 
 
                 # add the file to the database associated with the repository
 
                 # the id of the file is added automatically by the database
-                file = File(name=content_file.name, sha=content_file.sha ,repository_name=repoName, lastUpdated=datetime.strptime(content_file.last_modified, '%a, %d %b %Y %H:%M:%S %Z'))
-                db.session.add(file)
+                # check if there is a file in that folder with the same name
+
+                file = File.query.filter_by(name=content_file.name, repository_name=repoName).first()
+
+                if not file: # if the file is not in the database, add it
+                    file = File(name=content_file.name, sha=content_file.sha ,repository_name=repoName, lastUpdated=datetime.strptime(content_file.last_modified, '%a, %d %b %Y %H:%M:%S %Z'))
+                
+                    db.session.add(file)
 
 
             else:
-                folders.append(content_file.name)
-
+                
+                
                 # add the folder to the database associated with the repository
-                folder = Folder(name=content_file.name, sha=content_file.sha, repository_name=repoName, lastUpdated=datetime.strptime(content_file.last_modified, '%a, %d %b %Y %H:%M:%S %Z'))
-                db.session.add(folder)
+
+                # before adding the folder, check if it is already in the database (in the same directory)
+                folder = Folder.query.filter_by(name=content_file.name, repository_name=repoName).first()
+
+                if not folder: # if the folder is not in the database, add it
+                    folder = Folder(name=content_file.name, sha=content_file.sha, repository_name=repoName, lastUpdated=datetime.strptime(content_file.last_modified, '%a, %d %b %Y %H:%M:%S %Z'))
+                    db.session.add(folder)
 
         db.session.commit()
 
@@ -89,5 +99,8 @@ def get_files_and_folders(repoName, father_dir=None):
     # we keep the names of the files and folders
     files = [file.name for file in files]
     folders = [folder.name for folder in folders]
+
+
+    
     return files, folders
 

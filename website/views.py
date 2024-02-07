@@ -84,9 +84,7 @@ def home():
             return jsonify({"status": "ok"})
 
         elif type_message == "repo":
-            
-            session.pop('repo_to_view', None) # delete the old repo to view
-            
+                        
             repoName = data.get('repo_name')
             repo_to_check = Repository.query.filter_by(name=repoName).first()
 
@@ -151,12 +149,12 @@ def add():
 
 
 # REPO page
-@views.route('/<repoName>', methods=['GET','POST'])
+@views.route('/repo/<repoName>', methods=['GET','POST'])
 def repo(repoName):
 
     if request.method == 'GET':
         
-
+        print ("Hola carola")
         if repoName is None:
             return render_template("generic_error.html")
         
@@ -164,7 +162,8 @@ def repo(repoName):
         user_id = session.get('user_id')
         user = User.query.filter_by(id=user_id).first()
 
-        if not load_files_and_folders(repoName):
+        if not load_files_and_folders(repoName): # if there is an error with loading the files and folders
+            
             return jsonify({"status": "error"})
 
     
@@ -176,7 +175,7 @@ def repo(repoName):
         #  change the date format to a more readable one
         last_updated = reformat_date(last_updated)
 
-
+        
         return render_template("repo.html", repo=repoName, header_name=repoName, avatar=user.avatarUrl, files=files, folders=folders, last_updated=last_updated)
     
     else:

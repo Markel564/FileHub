@@ -4,7 +4,7 @@ import github
 from datetime import datetime
 from git import Repo
 import os
-
+from .website.models import User, Repository, Folder, File
 
 from sqlalchemy import create_engine, MetaData
 
@@ -58,10 +58,19 @@ def see_repo(name, path="", parent_folder=""):
     
     return True
 
-    
+
+def get_content(repoName):
+
+    # search for the repo in the db and get all the folders associated with it
+    folders = Folder.query.filter_by(repository_name=repoName).all()
+
+    print ("folders: ", folders)
+
+
 
 if __name__ == "__main__":
     
 
     # see_repo("IoT_project")
-    see_database()
+    # see_database()
+    get_content("Dam2_project")

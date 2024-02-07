@@ -35,8 +35,15 @@
 <br />
 <div class = container>
 
+    <h1>Last Updated: {{last_updated}}</h1>
+
     {% if folders %}
-        
+    {% for folder in folders %}
+        <div class="content-box" name="{{ folder }}">
+            <img src="../static/images/folder.svg" class="img-content"> 
+            <h1">{{ folder }}</h1>        
+        </div>
+    {% endfor %}
     {% endif %}
 
     {% if files %}
