@@ -1,3 +1,5 @@
+
+
 .top-options {
     display: flex;
     align-items: center;
@@ -133,6 +135,7 @@
 .content-box:hover{
   cursor: pointer;
   opacity: 0.8;
+  border: 2px solid black;
 }
 
 .content-box h1{

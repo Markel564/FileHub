@@ -12,6 +12,8 @@ import github
 import yaml
 from flask import session
 from datetime import datetime
+import pytz
+from tzlocal import get_localzone
 
 def load_files_and_folders(repoName):
 
@@ -28,24 +30,28 @@ def load_files_and_folders(repoName):
     if not user:
         return False
     
+    
     try:
 
         # authenticate the user
         g = github.Github(user.githubG)
+
         user = g.get_user()
+
 
         # get the repo
         repo = user.get_repo(repoName)
 
         # get the contents of the repo
-
         contents = repo.get_contents("")
-    
-
+      
+        files, folders = [], []
 
         for content_file in contents:
+            
             if content_file.type == "file":
- 
+                
+                
 
                 # add the file to the database associated with the repository
 
@@ -55,11 +61,25 @@ def load_files_and_folders(repoName):
                 file = File.query.filter_by(name=content_file.name, repository_name=repoName).first()
 
                 if not file: # if the file is not in the database, add it
-                    file = File(name=content_file.name, sha=content_file.sha ,repository_name=repoName, lastUpdated=datetime.strptime(content_file.last_modified, '%a, %d %b %Y %H:%M:%S %Z'))
-                
+
+                    # given that there is an issue with last_modified attribute (see https://github.com/PyGithub/PyGithub/issues/629)
+                    # we will see the most recent commit of the file and get the last modified date from there
+
+                    commits = repo.get_commits(path=content_file.path)
+                    last_commit = commits[0]
+                    last_modified = datetime.strptime(last_commit.last_modified, '%a, %d %b %Y %H:%M:%S %Z')
+
+                    # convert it to own timezone
+                    gmt = pytz.timezone('GMT')
+                    last_modified_gmt = gmt.localize(last_modified)
+                    timezone = get_localzone()
+                    last_modified = last_modified_gmt.astimezone(timezone)
+                    file = File(name=content_file.name, sha=content_file.sha ,repository_name=repoName, lastUpdated=last_modified)
+                    print ("file added -->", file.name, file.lastUpdated)
                     db.session.add(file)
 
 
+                files.append(content_file.name)
             else:
                 
                 
@@ -69,9 +89,35 @@ def load_files_and_folders(repoName):
                 folder = Folder.query.filter_by(name=content_file.name, repository_name=repoName).first()
 
                 if not folder: # if the folder is not in the database, add it
-                    folder = Folder(name=content_file.name, sha=content_file.sha, repository_name=repoName, lastUpdated=datetime.strptime(content_file.last_modified, '%a, %d %b %Y %H:%M:%S %Z'))
+
+                    commits = repo.get_commits(path=content_file.path)
+                    last_commit = commits[0]
+                    last_modified = datetime.strptime(last_commit.last_modified, '%a, %d %b %Y %H:%M:%S %Z')
+                    # convert it to own timezone
+                    gmt = pytz.timezone('GMT')
+                    last_modified_gmt = gmt.localize(last_modified)
+                    timezone = get_localzone()
+                    last_modified = last_modified_gmt.astimezone(timezone)
+                    folder = Folder(name=content_file.name, sha=content_file.sha, repository_name=repoName, lastUpdated=last_modified)
                     db.session.add(folder)
 
+                
+                folders.append(content_file.name)
+        
+        files_in_db = File.query.filter_by(repository_name=repoName).all()
+        folders_in_db = Folder.query.filter_by(repository_name=repoName).all()
+
+        if len(files_in_db) > len(files):
+            for file in files_in_db:
+                if file.name not in files:
+                    db.session.delete(file)
+                    print ("file deleted -->", file.name)
+        
+        if len(folders_in_db) > len(folders):
+            for folder in folders_in_db:
+                if folder.name not in folders:
+                    db.session.delete(folder)
+                    print ("folder deleted -->", folder.name)
         db.session.commit()
 
         g.close()
@@ -80,6 +126,7 @@ def load_files_and_folders(repoName):
         
     
     except github.GithubException as e:
+        print (e)
         return False
 
 

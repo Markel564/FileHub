@@ -4,14 +4,8 @@ import github
 from datetime import datetime
 from git import Repo
 import os
-from .website.models import User, Repository, Folder, File
 
 from sqlalchemy import create_engine, MetaData
-
-engine = create_engine('sqlite:///database.db', echo=True)
-
-metadata = MetaData()
-metadata.reflect(bind=engine)
 
 def see_database():
 
@@ -61,16 +55,21 @@ def see_repo(name, path="", parent_folder=""):
 
 def get_content(repoName):
 
-    # search for the repo in the db and get all the folders associated with it
-    folders = Folder.query.filter_by(repository_name=repoName).all()
+    g = initialize_github()
 
-    print ("folders: ", folders)
+    user = g.get_user()
 
+    repo = user.get_repo(repoName)
+
+    contents = repo.get_contents("")
+
+    for content in contents:
+
+        if content.type == "file":
+            print(f"File: {content.name}, last modified: {content.last_modified}")
 
 
 if __name__ == "__main__":
     
 
-    # see_repo("IoT_project")
-    # see_database()
-    get_content("Dam2_project")
+    get_content("example")
