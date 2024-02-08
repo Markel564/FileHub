@@ -154,7 +154,6 @@ def repo(repoName):
 
     if request.method == 'GET':
         
-        print ("Hola carola")
         if repoName is None:
             return render_template("generic_error.html")
         
@@ -170,6 +169,12 @@ def repo(repoName):
 
         files, folders = get_files_and_folders(repoName)
 
+        for file in files:
+            file[1] = reformat_date(file[1])
+        
+        for folder in folders:
+            folder[1] = reformat_date(folder[1])
+
         last_updated = Repository.query.filter_by(name=repoName).first().lastUpdated
         
         #  change the date format to a more readable one
@@ -180,7 +185,17 @@ def repo(repoName):
     
     else:
 
-        pass
+        data = request.get_json()  
+        
+        if data is None: # if no data was sent
+            return jsonify({"status": "error"})
+        
+        type_message = data.get('type')
+        
+
+        if type_message == "back":
+
+            return jsonify({"status": "ok"})
             
 
 
@@ -199,7 +214,7 @@ def reformat_date(last_updated):
         years = round((datetime.now() - last_updated).days // 365, 0)
         if years == 1:
             return "1 year ago"
-        return str(years) + " years ago"
+        return str(years) + "years ago"
 
     # if the number of months is +1, return months
     elif (datetime.now() - last_updated).days > 30:
@@ -212,14 +227,14 @@ def reformat_date(last_updated):
     elif (datetime.now() - last_updated).days > 7:
         weeks = round((datetime.now() - last_updated).days // 7, 0)
         if weeks == 1:
-            return "1 week ago"
+            return "last week"
         return str(weeks) + " weeks ago"
 
     # if the number of days is +1, return days
     elif (datetime.now() - last_updated).days > 1:
         days = round((datetime.now() - last_updated).days, 0)
         if days == 1:
-            return "1 day ago"
+            return "yesterday"
         return str(days) + " days ago"
 
     # if the number of hours is +1, return hours

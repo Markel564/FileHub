@@ -96,9 +96,9 @@ def get_files_and_folders(repoName, father_dir=None):
         files = File.query.filter_by(repository_name=repoName, folder_id=None).all()
         folders = Folder.query.filter_by(repository_name=repoName, fatherFolder_id=None).all()
     
-    # we keep the names of the files and folders
-    files = [file.name for file in files]
-    folders = [folder.name for folder in folders]
+    # we keep the names of the file and folders as well as the last updated date
+    files = [[file.name, file.lastUpdated] for file in files]
+    folders = [[folder.name, folder.lastUpdated] for folder in folders]
 
 
     

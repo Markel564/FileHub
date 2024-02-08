@@ -32,32 +32,38 @@
         <img src="../static/images/refresh2.svg" alt="Refresh" class="img-refresh">
     </button>
 </div>
+
 <br />
-<div class = container>
 
+<div class="container">
     <h1>Last Updated: {{last_updated}}</h1>
+    <div class="grid-container"> 
+        {% if folders %}
+        {% for folder in folders %}
+            <div class="content-box" name="{{ folder[0] }}">
+                <img src="../static/images/folder.svg" class="img-content"> 
+                <h1>{{ folder[0] }}</h1> 
+                <h2>{{ folder[1] }}</h2>       
+            </div>
+        {% endfor %}
+        {% endif %}
 
-    {% if folders %}
-    {% for folder in folders %}
-        <div class="content-box" name="{{ folder }}">
-            <img src="../static/images/folder.svg" class="img-content"> 
-            <h1">{{ folder }}</h1>        
-        </div>
-    {% endfor %}
-    {% endif %}
-
-    {% if files %}
-        
-    {% endif %}
+        {% if files %}
+        {% for file in files %}
+            <div class="content-box" name="{{ file[0] }}">
+                <img src="../static/images/file-regular.svg" class="img-content"> 
+                <h1>{{ file[0] }}</h1>     
+                <h2>{{ file[1] }}</h2>   
+            </div>
+        {% endfor %}
+        {% endif %}
+    </div> 
 
     {% if not folders and not files %}
         <div class="alert alert-info" role="alert">
             <strong>Info!</strong> This repository is empty.
         </div>
     {% endif %}
-     
-
-
 </div>
 
 {% endblock %}
