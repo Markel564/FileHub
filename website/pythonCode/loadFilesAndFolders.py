@@ -45,12 +45,11 @@ def load_files_and_folders(repoName):
         # get the contents of the repo
         contents = repo.get_contents("")
       
-        files, folders = [], []
+        files, folders, lastupdates = [], [], []
 
         for content_file in contents:
             
             if content_file.type == "file":
-                
                 
 
                 # add the file to the database associated with the repository
@@ -66,18 +65,23 @@ def load_files_and_folders(repoName):
                     # we will see the most recent commit of the file and get the last modified date from there
 
                     commits = repo.get_commits(path=content_file.path)
-                    last_commit = commits[0]
-                    last_modified = datetime.strptime(last_commit.last_modified, '%a, %d %b %Y %H:%M:%S %Z')
+                    last_commit = commits[0].commit.author.date
+                    
 
+                    last_commit = last_commit.replace(tzinfo=None)   
                     # convert it to own timezone
                     gmt = pytz.timezone('GMT')
-                    last_modified_gmt = gmt.localize(last_modified)
+                    last_modified_gmt = gmt.localize(last_commit)
                     timezone = get_localzone()
                     last_modified = last_modified_gmt.astimezone(timezone)
+                    print ("LM2 -->", last_modified)
                     file = File(name=content_file.name, sha=content_file.sha ,repository_name=repoName, lastUpdated=last_modified)
                     print ("file added -->", file.name, file.lastUpdated)
                     db.session.add(file)
 
+                    # the last updated date of the repository will be the last updated date of the file
+                    repository = Repository.query.filter_by(name=repoName).first()
+                    repository.lastUpdated = last_modified
 
                 files.append(content_file.name)
             else:
@@ -91,19 +95,32 @@ def load_files_and_folders(repoName):
                 if not folder: # if the folder is not in the database, add it
 
                     commits = repo.get_commits(path=content_file.path)
-                    last_commit = commits[0]
-                    last_modified = datetime.strptime(last_commit.last_modified, '%a, %d %b %Y %H:%M:%S %Z')
+                    last_commit = commits[0].commit.author.date
+                    
+
+                    
+                    last_commit = last_commit.replace(tzinfo=None)   
                     # convert it to own timezone
                     gmt = pytz.timezone('GMT')
-                    last_modified_gmt = gmt.localize(last_modified)
+                    last_modified_gmt = gmt.localize(last_commit)
                     timezone = get_localzone()
                     last_modified = last_modified_gmt.astimezone(timezone)
+                    
                     folder = Folder(name=content_file.name, sha=content_file.sha, repository_name=repoName, lastUpdated=last_modified)
                     db.session.add(folder)
 
+                    # the last updated date of the repository will be the last updated date of the file
+                    repository = Repository.query.filter_by(name=repoName).first()
+                    repository.lastUpdated = last_modified
                 
                 folders.append(content_file.name)
+
+        # change the last updated for a repository to the last modified date any file/folder
         
+    
+
+
+        # eliminate the files and folders that are not in the github repository
         files_in_db = File.query.filter_by(repository_name=repoName).all()
         folders_in_db = Folder.query.filter_by(repository_name=repoName).all()
 

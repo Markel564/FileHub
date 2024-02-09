@@ -175,6 +175,37 @@
 
 
 
+.no-results{
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 25px; 
+  background-color: #1a1a1d;
+  width: 50vw; 
+  margin: 30px auto;
+  border-radius: 25px;
+  background-color: #d9d9d9;
+
+}
+.no-results h1 {
+  flex: 1; 
+  margin-bottom: 30px; 
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1a1a1d;
+}
+.img-no-results{
+  height: 100px;
+  width: auto;
+}
+
+/* for non-searched elements dissapear */
+.hide {
+  display: none;
+}
+
+
 /* for smaller sceens*/
 @media (max-width: 1200px) {
   .grid-container {

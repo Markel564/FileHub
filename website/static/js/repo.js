@@ -1,4 +1,6 @@
 const backButton = document.querySelector("#backButton");
+const searchInput = document.querySelector("[data-search");
+const filesAndFolders = document.querySelectorAll(".content-box");
 var repoName = document.title;
 
 // function to go back to home page
@@ -28,3 +30,32 @@ backButton.addEventListener("click", () => {
     });
 
 })
+
+
+
+// function to search for a folder or file
+searchInput.addEventListener("input", (e) => {
+
+    // Value of input
+    const value = e.target.value.toLowerCase();
+
+    filesAndFolders.forEach((element) => {
+
+        // Check if the folder or file name contains the value of the input
+        const isVisible = element.querySelector("h1").textContent.toLowerCase().includes(value);
+
+        // If the folder or file name does not contain the value of the input, hide it
+        element.classList.toggle("hide", !isVisible);
+    });
+
+    // if there are no files or folders, display the div 'no-results'
+    const numberOfVisibleFilesAndFolders = document.querySelectorAll(".content-box:not(.hide)").length;
+    const noResultsDiv = document.querySelector(".no-results");
+    console.log(numberOfVisibleFilesAndFolders);
+    if (numberOfVisibleFilesAndFolders === 0) {
+        noResultsDiv.style.display = "flex";
+    } else {
+        noResultsDiv.style.display = "none";
+    }
+
+});

@@ -6,7 +6,6 @@ const repositories = document.querySelectorAll('.repository-name');
 // function to search for a repository
 searchInput.addEventListener("input", (e) => {
 
-
     // Value of input
     const value = e.target.value.toLowerCase();
     

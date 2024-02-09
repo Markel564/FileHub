@@ -206,9 +206,10 @@ def reformat_date(last_updated):
     if last_updated is None:
         return None
 
-    # if the date is None, return None
-    if last_updated is None:
-        return None
+    # Sometimes, datetime.now() is delayed by a few seconds. In case that this happens
+    # we will return 'just now' if the difference is less than 60 seconds
+    if (datetime.now() - last_updated).total_seconds() < 0:
+        return "just now"
     
     # if the number of years is +1, return years
     if (datetime.now() - last_updated).days > 365:
@@ -239,7 +240,7 @@ def reformat_date(last_updated):
         return str(days) + " days ago"
 
     # if the number of hours is +1, return hours
-    elif (datetime.now() - last_updated).seconds > 3600:
+    elif (datetime.now() - last_updated).total_seconds() > 3600:
         hours = round((datetime.now() - last_updated).seconds // 3600, 0)
         if hours == 1:
             return "1 hour ago"
@@ -255,7 +256,7 @@ def reformat_date(last_updated):
     else:
         seconds = round((datetime.now() - last_updated).seconds, 0)
         if seconds == 1:
-            return "1 second ago"
+            return "just now"
         return str(seconds) + " seconds ago"
     
     
