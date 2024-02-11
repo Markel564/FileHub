@@ -39,6 +39,7 @@ class Folder(db.Model):
     sha = db.Column(db.String(40), nullable=False, unique=False)
     repository_name = db.Column(db.String(100), db.ForeignKey('repository.name'), nullable=False)
     lastUpdated = db.Column(db.DateTime(timezone=True), nullable=False, default=func.now())
+    modified = db.Column(db.Boolean, default=True, nullable=False)
     fatherFolder_id = db.Column(db.Integer, db.ForeignKey('folder.id'), nullable=True) # folder where the folder is located
 
     folder_files = db.relationship('File', backref='belonging_folder', lazy=True) # files in the folder
@@ -50,6 +51,7 @@ class File(db.Model):
     path = db.Column(db.String(255), nullable=True)
     sha = db.Column(db.String(40), nullable=False, unique=False)
     lastUpdated = db.Column(db.DateTime(timezone=True), default=func.now())
+    modified = db.Column(db.Boolean, default=True, nullable=False)
     repository_name = db.Column(db.String(100), db.ForeignKey('repository.name'), nullable=False)
 
     folder_id = db.Column(db.Integer, db.ForeignKey('folder.id'), nullable=True) # folder where the file is located 

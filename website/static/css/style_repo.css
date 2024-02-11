@@ -115,14 +115,13 @@
   justify-items: center; 
 }
 
-.content-box{
+.content-box, .content-box-new{
   height: 220px;
   width: 220px;
   display: flex;
   flex-direction: column; 
   align-items: center; 
   padding: 25px; 
-  background-color: #d9d9d9;
   margin-bottom: 30px;
   border-radius: 25px;
   transition: opacity 0.3s ease; 
@@ -132,13 +131,20 @@
 }
 
 
-.content-box:hover{
+.content-box{
+  background-color: #d9d9d9;
+}
+
+.content-box-new{
+  background-color: green;
+}
+.content-box:hover, .content-box-new:hover{
   cursor: pointer;
   opacity: 0.8;
   border: 2px solid black;
 }
 
-.content-box h1{
+.content-box h1, .content-box-new h1{
   color: black;
   font-size: 1.5rem;
   font-weight: bold;
@@ -150,7 +156,7 @@
   max-width: 90%;
 }
 
-.content-box h2{
+.content-box h2, .content-box-new h2{
   color: black;
   font-size: 1.2rem;
   font-weight: bold;
