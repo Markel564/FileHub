@@ -13,6 +13,7 @@ from flask import session
 from .getRepos import get_repos
 
 
+
 def add_user():
     """
     input: none
@@ -32,7 +33,6 @@ def add_user():
 
     except:
         # if the user is not authenticated, return False
-        print ("SOSOOSOOS")
         return False
 
     
@@ -65,3 +65,5 @@ def add_user():
 
     g.close()
     return True
+
+

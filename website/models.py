@@ -51,7 +51,7 @@ class File(db.Model):
     path = db.Column(db.String(255), nullable=True)
     sha = db.Column(db.String(40), nullable=False, unique=False)
     lastUpdated = db.Column(db.DateTime(timezone=True), default=func.now())
-    modified = db.Column(db.Boolean, default=True, nullable=False)
+    modified = db.Column(db.Boolean, default=True, nullable=False) # necessary?
     repository_name = db.Column(db.String(100), db.ForeignKey('repository.name'), nullable=False)
 
     folder_id = db.Column(db.Integer, db.ForeignKey('folder.id'), nullable=True) # folder where the file is located 

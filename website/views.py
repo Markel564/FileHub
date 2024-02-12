@@ -12,7 +12,7 @@ The views are:
 
 from flask import Blueprint, render_template, flash, request, jsonify, session, redirect
 from . import db
-from .models import User, Repository
+from .models import User, Repository, Folder, File
 views = Blueprint('views', __name__)
 import os
 from .pythonCode import add_user, get_repos, delete_repo, add_repo, load_files_and_folders, get_files_and_folders
@@ -193,10 +193,41 @@ def repo(repoName):
         
         type_message = data.get('type')
         
-
         if type_message == "back":
 
             return jsonify({"status": "ok"})
+
+        elif type_message == "open":
+
+            folder = data.get('folder')
+
+            if folder is None:
+                return jsonify({"status": "error"})
+            
+            # see all the folders in the repository
+            folders = Folder.query.filter_by(repository_name=repoName).all()
+
+            print (folders)
+            print ("FOLDER:", folder)
+            if folder not in [f.name for f in folders]:
+                return jsonify({"status": "error"})
+
+            return jsonify({"status": "ok"})
+
+
+@views.route('/repo/<repoName>/<path>', methods=['GET','POST'])
+def folder(repoName, path):
+
+    if request.method == 'GET':
+        
+        if repoName is None or path is None:
+            return render_template("generic_error.html")
+        
+        if path == None:
+            return redirect(f"/repo/{repoName}")
+        
+        return render_template("folder.html", repo=repoName, path=path)
+            
             
 
 

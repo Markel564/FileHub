@@ -2,6 +2,8 @@ const backButton = document.querySelector("#backButton");
 const searchInput = document.querySelector("[data-search");
 const filesAndFolders = document.querySelectorAll(".content-box");
 var repoName = document.title;
+const folders = document.querySelectorAll("#folder");
+
 
 // function to go back to home page
 backButton.addEventListener("click", () => {
@@ -58,4 +60,35 @@ searchInput.addEventListener("input", (e) => {
         noResultsDiv.style.display = "none";
     }
 
+});
+
+
+// function to open a folder
+folders.forEach(folder => {
+    folder.addEventListener("click", () => {
+        const folderName = folder.querySelector("h1").textContent;
+        fetch("/repo/"+repoName, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ type: "open", folder: folderName }),
+        })
+        .then(function (response) {
+            if (response.ok) {
+                return response.json(); 
+            } else {
+                throw new Error("Network response was not ok");
+            }
+        })
+        .then(function (data) {
+            console.log(data);
+            if (data.status == "ok"){
+                window.location.replace("/repo/"+repoName+"/"+folderName);
+            }
+        })
+        .catch(function (error) {
+            console.error("Fetch error:", error);
+        });
+    });
 });
