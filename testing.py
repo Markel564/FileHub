@@ -69,7 +69,22 @@ def get_content(repoName):
             print(f"File: {content.name}, last modified: {content.last_modified}")
 
 
+def see_path(repoName, path):
+
+    g = initialize_github()
+
+    user = g.get_user()
+
+    repo = user.get_repo(repoName)
+
+    contents = repo.get_contents(path)
+
+    for content in contents:
+
+        print (content.name, content.path)
+
+    
 if __name__ == "__main__":
     
 
-    get_content("example")
+    see_path("Dam2_project","/notebooks/markel's/models")

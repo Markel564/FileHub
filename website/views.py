@@ -149,11 +149,16 @@ def add():
 
 
 # REPO page
-@views.route('/repo/<repoName>', methods=['GET','POST'])
-def repo(repoName):
+@views.route('/repo/<path:subpath>', methods=['GET','POST'])
+def repo(subpath):
+    # the path could be the name of the repository or a folder path such as 'repoName/folder1/folder2'
+    repoName = subpath.split("/")[0]
 
     if request.method == 'GET':
         
+
+        
+
         if repoName is None:
             return render_template("generic_error.html")
         
@@ -161,30 +166,43 @@ def repo(repoName):
         user_id = session.get('user_id')
         user = User.query.filter_by(id=user_id).first()
 
-        if not load_files_and_folders(repoName): # if there is an error with loading the files and folders
+        if len(subpath.split("/")) == 1:
+            if not load_files_and_folders(repoName): # if there is an error with loading the files and folders
+                
+                return jsonify({"status": "error"})
+
+        
+
+            files, folders = get_files_and_folders(repoName)
+
+            for file in files:
+                file[1] = reformat_date(file[1])
+                
             
-            return jsonify({"status": "error"})
+            for folder in folders:
+                folder[1] = reformat_date(folder[1])
+
+            last_updated = Repository.query.filter_by(name=repoName).first().lastUpdated
+            
+            #  change the date format to a more readable one
+            last_updated = reformat_date(last_updated)
+
+            
+            return render_template("repo.html", repo=repoName, avatar=user.avatarUrl, files=files, folders=folders, last_updated=last_updated)
+
+        else: # we are in a folder
+            
+            # get load the files and folders in the folder path
+            user_id = session.get('user_id')
+            user = User.query.filter_by(id=user_id).first()
 
     
 
-        files, folders = get_files_and_folders(repoName)
-
-        for file in files:
-            file[1] = reformat_date(file[1])
+            return render_template("repo.html")
             
-        
-        for folder in folders:
-            folder[1] = reformat_date(folder[1])
 
-        last_updated = Repository.query.filter_by(name=repoName).first().lastUpdated
-        
-        #  change the date format to a more readable one
-        last_updated = reformat_date(last_updated)
 
-        
-        return render_template("repo.html", repo=repoName, header_name=repoName, avatar=user.avatarUrl, files=files, folders=folders, last_updated=last_updated)
-    
-    else:
+    else: # POST
 
         data = request.get_json()  
         
@@ -211,24 +229,9 @@ def repo(repoName):
             print ("FOLDER:", folder)
             if folder not in [f.name for f in folders]:
                 return jsonify({"status": "error"})
-
             return jsonify({"status": "ok"})
 
 
-@views.route('/repo/<repoName>/<path>', methods=['GET','POST'])
-def folder(repoName, path):
-
-    if request.method == 'GET':
-        
-        if repoName is None or path is None:
-            return render_template("generic_error.html")
-        
-        if path == None:
-            return redirect(f"/repo/{repoName}")
-        
-        return render_template("folder.html", repo=repoName, path=path)
-            
-            
 
 
 def reformat_date(last_updated):
