@@ -153,7 +153,7 @@ def add():
 def repo(subpath):
     # the path could be the name of the repository or a folder path such as 'repoName/folder1/folder2'
     repoName = subpath.split("/")[0]
-
+    print (f"Subpath is {subpath}, repoName is {repoName}")
     if request.method == 'GET':
         
 
@@ -202,10 +202,18 @@ def repo(subpath):
             if not load_files_and_folders(repoName, directory[0]): # if there is an error with loading the files and folders
                 return jsonify({"status": "error"})
             
-            print ("Searching for files and folders in: ", directory[0] + "/")
             files, folders = get_files_and_folders(repoName, repoName + "/" + directory[0]+'/')
 
-            return render_template("repo.html", repo=directory[0], header_name=subpath, avatar=user.avatarUrl, files=files, folders=folders)
+            for file in files:
+                file[1] = reformat_date(file[1])
+            
+            for folder in folders:
+                folder[1] = reformat_date(folder[1])
+
+            last_updated = Folder.query.filter_by(repository_name=repoName, path=repoName + "/" + directory[0]).first().lastUpdated
+            last_updated = reformat_date(last_updated)
+
+            return render_template("repo.html", repo=directory[0], header_name=subpath, avatar=user.avatarUrl, files=files, folders=folders, last_updated=last_updated)
             
 
 
@@ -225,13 +233,18 @@ def repo(subpath):
         elif type_message == "open":
 
             folder = data.get('folder')
-
+            folder_path = data.get('folderPath')
+            print (f"folder: {folder}, folderPath: {folder_path}, repoName: {repoName}")
             if folder is None:
                 return jsonify({"status": "error"})
             
             # see all the folders in the repository
-            folders = Folder.query.filter_by(repository_name=repoName).all()
+            folders = Folder.query.filter_by(repository_name=repoName, folderPath=folder_path).all()
 
+            for f in folders:
+                print ("Folder is", f.name)
+
+    
             if folder not in [f.name for f in folders]:
                 return jsonify({"status": "error"})
             return jsonify({"status": "ok"})

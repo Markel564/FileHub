@@ -24,7 +24,17 @@ backButton.addEventListener("click", () => {
     })
     .then(function (data) {
         if (data.status == "ok"){
-            window.history.back();
+            // eliminate the last folder from the path
+            var path = window.location.pathname.split("/");
+            path.pop();
+            path = path.join("/");
+            console.log(path);
+            if (path == "/repo"){
+                window.location.replace("/");
+            }
+            else
+            window.location.replace(path);
+
         }
     })
     .catch(function (error) {
@@ -65,16 +75,24 @@ searchInput.addEventListener("input", (e) => {
 
 // function to open a folder
 folders.forEach(folder => {
+    
     folder.addEventListener("click", () => {
         const folderName = folder.querySelector("h1").textContent;
+        console.log(folderName)
+        let Path = window.location.pathname + "/";
+        // eliminate "/repo/" from the folder path which is the first 6 characters
+        let folderPath = Path.substring(6);
+        console.log(folderPath);
+
         fetch("/repo/"+repoName, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ type: "open", folder: folderName }),
+            body: JSON.stringify({ type: "open", folder: folderName, folderPath: folderPath }),
         })
         .then(function (response) {
+            console.log(response)
             if (response.ok) {
                 return response.json(); 
             } else {

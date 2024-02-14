@@ -96,7 +96,7 @@ def load_files_and_folders(repoName, path=""):
                     else:
                         file.modified = False
 
-                    print (f"File {content_file.name} checked (already in db)")
+                    print (f"File {content_file.name} with path {str(repoName+'/'+content_file.path)} already in db...")
                     lastupdates.append(file.lastUpdated)
 
 
@@ -124,7 +124,7 @@ def load_files_and_folders(repoName, path=""):
 
                     lastupdates.append(last_modified)
                     # the last updated date of the repository will be the last updated date of the file
-                    print (f"Folder {content_file.name} with {str(repoName+'/'+content_file.path)} added to db")
+                    print (f"Folder {content_file.name} with {str(repoName+'/'+content_file.path)} and folderPath {folder_path} added to db")
 
                 
 
@@ -144,7 +144,7 @@ def load_files_and_folders(repoName, path=""):
                         folder.modified = False
                     lastupdates.append(folder.lastUpdated)
 
-                    print (f"Folder {content_file.name} checked (already in db)")
+                    print (f"Folder {content_file.name} with path {str(repoName+'/'+content_file.path)} already in db...")
 
                 folders.append(content_file.name)
 
@@ -154,19 +154,22 @@ def load_files_and_folders(repoName, path=""):
         repository.lastUpdated = max(lastupdates)
 
         # eliminate the files and folders that are not in the github repository
-        files_in_db = File.query.filter_by(repository_name=repoName).all()
-        folders_in_db = Folder.query.filter_by(repository_name=repoName).all()
+        files_in_db = File.query.filter_by(repository_name=repoName, path=str(repoName+'/'+content_file.path)).all()
+        folders_in_db = Folder.query.filter_by(repository_name=repoName, path=str(repoName+'/'+content_file.path)).all()
 
         if len(files_in_db) > len(files):
             for file in files_in_db:
                 if file.name not in files:
+                    print ("DELETED")
                     db.session.delete(file)
         
         if len(folders_in_db) > len(folders):
             for folder in folders_in_db:
                 if folder.name not in folders:
+                    print ("DELETED")
                     db.session.delete(folder)
 
+        
         db.session.commit()
 
         g.close()
