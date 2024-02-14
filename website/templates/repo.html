@@ -4,11 +4,12 @@
 {% block title %}{{repo}}{% endblock %}
 
 {% block styles %}
-<link rel="stylesheet" href="../static/css/style_repo.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_repo.css') }}">
+
 {% endblock %}
 
 {% block js %}
-<script src="../static/js/repo.js" defer></script>
+<script src="{{ url_for('static', filename='js/repo.js') }}" defer></script>
 {% endblock %}
 
 {% block content %}
@@ -19,7 +20,7 @@
     <div class="buttons-left">
         <button class="btn btn-back" id="backButton">
             <span>
-                <img src="../static/images/arrow-left2.svg" alt="back-arrow" class="img-back">
+                <img src="{{ url_for('static', filename='images/arrow-left2.svg')}}" alt="back-arrow" class="img-back">
                 BACK
             </span>
         </button>
@@ -29,7 +30,7 @@
     </div>
     
     <button class="btn btn-refresh" id="refresh">
-        <img src="../static/images/refresh2.svg" alt="Refresh" class="img-refresh">
+        <img src="{{ url_for('static', filename='images/refresh2.svg')}}" alt="refresh" class="img-refresh">
     </button>
 </div>
 
@@ -42,13 +43,13 @@
         {% for folder in folders %}
             {% if folder[2] == True %}
             <div class="content-box-new" name="{{ folder[0] }}" id="folder">
-                <img src="../static/images/folder.svg" class="img-content"> 
+                <img src=" {{ url_for('static', filename='images/folder.svg')}}" class="img-content"> 
                 <h1>{{ folder[0] }}</h1> 
                 <h2>{{ folder[1] }}</h2>       
             </div>
             {% else %}
             <div class="content-box" name="{{ folder[0] }}" id="folder">
-                <img src="../static/images/folder.svg" class="img-content"> 
+                <img src="{{url_for('static', filename='images/folder.svg')}}" class="img-content">
                 <h1>{{ folder[0] }}</h1> 
                 <h2>{{ folder[1] }}</h2>       
             </div>
@@ -60,13 +61,13 @@
         {% for file in files %}
             {% if file[2] == True %}
             <div class="content-box-new" name="{{ file[0] }}">
-                <img src="../static/images/file-regular.svg" class="img-content"> 
+                <img src="{{url_for('static', filename='images/file-regular.svg')}}" class="img-content">
                 <h1>{{ file[0] }}</h1>     
                 <h2>{{ file[1] }}</h2>   
             </div>
             {% else %}
             <div class="content-box" name="{{ file[0] }}">
-                <img src="../static/images/file-regular.svg" class="img-content"> 
+                <img src="{{url_for('static', filename='images/file-regular.svg')}}" class="img-content">
                 <h1>{{ file[0] }}</h1>     
                 <h2>{{ file[1] }}</h2>   
             </div>
@@ -77,13 +78,13 @@
 
     {% if not folders and not files %}
         <div class="alert alert-info" role="alert">
-            <strong>Info!</strong> This repository is empty.
+            <strong>Info!</strong> No folders or files found.
         </div>
     {% endif %}
 
     <div class="no-results">
         <h1>No results found</h1>
-        <img src="../static/images/sad-face.svg" alt="No results found" class="img-no-results">
+        <img src="{{ url_for('static', filename='images/sad-face.svg')}}" alt="No results found" class="img-no-results">
      </div>
 
 </div>

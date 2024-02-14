@@ -57,40 +57,40 @@ def load_files_and_folders(repoName, path=""):
                 # the id of the file is added automatically by the database
                 # check if there is a file in that folder with the same name
     
-                file = File.query.filter_by(name=content_file.name, repository_name=repoName, path=str(repoName+'/'+path+'/'+content_file.name)).first() 
+                file = File.query.filter_by(name=content_file.name, repository_name=repoName, path=str(repoName+'/'+content_file.path)).first() 
                 
                 if not file: # if the file is not in the database, add it
-
                     # given that there is an issue with last_modified attribute (see https://github.com/PyGithub/PyGithub/issues/629)
                     # we will see the most recent commit of the file and get the last modified date from there
 
                     last_modified = get_last_modified(content_file.path, repo)
+                    
+                    # the folder path is the path of the file without the file name
+                    folder_path = repoName + '/' + content_file.path.split(content_file.name)[0]
 
-                    file = File(name=content_file.name, sha=content_file.sha ,repository_name=repoName, lastUpdated=last_modified, modified=True, path=str(repoName+'/'+content_file.path))
+                    file = File(name=content_file.name, sha=content_file.sha ,repository_name=repoName, lastUpdated=last_modified, 
+                    modified=True, path=str(repoName+'/'+content_file.path), folderPath=folder_path)
 
                     db.session.add(file)
 
                     # to keep track of the last updated date of the repository
                     lastupdates.append(last_modified)
 
-                    print (f"File {content_file.name} with path {str('/'+content_file.path)} added to db")
+                    print (f"File {content_file.name} with path {str(repoName+'/'+content_file.path)} added to db")
 
                 
 
                 else: # if the file is already in db, check if it has been updated and change modified to True if it has
 
-                    commits = repo.get_commits(path=content_file.path)
-                    last_commit = commits[0].commit.author.date
-
-                    last_commit_utc = last_commit.astimezone(pytz.utc).replace(tzinfo=None)
+                    last_commit_utc = get_last_modified(content_file.path, repo)
                     last_commit_str = last_commit_utc.strftime("%Y-%m-%d %H:%M:%S")
 
                     file_last_updated_utc = file.lastUpdated.replace(tzinfo=None).strftime("%Y-%m-%d %H:%M:%S")
 
-
                     if file_last_updated_utc != last_commit_str: # if the file has been updated
                         file.modified = True
                         file.lastUpdated = last_commit_utc
+
 
 
                     else:
@@ -107,33 +107,33 @@ def load_files_and_folders(repoName, path=""):
                 # add the folder to the database associated with the repository
 
                 # before adding the folder, check if it is already in the database (in the same directory)
-                folder = Folder.query.filter_by(name=content_file.name, repository_name=repoName, path=str(repoName+'/'+path+'/'+content_file.name)).first()
+                folder = Folder.query.filter_by(name=content_file.name, repository_name=repoName, path=str(repoName+'/'+content_file.path)).first()
 
                 if not folder: # if the folder is not in the database, add it
 
                     last_modified = get_last_modified(content_file.path, repo)
-                    
-                    folder = Folder(name=content_file.name, sha=content_file.sha, repository_name=repoName, lastUpdated=last_modified, modified=True, path=str(repoName+'/'+ content_file.path) ) 
+
+                    # the folder path is the path of the folder without the folder name
+                    folder_path = repoName + '/' + content_file.path.split(content_file.name)[0]
+
+                    folder = Folder(name=content_file.name, sha=content_file.sha, repository_name=repoName, 
+                    lastUpdated=last_modified, modified=True, path=str(repoName+'/'+ content_file.path), folderPath=folder_path) 
                     db.session.add(folder)
 
                     # to keep track of the last updated date of the repository
 
                     lastupdates.append(last_modified)
                     # the last updated date of the repository will be the last updated date of the file
-                    print (f"Folder {content_file.name} with {str('/'+content_file.path)} added to db")
+                    print (f"Folder {content_file.name} with {str(repoName+'/'+content_file.path)} added to db")
 
                 
 
                 else: # if the folder is already in db, check if it has been updated and change modified to True if it has
-
-                    commits = repo.get_commits(path=content_file.path)
-                    last_commit = commits[0].commit.author.date
-
-                    last_commit_utc = last_commit.astimezone(pytz.utc).replace(tzinfo=None)
+                    
+                    last_commit = get_last_modified(content_file.path, repo)
                     last_commit_str = last_commit.strftime("%Y-%m-%d %H:%M:%S")
 
                     folder_last_updated_utc = folder.lastUpdated.replace(tzinfo=None).strftime("%Y-%m-%d %H:%M:%S")
-
 
                     if folder_last_updated_utc != last_commit_str:
                         folder.modified = True
@@ -151,7 +151,6 @@ def load_files_and_folders(repoName, path=""):
         repository = Repository.query.filter_by(name=repoName).first()
 
         # update the last updated date of the repository
-
         repository.lastUpdated = max(lastupdates)
 
         # eliminate the files and folders that are not in the github repository
@@ -180,17 +179,15 @@ def load_files_and_folders(repoName, path=""):
 
 
 
-def get_files_and_folders(repoName, father_dir=None):
+def get_files_and_folders(repoName, father_dir):
 
     # get the files and folders from the database
     user_id = session.get('user_id')
 
-    if father_dir:
-        files = File.query.filter_by(repository_name=repoName, folder_id=father_dir).all()
-        folders = Folder.query.filter_by(repository_name=repoName, fatherFolder_id=father_dir).all()
-    else:
-        files = File.query.filter_by(repository_name=repoName, folder_id=None).all()
-        folders = Folder.query.filter_by(repository_name=repoName, fatherFolder_id=None).all()
+
+    files = File.query.filter_by(repository_name=repoName, folderPath=father_dir).all()
+    folders = Folder.query.filter_by(repository_name=repoName, folderPath=father_dir).all()
+    
     
     # we keep the names of the file and folders as well as the last updated date
     files = [[file.name, file.lastUpdated, file.modified] for file in files]
@@ -214,6 +211,8 @@ def get_last_modified(path, repo):
     timezone = get_localzone()
     last_modified = last_modified_gmt.astimezone(timezone)
     
+    # remove timezone info
+    last_modified = last_modified.replace(tzinfo=None)
     return last_modified
 
 

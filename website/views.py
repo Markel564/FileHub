@@ -173,7 +173,7 @@ def repo(subpath):
 
         
 
-            files, folders = get_files_and_folders(repoName)
+            files, folders = get_files_and_folders(repoName, repoName +'/')
 
             for file in files:
                 file[1] = reformat_date(file[1])
@@ -188,7 +188,7 @@ def repo(subpath):
             last_updated = reformat_date(last_updated)
 
             
-            return render_template("repo.html", repo=repoName, avatar=user.avatarUrl, files=files, folders=folders, last_updated=last_updated)
+            return render_template("repo.html", repo=repoName, header_name=repoName ,avatar=user.avatarUrl, files=files, folders=folders, last_updated=last_updated)
 
         else: # we are in a folder
             
@@ -196,9 +196,16 @@ def repo(subpath):
             user_id = session.get('user_id')
             user = User.query.filter_by(id=user_id).first()
 
-    
+            # obtain the directory from the path
+            directory = subpath.split("/")[1:]
 
-            return render_template("repo.html")
+            if not load_files_and_folders(repoName, directory[0]): # if there is an error with loading the files and folders
+                return jsonify({"status": "error"})
+            
+            print ("Searching for files and folders in: ", directory[0] + "/")
+            files, folders = get_files_and_folders(repoName, repoName + "/" + directory[0]+'/')
+
+            return render_template("repo.html", repo=directory[0], header_name=subpath, avatar=user.avatarUrl, files=files, folders=folders)
             
 
 
@@ -225,8 +232,6 @@ def repo(subpath):
             # see all the folders in the repository
             folders = Folder.query.filter_by(repository_name=repoName).all()
 
-            print (folders)
-            print ("FOLDER:", folder)
             if folder not in [f.name for f in folders]:
                 return jsonify({"status": "error"})
             return jsonify({"status": "ok"})

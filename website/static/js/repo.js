@@ -5,7 +5,7 @@ var repoName = document.title;
 const folders = document.querySelectorAll("#folder");
 
 
-// function to go back to home page
+// function to go back to one page before
 backButton.addEventListener("click", () => {
 
     fetch("/repo/"+repoName, {
@@ -24,7 +24,7 @@ backButton.addEventListener("click", () => {
     })
     .then(function (data) {
         if (data.status == "ok"){
-            window.location.replace("/");
+            window.history.back();
         }
     })
     .catch(function (error) {
@@ -82,7 +82,6 @@ folders.forEach(folder => {
             }
         })
         .then(function (data) {
-            console.log(data);
             if (data.status == "ok"){
                 window.location.replace("/repo/"+repoName+"/"+folderName);
             }
