@@ -88,7 +88,7 @@ folders.forEach(folder => {
         if (folderPath[folderPath.length-1] != "/"){
             folderPath = folderPath + "/";
         } 
-        console.log("We are sending the folder: " + folderName + " and the path: " + folderPath)
+        console.log("We are sending the folder: " + folderName + " and the path: " + folderPath)    
         fetch("/repo/"+folderPath, {
             method: "POST",
             headers: {
