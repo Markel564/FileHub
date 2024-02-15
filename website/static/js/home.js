@@ -63,7 +63,7 @@ addRepoButton.addEventListener("click", () => {
 
 
 
-// function to deleting a repository (does not delete, rather shows up confirmation modal)
+// function to delete a repository (does not delete, rather shows up confirmation modal)
 document.addEventListener("DOMContentLoaded", function () {
     
 

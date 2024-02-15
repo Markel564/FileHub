@@ -91,7 +91,7 @@ def home():
             if repo_to_check is None:
                 return jsonify({"status": "errorNoRepo"})
             
-            return jsonify({"status": "ok", "repoName": repoName})
+            return jsonify({"status": "ok", "repoName": repoName + "/"})
 
         return jsonify({"status": "error"})
 
@@ -153,10 +153,9 @@ def add():
 def repo(subpath):
     # the path could be the name of the repository or a folder path such as 'repoName/folder1/folder2'
     repoName = subpath.split("/")[0]
-    print (f"Subpath is {subpath}, repoName is {repoName}")
+    print ("SUBPATH IS", subpath)
     if request.method == 'GET':
         
-
         
 
         if repoName is None:
@@ -166,14 +165,13 @@ def repo(subpath):
         user_id = session.get('user_id')
         user = User.query.filter_by(id=user_id).first()
 
-        if len(subpath.split("/")) == 1:
+        if len(subpath.split("/")) == 2 and subpath.split("/")[-1] == '': # we are in the repository main page
             if not load_files_and_folders(repoName): # if there is an error with loading the files and folders
                 
                 return jsonify({"status": "error"})
 
         
-
-            files, folders = get_files_and_folders(repoName, repoName +'/')
+            files, folders = get_files_and_folders(repoName, subpath) # at first the path of the repository is the same as the name of the repository + '/'
 
             for file in files:
                 file[1] = reformat_date(file[1])
@@ -192,17 +190,26 @@ def repo(subpath):
 
         else: # we are in a folder
             
+
             # get load the files and folders in the folder path
             user_id = session.get('user_id')
             user = User.query.filter_by(id=user_id).first()
+        
+            
+            print ("PATHS ARE", subpath + "/", "repoName is", repoName)
 
-            # obtain the directory from the path
-            directory = subpath.split("/")[1:]
+            # the path the files are alocated in github (the one we pass to load_files_and_folders)
+            # is the subpath without the repoName
+            # for example, if the subpath is 'repoName/folder1/folder2/', the path is 'folder1/folder2'
 
-            if not load_files_and_folders(repoName, directory[0]): # if there is an error with loading the files and folders
+            # so we take the subpath and remove the repoName from it as well as the last '/'
+            directory = '/'.join(subpath.split("/")[1:]).rstrip('/')
+        
+
+            if not load_files_and_folders(repoName, directory): # if there is an error with loading the files and folders
                 return jsonify({"status": "error"})
             
-            files, folders = get_files_and_folders(repoName, repoName + "/" + directory[0]+'/')
+            files, folders = get_files_and_folders(repoName, subpath +'/')
 
             for file in files:
                 file[1] = reformat_date(file[1])
@@ -210,15 +217,18 @@ def repo(subpath):
             for folder in folders:
                 folder[1] = reformat_date(folder[1])
 
-            last_updated = Folder.query.filter_by(repository_name=repoName, path=repoName + "/" + directory[0]).first().lastUpdated
+            last_updated = Folder.query.filter_by(repository_name=repoName, path=subpath).first().lastUpdated
             last_updated = reformat_date(last_updated)
 
-            return render_template("repo.html", repo=directory[0], header_name=subpath, avatar=user.avatarUrl, files=files, folders=folders, last_updated=last_updated)
+            # for the attribute 'repo', we want to show the name of the folder instead
+            
+            return render_template("repo.html", repo=subpath.split("/")[-1], header_name=subpath, avatar=user.avatarUrl, files=files, folders=folders, last_updated=last_updated)
             
 
 
     else: # POST
-
+        
+        
         data = request.get_json()  
         
         if data is None: # if no data was sent
@@ -234,10 +244,16 @@ def repo(subpath):
 
             folder = data.get('folder')
             folder_path = data.get('folderPath')
-            print (f"folder: {folder}, folderPath: {folder_path}, repoName: {repoName}")
+
+            
+            
+            # the repoName is the first part of the folder path
+            repoName = folder_path.split("/")[0]
+            print ("repoName is", repoName, "folder is", folder, "folderPath is", folder_path)
             if folder is None:
                 return jsonify({"status": "error"})
             
+            # print (f"we are searching for {folder_path} in the database and repoName is {repoName}")
             # see all the folders in the repository
             folders = Folder.query.filter_by(repository_name=repoName, folderPath=folder_path).all()
 
@@ -247,7 +263,9 @@ def repo(subpath):
     
             if folder not in [f.name for f in folders]:
                 return jsonify({"status": "error"})
-            return jsonify({"status": "ok"})
+            
+            print ("return", folder_path + folder)
+            return jsonify({"status": "ok", "path": folder_path + folder})
 
 
 

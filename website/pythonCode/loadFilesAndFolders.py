@@ -76,7 +76,7 @@ def load_files_and_folders(repoName, path=""):
                     # to keep track of the last updated date of the repository
                     lastupdates.append(last_modified)
 
-                    print (f"File {content_file.name} with path {str(repoName+'/'+content_file.path)} added to db")
+                    print (f"File {content_file.name} with folder path {folder_path} added to db")
 
                 
 
@@ -96,7 +96,7 @@ def load_files_and_folders(repoName, path=""):
                     else:
                         file.modified = False
 
-                    print (f"File {content_file.name} with path {str(repoName+'/'+content_file.path)} already in db...")
+                    # print (f"File {content_file.name} with path {str(repoName+'/'+content_file.path)} already in db...")
                     lastupdates.append(file.lastUpdated)
 
 
@@ -124,7 +124,7 @@ def load_files_and_folders(repoName, path=""):
 
                     lastupdates.append(last_modified)
                     # the last updated date of the repository will be the last updated date of the file
-                    print (f"Folder {content_file.name} with {str(repoName+'/'+content_file.path)} and folderPath {folder_path} added to db")
+                    print (f"Folder {content_file.name} with folderPath {folder_path} added to db")
 
                 
 
@@ -144,7 +144,7 @@ def load_files_and_folders(repoName, path=""):
                         folder.modified = False
                     lastupdates.append(folder.lastUpdated)
 
-                    print (f"Folder {content_file.name} with path {str(repoName+'/'+content_file.path)} already in db...")
+                    # print (f"Folder {content_file.name} with path {str(repoName+'/'+content_file.path)} already in db...")
 
                 folders.append(content_file.name)
 

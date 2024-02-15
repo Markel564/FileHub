@@ -87,4 +87,4 @@ def see_path(repoName, path):
 if __name__ == "__main__":
     
 
-    see_path("Dam2_project","/notebooks/markel's/models")
+    see_path("example","/my_directory")

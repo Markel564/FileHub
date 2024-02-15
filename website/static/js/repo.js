@@ -78,21 +78,25 @@ folders.forEach(folder => {
     
     folder.addEventListener("click", () => {
         const folderName = folder.querySelector("h1").textContent;
-        console.log(folderName)
-        let Path = window.location.pathname + "/";
+        
+        let Path = window.location.pathname;
         // eliminate "/repo/" from the folder path which is the first 6 characters
         let folderPath = Path.substring(6);
-        console.log(folderPath);
-
-        fetch("/repo/"+repoName, {
+        
+        
+        // since the location of the folder does have a final "/", if there is not a final "/", we add it
+        if (folderPath[folderPath.length-1] != "/"){
+            folderPath = folderPath + "/";
+        } 
+        console.log("We are sending the folder: " + folderName + " and the path: " + folderPath)
+        fetch("/repo/"+folderPath, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({ type: "open", folder: folderName, folderPath: folderPath }),
         })
-        .then(function (response) {
-            console.log(response)
+        .then(function (response) { 
             if (response.ok) {
                 return response.json(); 
             } else {
@@ -100,8 +104,9 @@ folders.forEach(folder => {
             }
         })
         .then(function (data) {
+            let path = data.path;
             if (data.status == "ok"){
-                window.location.replace("/repo/"+repoName+"/"+folderName);
+                window.location.replace("/repo/"+path);
             }
         })
         .catch(function (error) {
