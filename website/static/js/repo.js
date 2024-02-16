@@ -28,15 +28,28 @@ backButton.addEventListener("click", () => {
             var path = window.location.pathname.split("/");
             path.pop();
             path = path.join("/");
-            console.log(path);
-            if (path == "/repo"){
-                window.location.replace("/");
+            console.log("Original path: " + path);
+            // we add the final "/" to the path
+            var count = (path.match(/\//g) || []).length;
+            path = path + "/";
+            if (path == "/repo/"+repoName+"/"){ // if we are in the root of the repository
+                window.location.replace("/"); 
             }
-            else
-            window.location.replace(path);
-
+            // There are two cases:
+            // a) The redirection takes you to the root of the repository (path = "/repo/repoName/")
+            // b) The redirection takes you to a folder (path = "/repo/repoName/folder")
+            // The difference is that in the first case, the path has a final "/", and in the second case, it does not have it
+            // count the number of "/" in the path
+            else if (count == 3){ // option a
+                window.location.replace(path)
+            }
+            else { // option b
+                // eliminate the final "/" from the path
+                path = path.substring(0, path.length-1);
+                window.location.replace(path);
+                // window.location.replace("/repo/"+path);
         }
-    })
+    }})
     .catch(function (error) {
         console.error("Fetch error:", error);
     });

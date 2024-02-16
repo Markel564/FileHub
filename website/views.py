@@ -153,11 +153,9 @@ def add():
 def repo(subpath):
     # the path could be the name of the repository or a folder path such as 'repoName/folder1/folder2'
     repoName = subpath.split("/")[0]
-    print ("SUBPATH IS", subpath)
+    
     if request.method == 'GET':
         
-        
-
         if repoName is None:
             return render_template("generic_error.html")
         
@@ -165,65 +163,51 @@ def repo(subpath):
         user_id = session.get('user_id')
         user = User.query.filter_by(id=user_id).first()
 
-        if len(subpath.split("/")) == 2 and subpath.split("/")[-1] == '': # we are in the repository main page
+            
+        root_of_project = False
+        directory = '/'.join(subpath.split("/")[1:]).rstrip('/')
+
+        if directory == '': # we are in a folder, if not, we are in the repository main page
+                root_of_project = True
+            
+        if root_of_project:
             if not load_files_and_folders(repoName): # if there is an error with loading the files and folders
-                
+                    
                 return jsonify({"status": "error"})
-
-        
             files, folders = get_files_and_folders(repoName, subpath) # at first the path of the repository is the same as the name of the repository + '/'
-
-            for file in files:
-                file[1] = reformat_date(file[1])
-                
-            
-            for folder in folders:
-                folder[1] = reformat_date(folder[1])
-
             last_updated = Repository.query.filter_by(name=repoName).first().lastUpdated
-            
-            #  change the date format to a more readable one
-            last_updated = reformat_date(last_updated)
 
-            
-            return render_template("repo.html", repo=repoName, header_name=repoName ,avatar=user.avatarUrl, files=files, folders=folders, last_updated=last_updated)
-
-        else: # we are in a folder
-            
-
-            # get load the files and folders in the folder path
-            user_id = session.get('user_id')
-            user = User.query.filter_by(id=user_id).first()
-        
-            
-            print ("PATHS ARE", subpath + "/", "repoName is", repoName)
-
+            title = repoName
+        else:
             # the path the files are alocated in github (the one we pass to load_files_and_folders)
             # is the subpath without the repoName
             # for example, if the subpath is 'repoName/folder1/folder2/', the path is 'folder1/folder2'
-
-            # so we take the subpath and remove the repoName from it as well as the last '/'
-            directory = '/'.join(subpath.split("/")[1:]).rstrip('/')
-        
-
-            if not load_files_and_folders(repoName, directory): # if there is an error with loading the files and folders
+            print ("Directory is", directory)
+            if not load_files_and_folders(repoName, directory):
                 return jsonify({"status": "error"})
-            
             files, folders = get_files_and_folders(repoName, subpath +'/')
-
-            for file in files:
-                file[1] = reformat_date(file[1])
-            
-            for folder in folders:
-                folder[1] = reformat_date(folder[1])
-
             last_updated = Folder.query.filter_by(repository_name=repoName, path=subpath).first().lastUpdated
-            last_updated = reformat_date(last_updated)
 
-            # for the attribute 'repo', we want to show the name of the folder instead
+            title = subpath.split("/")[-1]
+
+
+        for file in files:
+            file[1] = reformat_date(file[1])
+                
             
-            return render_template("repo.html", repo=subpath.split("/")[-1], header_name=subpath, avatar=user.avatarUrl, files=files, folders=folders, last_updated=last_updated)
+        for folder in folders:
+            folder[1] = reformat_date(folder[1])
+
             
+            
+            #  change the date format to a more readable one
+        last_updated = reformat_date(last_updated)
+
+            
+        return render_template("repo.html", title=title, header_name=repoName,avatar=user.avatarUrl, whole_path=subpath,
+        files=files, folders=folders, last_updated=last_updated)
+
+       
 
 
     else: # POST

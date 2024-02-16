@@ -136,7 +136,7 @@
 }
 
 .content-box-new{
-  background-color: green;
+  background: linear-gradient(45deg, #588157 50%, #A3b18a 50%);
 }
 .content-box:hover, .content-box-new:hover{
   cursor: pointer;
