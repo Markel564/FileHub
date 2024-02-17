@@ -56,6 +56,14 @@
             </div>
             {% endif %}
         {% endfor %}
+            {% if not files %}
+            <form class="dropzone" id="add-file">
+                <div class="content-box" name="" id="new-file">
+                    <img src="{{url_for('static', filename='images/upload-solid.svg')}}" class="img-content-new">
+                    <h2>Drag new file</h2>
+                </div>
+            </form>
+            {% endif %}
         {% endif %}
 
         {% if files %}
@@ -74,14 +82,25 @@
             </div>
             {% endif %}
         {% endfor %}
+
+        <!-- to add a new file -->
+        <form class="dropzone" id="add-file">
+            <div class="content-box" name="" id="new-file">
+                <img src="{{url_for('static', filename='images/upload-solid.svg')}}" class="img-content-new">
+                <h2>Drag new file</h2>
+            </div>
+        </form>
         {% endif %}
     </div> 
 
-    {% if not folders and not files %}
-        <div class="alert alert-info" role="alert">
-            <strong>Info!</strong> No folders or files found.
-        </div>
+    {% if not files %}
+        <!-- <div class="content-box" name="" id="new-file">
+            <img src="{{url_for('static', filename='images/upload-solid.svg')}}" class="img-content-new">
+            <h2>Drag new file</h2>  
+        </div> -->
     {% endif %}
+    
+    
 
     <div class="no-results">
         <h1>No results found</h1>

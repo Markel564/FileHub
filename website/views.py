@@ -254,6 +254,22 @@ def repo(subpath):
 
 
 
+@views.route('/upload-file', methods=['GET','POST'])
+def upload_file():
+    if 'file' in request.files:
+        file = request.files['file']
+        # Save the uploaded file to a directory on the server
+        file.save('uploads/' + file.filename)
+        # add the file to the database
+        additional_info = request.form.get('path')
+
+        print ("additional_info is", additional_info)
+
+        return jsonify({'message': 'File uploaded successfully'})
+    else:
+        return jsonify({'error': 'No file received'}), 400
+
+
 def reformat_date(last_updated):
 
     # if the date is None, return None

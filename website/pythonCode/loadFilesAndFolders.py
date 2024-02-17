@@ -108,7 +108,7 @@ def load_files_and_folders(repoName, path=""):
 
                 # before adding the folder, check if it is already in the database (in the same directory)
                 folder = Folder.query.filter_by(name=content_file.name, repository_name=repoName, path=str(repoName+'/'+content_file.path)).first()
-
+                print ("Folder with name", content_file.name, "found")
                 if not folder: # if the folder is not in the database, add it
 
                     last_modified = get_last_modified(content_file.path, repo)
@@ -154,15 +154,17 @@ def load_files_and_folders(repoName, path=""):
         repository.lastUpdated = max(lastupdates)
 
         # eliminate the files and folders that are not in the github repository
-        files_in_db = File.query.filter_by(repository_name=repoName, path=str(repoName+'/'+content_file.path)).all()
-        folders_in_db = Folder.query.filter_by(repository_name=repoName, path=str(repoName+'/'+content_file.path)).all()
+        files_in_db = File.query.filter_by(repository_name=repoName, folderPath=repoName + '/' + content_file.path.split(content_file.name)[0]).all()
+        folders_in_db = Folder.query.filter_by(repository_name=repoName, folderPath=repoName + '/' + content_file.path.split(content_file.name)[0]).all()
 
+        print ("files in db", files_in_db, "files in github", files)
         if len(files_in_db) > len(files):
             for file in files_in_db:
                 if file.name not in files:
                     print ("DELETED")
                     db.session.delete(file)
         
+        print ("folders in db", folders_in_db, "folders in github", folders)
         if len(folders_in_db) > len(folders):
             for folder in folders_in_db:
                 if folder.name not in folders:

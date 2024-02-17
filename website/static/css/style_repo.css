@@ -144,6 +144,7 @@
   border: 2px solid black;
 }
 
+
 .content-box h1, .content-box-new h1{
   color: black;
   font-size: 1.5rem;
@@ -168,6 +169,24 @@
   max-width: 90%;
   margin-top: 30px;
 }
+
+#new-file{
+  background-color: #c8e8d4;
+  border: 3px dashed #1a1a1d;
+}
+
+#new-file h2{
+  margin-top: 10px;
+}
+
+#new-file:hover{
+  background-color: #43803d;
+}
+.img-content-new{
+  height: 70%;
+  width: auto;
+}
+
 
 .img-content{
   height: 35px;
@@ -208,6 +227,10 @@
 
 /* for non-searched elements dissapear */
 .hide {
+  display: none;
+}
+
+.dropzone .dz-message {
   display: none;
 }
 

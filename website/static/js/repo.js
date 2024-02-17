@@ -1,3 +1,5 @@
+// const Dropzone = require("dropzone");
+
 const backButton = document.querySelector("#backButton");
 const searchInput = document.querySelector("[data-search");
 const filesAndFolders = document.querySelectorAll(".content-box");
@@ -31,6 +33,7 @@ backButton.addEventListener("click", () => {
             console.log("Original path: " + path);
             // we add the final "/" to the path
             var count = (path.match(/\//g) || []).length;
+            console.log("Number of /: " + count);
             path = path + "/";
             if (path == "/repo/"+repoName+"/"){ // if we are in the root of the repository
                 window.location.replace("/"); 
@@ -40,7 +43,7 @@ backButton.addEventListener("click", () => {
             // b) The redirection takes you to a folder (path = "/repo/repoName/folder")
             // The difference is that in the first case, the path has a final "/", and in the second case, it does not have it
             // count the number of "/" in the path
-            else if (count == 3){ // option a
+            else if (count == 2){ // option a
                 window.location.replace(path)
             }
             else { // option b
@@ -126,4 +129,44 @@ folders.forEach(folder => {
             console.error("Fetch error:", error);
         });
     });
+});
+
+
+// Drag and drop functionality
+let files = [];
+Dropzone.autoDiscover = false;
+if (!document.querySelector('.dropzone').classList.contains('dz-clickable')) {
+    let myDropzone = new Dropzone(".dropzone", {
+        url:'/upload-file',
+        maxFilesize:104857600, // 100MB (GitHub limit)
+        maxFiles:1,
+        acceptedFiles: ".docx",
+        addRemoveLinks:false,
+        previewTemplate: '<div class="dz-preview dz-file-preview"></div>',
+        sending: function(file, xhr, formData) {
+            formData.append("repoName", repoName);
+            formData.append("path", window.location.pathname);
+        },
+    });
+    
+    myDropzone.on("addedfile", function(file) {
+        files.push(file);
+    });
+
+    myDropzone.on("removedfile", function(file) {
+        let index = files.indexOf(file);
+        files.splice(index, 1);
+    });
+
+    myDropzone.on("error", function(file, errorMessage) {
+        if (errorMessage === "You can't upload files of this type.") {
+            alert(errorMessage);
+            myDropzone.removeFile(file);
+        }
+    });
+}
+
+// prevent small rectangles for dragging files
+document.getElementById('add-file').addEventListener('submit', function(event) {
+    event.preventDefault(); 
 });
