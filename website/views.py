@@ -15,7 +15,7 @@ from . import db
 from .models import User, Repository, Folder, File
 views = Blueprint('views', __name__)
 import os
-from .pythonCode import add_user, get_repos, delete_repo, add_repo, load_files_and_folders, get_files_and_folders
+from .pythonCode import add_user, get_repos, delete_repo, add_repo, load_files_and_folders, get_files_and_folders, add_file
 from datetime import datetime
 
 # HOME PAGE
@@ -182,7 +182,7 @@ def repo(subpath):
             # the path the files are alocated in github (the one we pass to load_files_and_folders)
             # is the subpath without the repoName
             # for example, if the subpath is 'repoName/folder1/folder2/', the path is 'folder1/folder2'
-            print ("Directory is", directory)
+
             if not load_files_and_folders(repoName, directory):
                 return jsonify({"status": "error"})
             files, folders = get_files_and_folders(repoName, subpath +'/')
@@ -200,7 +200,7 @@ def repo(subpath):
 
             
             
-            #  change the date format to a more readable one
+        #  change the date format to a more readable one
         last_updated = reformat_date(last_updated)
 
             
@@ -233,22 +233,18 @@ def repo(subpath):
             
             # the repoName is the first part of the folder path
             repoName = folder_path.split("/")[0]
-            print ("repoName is", repoName, "folder is", folder, "folderPath is", folder_path)
+     
             if folder is None:
                 return jsonify({"status": "error"})
             
-            # print (f"we are searching for {folder_path} in the database and repoName is {repoName}")
-            # see all the folders in the repository
+
             folders = Folder.query.filter_by(repository_name=repoName, folderPath=folder_path).all()
 
-            for f in folders:
-                print ("Folder is", f.name)
 
     
             if folder not in [f.name for f in folders]:
                 return jsonify({"status": "error"})
             
-            print ("return", folder_path + folder)
             return jsonify({"status": "ok", "path": folder_path + folder})
 
 
@@ -261,9 +257,15 @@ def upload_file():
         # Save the uploaded file to a directory on the server
         file.save('uploads/' + file.filename)
         # add the file to the database
-        additional_info = request.form.get('path')
+        path = request.form.get('path')
+        repoName = request.form.get('repoName')
 
-        print ("additional_info is", additional_info)
+        print (path, repoName)
+        ack = add_file(repoName, file.filename, path) 
+        if ack:
+            print ("File added successfully")
+        else:
+            print ("Error adding file")
 
         return jsonify({'message': 'File uploaded successfully'})
     else:
@@ -276,48 +278,49 @@ def reformat_date(last_updated):
     if last_updated is None:
         return None
 
+
     # Sometimes, datetime.now() is delayed by a few seconds. In case that this happens
     # we will return 'just now' if the difference is less than 60 seconds
     if (datetime.now() - last_updated).total_seconds() < 0:
         return "just now"
     
     # if the number of years is +1, return years
-    if (datetime.now() - last_updated).days > 365:
+    if (datetime.now() - last_updated).days >= 365:
         years = round((datetime.now() - last_updated).days // 365, 0)
         if years == 1:
             return "1 year ago"
         return str(years) + "years ago"
 
     # if the number of months is +1, return months
-    elif (datetime.now() - last_updated).days > 30:
+    elif (datetime.now() - last_updated).days >= 30:
         months = round((datetime.now() - last_updated).days // 30, 0)
         if months == 1:
             return "1 month ago"
         return str(months) + " months ago"
 
     # if the number of weeks is +1, return weeks
-    elif (datetime.now() - last_updated).days > 7:
+    elif (datetime.now() - last_updated).days >= 7:
         weeks = round((datetime.now() - last_updated).days // 7, 0)
         if weeks == 1:
             return "last week"
         return str(weeks) + " weeks ago"
 
     # if the number of days is +1, return days
-    elif (datetime.now() - last_updated).days > 1:
+    elif (datetime.now() - last_updated).days >= 1:
         days = round((datetime.now() - last_updated).days, 0)
         if days == 1:
             return "yesterday"
         return str(days) + " days ago"
 
     # if the number of hours is +1, return hours
-    elif (datetime.now() - last_updated).total_seconds() > 3600:
+    elif (datetime.now() - last_updated).total_seconds() >= 3600:
         hours = round((datetime.now() - last_updated).seconds // 3600, 0)
         if hours == 1:
             return "1 hour ago"
         return str(hours) + " hours ago"
 
     # if the number of minutes is +1, return minutes
-    elif (datetime.now() - last_updated).seconds > 60:
+    elif (datetime.now() - last_updated).seconds >= 60:
         minutes = round((datetime.now() - last_updated).seconds // 60, 0)
         if minutes == 1:
             return "1 minute ago"

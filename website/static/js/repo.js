@@ -136,6 +136,14 @@ folders.forEach(folder => {
 let files = [];
 Dropzone.autoDiscover = false;
 if (!document.querySelector('.dropzone').classList.contains('dz-clickable')) {
+    let path = window.location.pathname;
+    // remove the initial "/repo/" from the path
+    path = path.substring(6);
+    // remove the repoName from the path
+    path = path.substring(repoName.length);
+    // finally, remove the first "/" of the remaining path
+    path = path.substring(1);
+    console.log("path is: " + window.location.pathname);
     let myDropzone = new Dropzone(".dropzone", {
         url:'/upload-file',
         maxFilesize:104857600, // 100MB (GitHub limit)
@@ -145,7 +153,7 @@ if (!document.querySelector('.dropzone').classList.contains('dz-clickable')) {
         previewTemplate: '<div class="dz-preview dz-file-preview"></div>',
         sending: function(file, xhr, formData) {
             formData.append("repoName", repoName);
-            formData.append("path", window.location.pathname);
+            formData.append("path", path);
         },
     });
     
