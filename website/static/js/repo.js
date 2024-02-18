@@ -3,14 +3,15 @@
 const backButton = document.querySelector("#backButton");
 const searchInput = document.querySelector("[data-search");
 const filesAndFolders = document.querySelectorAll(".content-box");
-var repoName = document.title;
+var folderName = document.title;
+const repoName = document.querySelector("#headerName").textContent;
 const folders = document.querySelectorAll("#folder");
 
 
 // function to go back to one page before
 backButton.addEventListener("click", () => {
 
-    fetch("/repo/"+repoName, {
+    fetch("/repo/"+folderName, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -35,12 +36,12 @@ backButton.addEventListener("click", () => {
             var count = (path.match(/\//g) || []).length;
             console.log("Number of /: " + count);
             path = path + "/";
-            if (path == "/repo/"+repoName+"/"){ // if we are in the root of the repository
+            if (path == "/repo/"+folderName+"/"){ // if we are in the root of the repository
                 window.location.replace("/"); 
             }
             // There are two cases:
-            // a) The redirection takes you to the root of the repository (path = "/repo/repoName/")
-            // b) The redirection takes you to a folder (path = "/repo/repoName/folder")
+            // a) The redirection takes you to the root of the repository (path = "/repo/folderName/")
+            // b) The redirection takes you to a folder (path = "/repo/folderName/folder")
             // The difference is that in the first case, the path has a final "/", and in the second case, it does not have it
             // count the number of "/" in the path
             else if (count == 2){ // option a
@@ -143,7 +144,11 @@ if (!document.querySelector('.dropzone').classList.contains('dz-clickable')) {
     path = path.substring(repoName.length);
     // finally, remove the first "/" of the remaining path
     path = path.substring(1);
-    console.log("path is: " + window.location.pathname);
+    // add the final "/" to the path
+    if (path[path.length-1] != "/"){
+        path = path + "/";
+    }
+    
     let myDropzone = new Dropzone(".dropzone", {
         url:'/upload-file',
         maxFilesize:104857600, // 100MB (GitHub limit)

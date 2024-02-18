@@ -148,8 +148,21 @@ def load_files_and_folders(repoName, path=""):
         repository = Repository.query.filter_by(name=repoName).first()
 
         # update the last updated date of the repository
-
         repository.lastUpdated = max(lastupdates)
+
+        # also, if we are in a folder, we need to update the last updated date of the folder
+        if path != "":
+            folder = Folder.query.filter_by(name=path.split('/')[-1], repository_name=repoName, path=str(repoName + '/'+ path)).first()
+           
+            if folder:
+                last_updated = repository.lastUpdated.replace(tzinfo=None).strftime("%Y-%m-%d %H:%M:%S")
+                folder_last_updated = folder.lastUpdated.replace(tzinfo=None).strftime("%Y-%m-%d %H:%M:%S")
+                if last_updated != folder_last_updated:
+                    folder.modified = True # if the folder has been updated, we set modified to True
+                
+                folder.lastUpdated = repository.lastUpdated # update the last updated date of the folder to the one calculated before
+                
+
 
         # eliminate the files and folders that are not in the github repository
         files_in_db = File.query.filter_by(repository_name=repoName, folderPath=repoName + '/' + content_file.path.split(content_file.name)[0]).all()

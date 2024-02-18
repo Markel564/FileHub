@@ -19,6 +19,8 @@ def add_file(repo, file_name, path):
         g = github.Github(user.githubG)
         user = g.get_user()
         repo = user.get_repo(repo)
+
+        print ("repo: ", repo)
         
         # read the file content
 

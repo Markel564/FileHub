@@ -187,7 +187,7 @@ def repo(subpath):
                 return jsonify({"status": "error"})
             files, folders = get_files_and_folders(repoName, subpath +'/')
             last_updated = Folder.query.filter_by(repository_name=repoName, path=subpath).first().lastUpdated
-
+            print ("The last updated is: ", last_updated, "for path: ", subpath)
             title = subpath.split("/")[-1]
 
 
@@ -260,7 +260,7 @@ def upload_file():
         path = request.form.get('path')
         repoName = request.form.get('repoName')
 
-        print (path, repoName)
+        print ("See -->", path, repoName)
         ack = add_file(repoName, file.filename, path) 
         if ack:
             print ("File added successfully")
