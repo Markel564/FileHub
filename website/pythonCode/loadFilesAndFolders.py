@@ -14,6 +14,12 @@ from flask import session
 from datetime import datetime
 import pytz
 from tzlocal import get_localzone
+import time
+from cachetools import TTLCache
+
+# Define a cache with a time-to-live (TTL) of 1 hour
+cache = TTLCache(maxsize=1000, ttl=3600)
+
 
 def load_files_and_folders(repoName, path=""):
 
@@ -132,12 +138,15 @@ def load_files_and_folders(repoName, path=""):
 
                     folder_last_updated_utc = folder.lastUpdated.replace(tzinfo=None).strftime("%Y-%m-%d %H:%M:%S")
 
+                    print (f"folder {folder.name} with path {folder.path} and last updated {folder.lastUpdated} has last commit {last_commit_utc}")
                     if folder_last_updated_utc != last_commit_str:
                         folder.modified = True
                         folder.lastUpdated = last_commit_utc
+                        print ("We changed the last updated date of the folder to", folder.lastUpdated)
                         
 
                     else:
+                        print ("Again, the folder has not been updated")
                         folder.modified = False
                     
                     lastupdates.append(folder.lastUpdated)
@@ -153,14 +162,16 @@ def load_files_and_folders(repoName, path=""):
         # also, if we are in a folder, we need to update the last updated date of the folder
         if path != "":
             folder = Folder.query.filter_by(name=path.split('/')[-1], repository_name=repoName, path=str(repoName + '/'+ path)).first()
-           
             if folder:
                 last_updated = repository.lastUpdated.replace(tzinfo=None).strftime("%Y-%m-%d %H:%M:%S")
                 folder_last_updated = folder.lastUpdated.replace(tzinfo=None).strftime("%Y-%m-%d %H:%M:%S")
                 if last_updated != folder_last_updated:
                     folder.modified = True # if the folder has been updated, we set modified to True
-                
-                folder.lastUpdated = repository.lastUpdated # update the last updated date of the folder to the one calculated before
+                    folder.lastUpdated = repository.lastUpdated # update the last updated date of the folder to the one calculated before
+                else:
+                    
+                    folder.modified = False
+                    print (f"folder {folder.name} with path {folder.path} and last updated {folder.lastUpdated} has not been updated")
                 
 
 
@@ -212,22 +223,32 @@ def get_files_and_folders(repoName, father_dir):
     return files, folders
 
 
-
 def get_last_modified(path, repo):
 
-    commits = repo.get_commits(path=path)
-    last_commit = commits[0].commit.author.date
+    cached_last_modified = cache.get(path)
+    if cached_last_modified:
+        return cached_last_modified
 
-    last_commit = last_commit.replace(tzinfo=None)
-    # convert it to own timezone
-    gmt = pytz.timezone('GMT')
-    last_modified_gmt = gmt.localize(last_commit)
-    timezone = get_localzone()
-    last_modified = last_modified_gmt.astimezone(timezone)
-    
-    # remove timezone info
-    last_modified = last_modified.replace(tzinfo=None)
-    return last_modified
+    try:
+
+        commits = repo.get_commits(path=path)
+        last_commit = commits[0].commit.author.date
+        last_commit = last_commit.replace(tzinfo=None)
+        gmt = pytz.timezone('GMT')
+        last_modified_gmt = gmt.localize(last_commit)
+        timezone = get_localzone()
+        last_modified = last_modified_gmt.astimezone(timezone)
+        last_modified = last_modified.replace(tzinfo=None)
+  
+
+        # Store the result in cache
+        cache[path] = last_modified
+
+        return last_modified
+
+    except Exception as e:
+        print(f"Error getting last modified for {path}: {e}")
+        return None
 
 
 

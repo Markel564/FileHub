@@ -6,7 +6,7 @@ const filesAndFolders = document.querySelectorAll(".content-box");
 var folderName = document.title;
 const repoName = document.querySelector("#headerName").textContent;
 const folders = document.querySelectorAll("#folder");
-
+const addFileButton = document.querySelector("#add-file");
 
 // function to go back to one page before
 backButton.addEventListener("click", () => {
@@ -177,9 +177,58 @@ if (!document.querySelector('.dropzone').classList.contains('dz-clickable')) {
             myDropzone.removeFile(file);
         }
     });
+
+    myDropzone.on("success", function(file, response) {
+        window.location.reload();
+    });
 }
 
 // prevent small rectangles for dragging files
 document.getElementById('add-file').addEventListener('submit', function(event) {
     event.preventDefault(); 
+});
+
+// function to upload a file by clicking the add-file div
+addFileButton.addEventListener("click", () => {
+    document.getElementById('file-input').click(); // Click on the file input
+});
+
+// event listener for the file input
+document.getElementById('file-input').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file){
+        let formData = new FormData();
+        formData.append("file", file);
+        formData.append("repoName", repoName);
+        // similar to before, we construct the path
+        let path = window.location.pathname;
+        path = path.substring(6);
+        path = path.substring(repoName.length);
+        path = path.substring(1);
+        if (path[path.length-1] != "/"){
+            path = path + "/";
+        }
+        formData.append("path", path);
+        console.log("We are sending the file: " + file.name + " and the path: " + path + " and the repoName: " + repoName);
+        fetch("/upload-file", {
+            method: "POST",
+            body: formData,
+        })
+        .then(function (response) {
+            if (response.ok) {
+                return response.json(); 
+            } else {
+                throw new Error("Network response was not ok");
+            }
+        })
+        .then(function (data) {
+            if (data.status == "ok"){
+                // we reload the page
+                window.location.reload();
+            }
+        }
+        .catch(function (error) {
+            console.error("Fetch error:", error);
+        }));
+    }
 });

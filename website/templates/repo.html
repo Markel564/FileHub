@@ -42,19 +42,11 @@
     <div class="grid-container"> 
         {% if folders %}
         {% for folder in folders %}
-            {% if folder[2] == True %}
-            <div class="content-box-new" name="{{ folder[0] }}" id="folder">
+            <div class="content-box" id="folder" name="{{ folder[0] }}" id="folder">
                 <img src=" {{ url_for('static', filename='images/folder.svg')}}" class="img-content"> 
                 <h1>{{ folder[0] }}</h1> 
                 <h2>{{ folder[1] }}</h2>       
             </div>
-            {% else %}
-            <div class="content-box" name="{{ folder[0] }}" id="folder">
-                <img src="{{url_for('static', filename='images/folder.svg')}}" class="img-content">
-                <h1>{{ folder[0] }}</h1> 
-                <h2>{{ folder[1] }}</h2>       
-            </div>
-            {% endif %}
         {% endfor %}
             {% if not files %}
             <form class="dropzone" id="add-file">
@@ -92,14 +84,6 @@
         </form>
         {% endif %}
     </div> 
-
-    {% if not files %}
-        <!-- <div class="content-box" name="" id="new-file">
-            <img src="{{url_for('static', filename='images/upload-solid.svg')}}" class="img-content-new">
-            <h2>Drag new file</h2>  
-        </div> -->
-    {% endif %}
-    
     
 
     <div class="no-results">
@@ -108,6 +92,9 @@
      </div>
 
 </div>
+
+<!-- to upload clicking the drag and drop div -->
+<input type="file" id="file-input" style="display: none;">
 
 
 

@@ -128,6 +128,7 @@
   margin-top: 20px;
   min-width: 0; 
   word-wrap: break-word;
+  border: 2px solid black;
 }
 
 
@@ -141,7 +142,6 @@
 .content-box:hover, .content-box-new:hover{
   cursor: pointer;
   opacity: 0.8;
-  border: 2px solid black;
 }
 
 
@@ -170,8 +170,11 @@
   margin-top: 30px;
 }
 
+#folder{
+  background-color: #c3073f;
+}
 #new-file{
-  background-color: #c8e8d4;
+  background-color: #d9d9d9;
   border: 3px dashed #1a1a1d;
 }
 
@@ -180,7 +183,7 @@
 }
 
 #new-file:hover{
-  background-color: #43803d;
+  background-color: #365486;
 }
 .img-content-new{
   height: 70%;

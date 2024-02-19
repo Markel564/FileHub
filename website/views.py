@@ -145,7 +145,7 @@ def add():
 
             return jsonify({"status": "errorCreation"})
         
-        
+import time  
 
 
 # REPO page
@@ -155,7 +155,7 @@ def repo(subpath):
     repoName = subpath.split("/")[0]
     
     if request.method == 'GET':
-        
+        time_start = time.time()
         if repoName is None:
             return render_template("generic_error.html")
         
@@ -187,7 +187,7 @@ def repo(subpath):
                 return jsonify({"status": "error"})
             files, folders = get_files_and_folders(repoName, subpath +'/')
             last_updated = Folder.query.filter_by(repository_name=repoName, path=subpath).first().lastUpdated
-            print ("The last updated is: ", last_updated, "for path: ", subpath)
+
             title = subpath.split("/")[-1]
 
 
@@ -197,13 +197,15 @@ def repo(subpath):
             
         for folder in folders:
             folder[1] = reformat_date(folder[1])
-
+            print (f"Folder {folder[0]} last updated {folder[1]} modified {folder[2]}")
+            
             
             
         #  change the date format to a more readable one
         last_updated = reformat_date(last_updated)
 
-            
+        end_time = time.time() 
+
         return render_template("repo.html", title=title, header_name=repoName,avatar=user.avatarUrl, whole_path=subpath,
         files=files, folders=folders, last_updated=last_updated)
 
@@ -260,12 +262,12 @@ def upload_file():
         path = request.form.get('path')
         repoName = request.form.get('repoName')
 
-        print ("See -->", path, repoName)
+        
         ack = add_file(repoName, file.filename, path) 
         if ack:
-            print ("File added successfully")
+            flash("File uploaded successfully", category='success')
         else:
-            print ("Error adding file")
+            return jsonify({'error': 'Error adding file to the database'}), 400
 
         return jsonify({'message': 'File uploaded successfully'})
     else:

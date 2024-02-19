@@ -4,6 +4,10 @@ import github
 from datetime import datetime
 from git import Repo
 import os
+import datetime
+import pytz
+
+
 
 from sqlalchemy import create_engine, MetaData
 
@@ -86,5 +90,6 @@ def see_path(repoName, path):
     
 if __name__ == "__main__":
     
-
-    see_path("example","/my_directory")
+    local_timezone = datetime.datetime.now(pytz.timezone('UTC')).astimezone().tzinfo
+    print(local_timezone)
+    # see_path("example","/my_directory")
