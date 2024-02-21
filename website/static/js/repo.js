@@ -31,10 +31,9 @@ backButton.addEventListener("click", () => {
             var path = window.location.pathname.split("/");
             path.pop();
             path = path.join("/");
-            console.log("Original path: " + path);
             // we add the final "/" to the path
             var count = (path.match(/\//g) || []).length;
-            console.log("Number of /: " + count);
+
             path = path + "/";
             if (path == "/repo/"+folderName+"/"){ // if we are in the root of the repository
                 window.location.replace("/"); 
@@ -232,3 +231,53 @@ document.getElementById('file-input').addEventListener('change', function(e) {
         }));
     }
 });
+
+
+
+// function to open the window to clone a repository
+document.addEventListener("DOMContentLoaded", function () {
+
+    var synchronizeButton = document.querySelector("#cloneButton");
+
+    synchronizeButton.addEventListener("click", () => {
+
+        fetch("/repo/" + repoName + "/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({type: "clone-request", repoName: repoName }),
+        })
+        .then(function (response) {
+            if (response.ok) {
+                return response.json(); 
+            } else {
+                throw new Error("Network response was not ok");
+            }
+        })
+        .then(function (data) {
+            if (data.status == "ok"){
+                console.log("The clone request was successful")
+                var errorContainer = document.getElementById("modal-content");
+                console.log(errorContainer);
+                var state = false; 
+                function toggleState() {
+                        
+                    if (state){ // if state is true, then hide the modal
+                        errorContainer.classList.remove("modal-content");
+                        errorContainer.classList.add("hide")
+                    }else{
+                        errorContainer.classList.remove("hide");
+                        errorContainer.classList.add("modal-content");
+                    }
+                }
+                    
+                toggleState();
+            }
+        })
+        .catch(function (error) {
+            console.error("Fetch error:", error);
+        });
+
+    });
+}); 

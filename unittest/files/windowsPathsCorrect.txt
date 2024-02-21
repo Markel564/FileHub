@@ -1,0 +1,8 @@
+C:\Users\user\Folder1\Folder2
+C:\Users\user
+C:\Users\user\Folder1
+C:\Users\user\Folder1\Folder2
+C:\Users\user\Folder Separated
+C:\\Users\\user\\Folder1\\Folder2
+C:\\Users\\user\Folder Separated\\Folder2
+C:\\Users\\user\Folder Separated\Folder2

@@ -138,15 +138,12 @@ def load_files_and_folders(repoName, path=""):
 
                     folder_last_updated_utc = folder.lastUpdated.replace(tzinfo=None).strftime("%Y-%m-%d %H:%M:%S")
 
-                    print (f"folder {folder.name} with path {folder.path} and last updated {folder.lastUpdated} has last commit {last_commit_utc}")
                     if folder_last_updated_utc != last_commit_str:
                         folder.modified = True
                         folder.lastUpdated = last_commit_utc
-                        print ("We changed the last updated date of the folder to", folder.lastUpdated)
                         
 
                     else:
-                        print ("Again, the folder has not been updated")
                         folder.modified = False
                     
                     lastupdates.append(folder.lastUpdated)
@@ -171,7 +168,6 @@ def load_files_and_folders(repoName, path=""):
                 else:
                     
                     folder.modified = False
-                    print (f"folder {folder.name} with path {folder.path} and last updated {folder.lastUpdated} has not been updated")
                 
 
 
@@ -182,13 +178,13 @@ def load_files_and_folders(repoName, path=""):
         if len(files_in_db) > len(files):
             for file in files_in_db:
                 if file.name not in files:
-                    print ("DELETED")
+                    # print ("DELETED")
                     db.session.delete(file)
         
         if len(folders_in_db) > len(folders):
             for folder in folders_in_db:
                 if folder.name not in folders:
-                    print ("DELETED")
+                    # print ("DELETED")
                     db.session.delete(folder)
 
         

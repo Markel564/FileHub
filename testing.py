@@ -1,95 +1,62 @@
-from github import Github
-from github import Auth
-import github
-from datetime import datetime
-from git import Repo
+# from github import Github
+# from github import Auth
+# import github
+# from datetime import datetime
+# from git import Repo
+# import os
+# import datetime
+# import pytz
 import os
-import datetime
-import pytz
+from pathlib import Path    
+from pathlib import PurePosixPath
+from pathlib import PureWindowsPath, PurePosixPath
 
-
-
-from sqlalchemy import create_engine, MetaData
-
-def see_database():
-
-    for table in metadata.tables.values():
-        print(f"Table: {table.name}")
-        for foreign_key in table.foreign_keys:
-            print(f"  - Foreign Key: {foreign_key}")
-        for column in table.columns:
-            print(f"  - Column: {column.name}, Type: {column.type}")
-
-def initialize_github():
-    # returns a Github object
-    # we use my personal access token to authenticate
-    auth = Auth.Token("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")
-    g = Github(auth=auth, base_url="https://api.github.com")
-
-    return g
-
-
-
-
-def see_repo(name, path="", parent_folder=""):
-    g = initialize_github()
-    user = g.get_user()
-    repo = user.get_repo(name)
+def doesPathExist(path):
+    isExist = os.path.exists(path)  
     
-    # Get the contents of the current path within the repo
-    contents = repo.get_contents(path)
+    if not isExist:
+        print ("Does not exist")
+        return False
 
-    for content in contents:
-        if content.type == "dir":
-            # Get the name of the directory
-            directory_name = content.name
-
-            # Determine the full path of the directory
-            full_path = content.path
-
-
-            # Print the directory name and its parent folder
-            print(f"Directory: {directory_name}, Path: {full_path}")
-
-            # Recursively call see_repo for the subdirectory
-            see_repo(name, path=full_path, parent_folder=directory_name)
+    if not os.access(path, os.R_OK):
+        print ("Not readable")
+        return False
+    if not os.access(path, os.W_OK):
+        print ("Not writable")
+        return False
+    if not os.access(path, os.X_OK):
+        print ("Not executable")
+        return False
+    
+    # chech that it is a directory
+    if not os.path.isdir(path):
+        print ("Not a directory")
+        return False
     
     return True
 
 
-def get_content(repoName):
-
-    g = initialize_github()
-
-    user = g.get_user()
-
-    repo = user.get_repo(repoName)
-
-    contents = repo.get_contents("")
-
-    for content in contents:
-
-        if content.type == "file":
-            print(f"File: {content.name}, last modified: {content.last_modified}")
-
-
-def see_path(repoName, path):
-
-    g = initialize_github()
-
-    user = g.get_user()
-
-    repo = user.get_repo(repoName)
-
-    contents = repo.get_contents(path)
-
-    for content in contents:
-
-        print (content.name, content.path)
-
+def windows_to_unix_path(windows_path):
+    # Convert backslashes to forward slashes
+    unix_path = windows_path.replace('\\', '/')
     
+    # Check if the path starts with a drive letter
+    if len(unix_path) > 1 and unix_path[1] == ':':
+        drive_letter = unix_path[0].lower()
+        path_without_drive = unix_path[2:]
+        unix_path = '/mnt/' + drive_letter + path_without_drive
+
+    return unix_path + "/"
+
+
+
 if __name__ == "__main__":
-    
-    local_timezone = datetime.datetime.now(pytz.timezone('UTC')).astimezone().tzinfo
-    print(local_timezone)
-    # see_path("example","/my_directory")
+
+    # Example usage
+    windows_path = r'C:\Users\marke\Desktop\TFG\MarkHub'
+    windows_path = r'C:\Users\\marke\Desktop\\TFG\MarkHub'
+    # windows_path = r'/sys/dev/char'
+    unix_path = windows_to_unix_path(windows_path)
+    print("Unix-style path:", unix_path)
+
+    print (doesPathExist(unix_path))

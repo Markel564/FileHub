@@ -104,18 +104,7 @@
   display: none;
 }
 
-/* for info-container */
-.show-info{
-  display: block;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  height: 50vh;
-  width: 24vw;
-  transform: translate(-50%, -50%);
-  z-index: 999; 
-  border-radius: 50px;
-}
+
 
 .no-results{
   display: none;
@@ -140,12 +129,3 @@
 }
 
 
-/* FOR FUTURE */
-@media screen and (max-width: 768px) {
-  .show-info {
-      /* Adjust styles for smaller screens */
-      width: 90%;
-      height: 90vh;
-      /* ... other adjustments ... */
-  }
-}

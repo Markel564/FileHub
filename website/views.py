@@ -15,7 +15,7 @@ from . import db
 from .models import User, Repository, Folder, File
 views = Blueprint('views', __name__)
 import os
-from .pythonCode import add_user, get_repos, delete_repo, add_repo, load_files_and_folders, get_files_and_folders, add_file
+from .pythonCode import *
 from datetime import datetime
 
 # HOME PAGE
@@ -145,7 +145,7 @@ def add():
 
             return jsonify({"status": "errorCreation"})
         
-import time  
+  
 
 
 # REPO page
@@ -153,9 +153,9 @@ import time
 def repo(subpath):
     # the path could be the name of the repository or a folder path such as 'repoName/folder1/folder2'
     repoName = subpath.split("/")[0]
-    
+
     if request.method == 'GET':
-        time_start = time.time()
+  
         if repoName is None:
             return render_template("generic_error.html")
         
@@ -197,14 +197,14 @@ def repo(subpath):
             
         for folder in folders:
             folder[1] = reformat_date(folder[1])
-            print (f"Folder {folder[0]} last updated {folder[1]} modified {folder[2]}")
+ 
             
             
             
         #  change the date format to a more readable one
         last_updated = reformat_date(last_updated)
 
-        end_time = time.time() 
+
 
         return render_template("repo.html", title=title, header_name=repoName,avatar=user.avatarUrl, whole_path=subpath,
         files=files, folders=folders, last_updated=last_updated)
@@ -214,6 +214,7 @@ def repo(subpath):
 
     else: # POST
         
+
         
         data = request.get_json()  
         
@@ -249,7 +250,37 @@ def repo(subpath):
             
             return jsonify({"status": "ok", "path": folder_path + folder})
 
+        elif type_message == "clone-request":
 
+            repoName = data.get('repoName')
+
+            # search for the repository in the database
+            repo = Repository.query.filter_by(name=repoName).first()
+            if repo is None:
+                return jsonify({"status": "error"})
+            
+            
+            return jsonify({"status": "ok"})
+
+        elif type_message == "clone-cancel":
+
+            return jsonify({"status": "ok"})
+
+        elif type_message == "clone-confirm":
+            
+            repoName = data.get('repoName')
+            absolute_path = data.get('absolutePath')
+
+            repo = Repository.query.filter_by(name=repoName).first()
+            if repo is None:
+                return jsonify({"status": "error"})
+            
+            if repo.isCloned:
+                return jsonify({"status": "errorAlreadyCloned"})
+
+            ack = clone_repo(repoName, absolute_path)
+            print(ack)
+            return jsonify({"status": "ok"})
 
 
 @views.route('/upload-file', methods=['GET','POST'])

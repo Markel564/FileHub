@@ -238,6 +238,15 @@
 }
 
 
+.hide {
+  display: none;
+}
+
+
+
+
+
+
 /* for smaller sceens*/
 @media (max-width: 1200px) {
   .grid-container {

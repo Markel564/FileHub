@@ -1,0 +1,8 @@
+/mnt/c/Users/user/Folder1/Folder2/
+/mnt/c/Users/user/
+/mnt/c/Users/user/Folder1/
+/mnt/c/Users/user/Folder1/Folder2/
+/mnt/c/Users/user/Folder Separated/
+/mnt/c//Users//user//Folder1//Folder2/
+/mnt/c//Users//user/Folder Separated//Folder2/
+/mnt/c//Users//user/Folder Separated/Folder2/

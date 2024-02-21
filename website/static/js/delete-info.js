@@ -58,16 +58,16 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     })
     .then(function (data) {
-        var errorContainer = document.getElementById("info-container");
+        var errorContainer = document.getElementById("modal-content");
             
             var state = false;
             function toggleState() {
                 if (!state){ 
-                    errorContainer.classList.remove("show-info");
+                    errorContainer.classList.remove("modal-content");
                     errorContainer.classList.add("hide")
                 }else{
                     errorContainer.classList.remove("hide");
-                    errorContainer.classList.add("show-info");
+                    errorContainer.classList.add("modal-content");
                 }
             }
             toggleState();

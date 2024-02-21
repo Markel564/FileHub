@@ -5,11 +5,13 @@
 
 {% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style_repo.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_new_window.css') }}">
 
 {% endblock %}
 
 {% block js %}
 <script src="{{ url_for('static', filename='js/repo.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/clone.js') }}" defer></script>
 {% endblock %}
 
 {% block content %}
@@ -25,8 +27,8 @@
             </span>
         </button>
         <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" data-search>
-        <button class="btn btn-add-people" id="addPeople">ADD PEOPLE</button>
-        <button class="btn btn-settings" id="settings">SETTINGS</button>
+        <button class="btn btn-add-people" id="addPeopleButton">ADD PEOPLE</button>
+        <button class="btn btn-clone" id="cloneButton">SYNCHRONIZE</button>
     </div>
     
     <button class="btn btn-refresh" id="refresh">
@@ -96,8 +98,25 @@
 <!-- to upload clicking the drag and drop div -->
 <input type="file" id="file-input" style="display: none;">
 
-
-
+<!-- to 'clone' the repository -->
+<div id="modal-content" class="modal-content">
+    <div class="modal-row">
+        <h2>SYNCHRONIZE</h2>
+    </div>
+    <div class="modal-row">
+        <p>This repository will be synchronized with your local system</p>
+    </div>
+    <div class="absolutePath">
+        <input type="text" id="path" placeholder="Absolute Path" class="form-control">
+    </div>
+    <div class="modal-row">
+    <div class="modal-footer">
+    <button class="btn ok" id="ok">OK</button>
+    <button class="btn back" id="back">Back</button>
+    </div>
+    </div>
+    </div>
+</div>
 
 
 
