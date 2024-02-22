@@ -215,7 +215,7 @@ def repo(subpath):
     else: # POST
         
 
-        
+        print ("POST") 
         data = request.get_json()  
         
         if data is None: # if no data was sent
@@ -274,7 +274,6 @@ def repo(subpath):
             repo = Repository.query.filter_by(name=repoName).first()
             print ("Repo is: ", repo, "cloned: ", repo.isCloned)
             if repo is None:
-                print ("dsf")
                 return jsonify({"status": "error"})
             
             if repo.isCloned:
@@ -283,6 +282,7 @@ def repo(subpath):
                 return jsonify({"status": "errorAlreadyCloned"})
 
             ack = clone_repo(repoName, absolute_path)
+
             print ("Ack is: ", ack)
             if not ack:
                 flash("Error cloning the repository", category='error')

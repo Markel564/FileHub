@@ -61,7 +61,6 @@ createButton.addEventListener("click", (event) => {
                             }),
     })
     .then(function (response) {
-        console.log(response.status);
         if (response.ok) {
             return response.json(); 
         } else {

@@ -41,9 +41,9 @@ document.addEventListener("DOMContentLoaded", function () {
             toggleState();
             console.log(data);
             if (data.status == "ok"){
-                
-                // reload the page instead of redirecting to the main page
-                window.location.reload();
+                // window.location.replace("/");
+                // window.location.reload();
+                window.location.href = window.location.href;
             }
             if (data.status == "errorAlreadyCloned"){
                 alert("The repository is already cloned");
