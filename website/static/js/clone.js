@@ -39,11 +39,18 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
             }
             toggleState();
+            console.log(data);
             if (data.status == "ok"){
                 
                 // reload the page instead of redirecting to the main page
                 window.location.reload();
             }
+            if (data.status == "errorAlreadyCloned"){
+                alert("The repository is already cloned");
+                // window.location.reload();
+                
+            }
+            
         })
         .catch(function (error) {
             console.error("Fetch error for clonation:", error);

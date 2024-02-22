@@ -168,12 +168,12 @@ def repo(subpath):
         directory = '/'.join(subpath.split("/")[1:]).rstrip('/')
 
         if directory == '': # we are in a folder, if not, we are in the repository main page
-                root_of_project = True
+            root_of_project = True
             
         if root_of_project:
             if not load_files_and_folders(repoName): # if there is an error with loading the files and folders
-                    
                 return jsonify({"status": "error"})
+
             files, folders = get_files_and_folders(repoName, subpath) # at first the path of the repository is the same as the name of the repository + '/'
             last_updated = Repository.query.filter_by(name=repoName).first().lastUpdated
 
@@ -267,20 +267,32 @@ def repo(subpath):
             return jsonify({"status": "ok"})
 
         elif type_message == "clone-confirm":
-            
+ 
             repoName = data.get('repoName')
             absolute_path = data.get('absolutePath')
 
             repo = Repository.query.filter_by(name=repoName).first()
+            print ("Repo is: ", repo, "cloned: ", repo.isCloned)
             if repo is None:
+                print ("dsf")
                 return jsonify({"status": "error"})
             
             if repo.isCloned:
+                
+                flash("Repository already cloned!", category='error')
                 return jsonify({"status": "errorAlreadyCloned"})
 
             ack = clone_repo(repoName, absolute_path)
-            print(ack)
+            print ("Ack is: ", ack)
+            if not ack:
+                flash("Error cloning the repository", category='error')
+                return jsonify({"status": "error"})
+            
+            flash("Repository cloned successfully", category='success')
             return jsonify({"status": "ok"})
+
+
+
 
 
 @views.route('/upload-file', methods=['GET','POST'])

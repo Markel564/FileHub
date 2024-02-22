@@ -48,9 +48,13 @@ def load_files_and_folders(repoName, path=""):
         # get the repo
         repo = user.get_repo(repoName)
 
+
+        # the size of the repo might be empty, but it should return a valid response
+        if repo.size == 0:
+            return True
         # get the contents of the repo
         contents = repo.get_contents(path=path)
-      
+        
         files, folders, lastupdates = [], [], []
 
         for content_file in contents:
@@ -154,6 +158,7 @@ def load_files_and_folders(repoName, path=""):
         repository = Repository.query.filter_by(name=repoName).first()
 
         # update the last updated date of the repository
+        
         repository.lastUpdated = max(lastupdates)
 
         # also, if we are in a folder, we need to update the last updated date of the folder
@@ -195,7 +200,7 @@ def load_files_and_folders(repoName, path=""):
         return True
         
     
-    except github.GithubException as e:
+    except github.GithubException as e: 
         return False
 
 

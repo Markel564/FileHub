@@ -259,7 +259,6 @@ document.addEventListener("DOMContentLoaded", function () {
             if (data.status == "ok"){
                 console.log("The clone request was successful")
                 var errorContainer = document.getElementById("modal-content");
-                console.log(errorContainer);
                 var state = false; 
                 function toggleState() {
                         

@@ -50,41 +50,33 @@
                 <h2>{{ folder[1] }}</h2>       
             </div>
         {% endfor %}
-            {% if not files %}
-            <form class="dropzone" id="add-file">
-                <div class="content-box" name="" id="new-file">
-                    <img src="{{url_for('static', filename='images/upload-solid.svg')}}" class="img-content-new">
-                    <h2>Drag new file</h2>
-                </div>
-            </form>
-            {% endif %}
         {% endif %}
 
         {% if files %}
-        {% for file in files %}
-            {% if file[2] == True %}
-            <div class="content-box-new" name="{{ file[0] }}">
-                <img src="{{url_for('static', filename='images/file-regular.svg')}}" class="img-content">
-                <h1>{{ file[0] }}</h1>     
-                <h2>{{ file[1] }}</h2>   
-            </div>
-            {% else %}
-            <div class="content-box" name="{{ file[0] }}">
-                <img src="{{url_for('static', filename='images/file-regular.svg')}}" class="img-content">
-                <h1>{{ file[0] }}</h1>     
-                <h2>{{ file[1] }}</h2>   
-            </div>
-            {% endif %}
-        {% endfor %}
-
-        <!-- to add a new file -->
+            {% for file in files %}
+                {% if file[2] == True %}
+                <div class="content-box-new" name="{{ file[0] }}">
+                    <img src="{{url_for('static', filename='images/file-regular.svg')}}" class="img-content">
+                    <h1>{{ file[0] }}</h1>     
+                    <h2>{{ file[1] }}</h2>   
+                </div>
+                {% else %}
+                <div class="content-box" name="{{ file[0] }}">
+                    <img src="{{url_for('static', filename='images/file-regular.svg')}}" class="img-content">
+                    <h1>{{ file[0] }}</h1>     
+                    <h2>{{ file[1] }}</h2>   
+                </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        
         <form class="dropzone" id="add-file">
             <div class="content-box" name="" id="new-file">
                 <img src="{{url_for('static', filename='images/upload-solid.svg')}}" class="img-content-new">
                 <h2>Drag new file</h2>
             </div>
         </form>
-        {% endif %}
+
     </div> 
     
 
@@ -99,7 +91,7 @@
 <input type="file" id="file-input" style="display: none;">
 
 <!-- to 'clone' the repository -->
-<div id="modal-content" class="modal-content">
+<div id="modal-content" class="hide">
     <div class="modal-row">
         <h2>SYNCHRONIZE</h2>
     </div>
