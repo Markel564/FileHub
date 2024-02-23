@@ -20,13 +20,17 @@ def add_file(repo, file_name, path):
         user = g.get_user()
         repo = user.get_repo(repo)
 
-        
+        print (f"repo: {repo}, file_name: {file_name}, path: {path}")
         # read the file content
 
         with open("./uploads/"+file_name, 'rb') as file:
             content = file.read()
         
-        route = path + file_name   
+        if path == "/": # if the file is in the root
+            route = file_name
+        else:
+            route = path + file_name
+           
         repo.create_file(route, "Uploaded file", content)
 
         os.remove("./uploads/"+file_name)

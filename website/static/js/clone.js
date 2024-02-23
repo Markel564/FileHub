@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // CLONATION CONFIRMATION
     function PostRequestClone() {
-        
+        console.log("Cloning the repository")
         // obtain the path entered by the user in the input
         var path = document.getElementById("path").value;
         
@@ -46,8 +46,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 window.location.href = window.location.href;
             }
             if (data.status == "errorAlreadyCloned"){
-                alert("The repository is already cloned");
+                console.log("The repository is already cloned");
+                // alert("The repository is already cloned");
                 // window.location.reload();
+                window.location.href = window.location.href;
                 
             }
             
@@ -59,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // CANCEL CLONATION
     function PostRequestCancel() {
-            
+            console.log("Canceling clonation")
             fetch("/repo/" + repoName + "/", {
             method: "POST",
             headers: {

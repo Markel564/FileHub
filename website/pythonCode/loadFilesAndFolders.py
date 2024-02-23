@@ -48,15 +48,12 @@ def load_files_and_folders(repoName, path=""):
         # get the repo
         repo = user.get_repo(repoName)
 
-
-        # the size of the repo might be empty, but it should return a valid response
-        if repo.size == 0:
-            return True
         # get the contents of the repo
         contents = repo.get_contents(path=path)
         
         files, folders, lastupdates = [], [], []
 
+        
         for content_file in contents:
             
             if content_file.type == "file":
@@ -114,17 +111,28 @@ def load_files_and_folders(repoName, path=""):
                 # add the folder to the database associated with the repository
 
                 # before adding the folder, check if it is already in the database (in the same directory)
+                print (f"Searching for folder {content_file.name} in db with path {str(repoName+'/'+content_file.path)} and repo {repoName}")
                 folder = Folder.query.filter_by(name=content_file.name, repository_name=repoName, path=str(repoName+'/'+content_file.path)).first()
 
+                
                 if not folder: # if the folder is not in the database, add it
-
+                    
                     last_modified = get_last_modified(content_file.path, repo)
 
                     # the folder path is the path of the folder without the folder name
-                    folder_path = repoName + '/' + content_file.path.split(content_file.name)[0]
+
+                
+                    folder_path = repoName + '/' + content_file.path[0:len(content_file.path)-len(content_file.name)]
+                    
+
+                    # the folder path is the repoName + the path of the folder without the folder name
+                    
+                    
+                    # folder_path = repoName + '/' + content_file.path.split('/').slice(1, -1).join('/');
 
                     folder = Folder(name=content_file.name, sha=content_file.sha, repository_name=repoName, 
                     lastUpdated=last_modified, modified=True, path=str(repoName+'/'+ content_file.path), folderPath=folder_path) 
+                    print (f"Adding folder {content_file.name} to db with path {str(repoName+'/'+content_file.path)} and folder path {folder_path}")
                     db.session.add(folder)
 
                     # to keep track of the last updated date of the repository
@@ -136,6 +144,7 @@ def load_files_and_folders(repoName, path=""):
 
                 else: # if the folder is already in db, check if it has been updated and change modified to True if it has
                     
+                    print ("Folder in db")
                     
                     last_commit_utc = get_last_modified(content_file.path, repo)
                     last_commit_str = last_commit_utc.strftime("%Y-%m-%d %H:%M:%S")
@@ -155,7 +164,31 @@ def load_files_and_folders(repoName, path=""):
 
                 folders.append(content_file.name)
 
+
+        # the size of the repo might be empty, but it should return a valid response
+        # repo.size does not work always as the cache might be empty and it takes time to update
+
+        
+
         repository = Repository.query.filter_by(name=repoName).first()
+
+        if files == [] and folders == []: # if the repository is empty
+
+            # clear the files and folders in the database of that path
+            files_in_db = File.query.filter_by(repository_name=repoName, folderPath=repoName + '/' + path).all()
+            folders_in_db = Folder.query.filter_by(repository_name=repoName, folderPath=repoName + '/' + path).all()
+
+            for file in files_in_db:
+                db.session.delete(file)
+            
+            for folder in folders_in_db:
+                db.session.delete(folder)
+            
+            last_updated = get_last_modified(path, repo)
+            repository.lastUpdated = last_updated
+            db.session.commit()
+
+            return True
 
         # update the last updated date of the repository
         
@@ -214,12 +247,14 @@ def get_files_and_folders(repoName, father_dir):
     files = File.query.filter_by(repository_name=repoName, folderPath=father_dir).all()
     folders = Folder.query.filter_by(repository_name=repoName, folderPath=father_dir).all()
     
-    
+    folders2 = [[folder.name, folder.path] for folder in folders]
+    print ("Folders are", folders2)
+
     # we keep the names of the file and folders as well as the last updated date
     files = [[file.name, file.lastUpdated, file.modified] for file in files]
     folders = [[folder.name, folder.lastUpdated, folder.modified] for folder in folders]
-
-
+    
+    
     
     return files, folders
 

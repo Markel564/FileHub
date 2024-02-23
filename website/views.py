@@ -155,7 +155,7 @@ def repo(subpath):
     repoName = subpath.split("/")[0]
 
     if request.method == 'GET':
-  
+        print ("GET")
         if repoName is None:
             return render_template("generic_error.html")
         
@@ -171,9 +171,11 @@ def repo(subpath):
             root_of_project = True
             
         if root_of_project:
+            
             if not load_files_and_folders(repoName): # if there is an error with loading the files and folders
                 return jsonify({"status": "error"})
 
+            
             files, folders = get_files_and_folders(repoName, subpath) # at first the path of the repository is the same as the name of the repository + '/'
             last_updated = Repository.query.filter_by(name=repoName).first().lastUpdated
 
@@ -197,7 +199,7 @@ def repo(subpath):
             
         for folder in folders:
             folder[1] = reformat_date(folder[1])
- 
+
             
             
             
@@ -214,8 +216,7 @@ def repo(subpath):
 
     else: # POST
         
-
-        print ("POST") 
+ 
         data = request.get_json()  
         
         if data is None: # if no data was sent
@@ -274,20 +275,24 @@ def repo(subpath):
             repo = Repository.query.filter_by(name=repoName).first()
             print ("Repo is: ", repo, "cloned: ", repo.isCloned)
             if repo is None:
+                print ("Repo is None")
                 return jsonify({"status": "error"})
             
             if repo.isCloned:
                 
                 flash("Repository already cloned!", category='error')
+                print ("Repository already cloned")
                 return jsonify({"status": "errorAlreadyCloned"})
 
             ack = clone_repo(repoName, absolute_path)
 
-            print ("Ack is: ", ack)
+            
             if not ack:
+                print ("error cloning the repository")
                 flash("Error cloning the repository", category='error')
                 return jsonify({"status": "error"})
             
+            print ("Clonation OK")
             flash("Repository cloned successfully", category='success')
             return jsonify({"status": "ok"})
 
@@ -311,8 +316,9 @@ def upload_file():
             flash("File uploaded successfully", category='success')
         else:
             return jsonify({'error': 'Error adding file to the database'}), 400
-
-        return jsonify({'message': 'File uploaded successfully'})
+        
+        print ("File uploaded successfully")
+        return jsonify({'status': 'ok'})
     else:
         return jsonify({'error': 'No file received'}), 400
 

@@ -79,7 +79,7 @@ searchInput.addEventListener("input", (e) => {
     // if there are no files or folders, display the div 'no-results'
     const numberOfVisibleFilesAndFolders = document.querySelectorAll(".content-box:not(.hide)").length;
     const noResultsDiv = document.querySelector(".no-results");
-    console.log(numberOfVisibleFilesAndFolders);
+
     if (numberOfVisibleFilesAndFolders === 0) {
         noResultsDiv.style.display = "flex";
     } else {
@@ -104,7 +104,7 @@ folders.forEach(folder => {
         if (folderPath[folderPath.length-1] != "/"){
             folderPath = folderPath + "/";
         } 
-        console.log("We are sending the folder: " + folderName + " and the path: " + folderPath)    
+   
         fetch("/repo/"+folderPath, {
             method: "POST",
             headers: {
@@ -178,6 +178,7 @@ if (!document.querySelector('.dropzone').classList.contains('dz-clickable')) {
     });
 
     myDropzone.on("success", function(file, response) {
+        console.log("Success")
         window.location.reload();
     });
 }
@@ -208,7 +209,7 @@ document.getElementById('file-input').addEventListener('change', function(e) {
             path = path + "/";
         }
         formData.append("path", path);
-        console.log("We are sending the file: " + file.name + " and the path: " + path + " and the repoName: " + repoName);
+
         fetch("/upload-file", {
             method: "POST",
             body: formData,
@@ -221,14 +222,16 @@ document.getElementById('file-input').addEventListener('change', function(e) {
             }
         })
         .then(function (data) {
+            console.log("DATA", data)
             if (data.status == "ok"){
                 // we reload the page
+                console.log("RELOAD")
                 window.location.reload();
             }
-        }
+        }) 
         .catch(function (error) {
             console.error("Fetch error:", error);
-        }));
+        });
     }
 });
 
@@ -257,7 +260,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(function (data) {
             if (data.status == "ok"){
-                console.log("The clone request was successful")
+
                 var errorContainer = document.getElementById("modal-content");
                 var state = false; 
                 function toggleState() {

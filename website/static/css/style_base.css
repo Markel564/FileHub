@@ -45,3 +45,16 @@ body {
     opacity: 0.8;
     cursor: pointer;
 }
+
+
+#flash-messages {
+    position: fixed;
+    top: 0px; /* Adjust as needed */
+    width: 100%;
+    z-index: 1000; /* Ensure messages appear on top of other content */
+}
+
+
+.alert {
+    margin-bottom: 10px; /* Adjust as needed */
+}
