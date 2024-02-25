@@ -1,9 +1,1 @@
-db models defined at excalidraw
-
-
-TO THINK ABOUT:
-
-- Handle more errors (e.g. file name is too long)
-- local paths
-- how to work with the drag and drop (how it is created in the file system)
-
+windows-to-unix estoy considerando tambien WSL y no solo linux

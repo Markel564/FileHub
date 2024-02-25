@@ -4,6 +4,7 @@ import logging
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import os
+from pathlib import Path
 
 def on_created(event):
     print(f"{event.src_path} has been created!")
@@ -18,37 +19,46 @@ def on_moved(event):
     print(f"Moved {event.src_path} to {event.dest_path}")
 
 if __name__ == "__main__":
+
+    windows_path = r"C:\Users\marke\Desktop\test"
+    windows_path2 = r"C:\\Users\\marke\\Desktop\\test"
+
+    unix_path = Path(windows_path).resolve()
+    unix_path2 = Path(windows_path2).resolve()
+
+    print(unix_path)
+
+    print(unix_path2)
     # Configure logging
-    logging.basicConfig(level=logging.INFO)
+    # logging.basicConfig(level=logging.INFO)
 
-    event_handler = FileSystemEventHandler()
+    # event_handler = FileSystemEventHandler()
 
-    # Assigning event handling functions
-    event_handler.on_created = on_created
-    event_handler.on_deleted = on_deleted
-    event_handler.on_modified = on_modified
-    event_handler.on_moved = on_moved
+    # # Assigning event handling functions
+    # event_handler.on_created = on_created
+    # event_handler.on_deleted = on_deleted
+    # event_handler.on_modified = on_modified
+    # event_handler.on_moved = on_moved
 
-    path = "/mnt/c/Users/marke/Desktop"
+    # path = "/mnt/c/Users/marke/Desktop/"
 
-    if os.path.exists(path):
-        print("Path exists")
-    else:
-        print("Path does not exist")
-        sys.exit(1)
+    # if os.path.exists(path):    
+    #     print("Path exists")
+    # else:
+    #     print("Path does not exist")
+    #     sys.exit(1)
 
-    observer = Observer()
-    observer.schedule(event_handler, path, recursive=True)
-    print("Observer started")
-    observer.start()
+    # observer = Observer()
+    # observer.schedule(event_handler, path, recursive=True)
+    # print("Observer started")
+    # observer.start()
 
-    try:
-        while True:
-            print("Monitoring")
-            time.sleep(1)
-    except KeyboardInterrupt:
-        print("Stopped monitoring")
-        observer.stop()
-        print("Stopped monitoring")
+    # try:
+    #     while True:
+    #         time.sleep(1)
+    # except KeyboardInterrupt:
+    #     print("Stopped monitoring")
+    #     observer.stop()
+    #     print("Stopped monitoring")
 
-    observer.join()
+    # observer.join()
