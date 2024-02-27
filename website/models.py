@@ -26,6 +26,7 @@ class Repository(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     isCloned = db.Column(db.Boolean, default=False)
     lastUpdated = db.Column(db.DateTime(timezone=True), nullable=False, default=func.now())
+    loadedInDB = db.Column(db.Boolean, default=False, nullable=False)
 
     repository_files = db.relationship('File', backref='belongs_repository', lazy=True)
     repository_folders = db.relationship('Folder', backref='belongs_repository', lazy=True)  
@@ -40,6 +41,7 @@ class Folder(db.Model):
     repository_name = db.Column(db.String(100), db.ForeignKey('repository.name'), nullable=False)
     lastUpdated = db.Column(db.DateTime(timezone=True), nullable=False, default=func.now())
     modified = db.Column(db.Boolean, default=True, nullable=False)
+    shaHash = db.Column(db.String(64), nullable=True, unique=False)
     path = db.Column(db.String(255), nullable=True, unique=True)
     folderPath = db.Column(db.String(255), nullable=False, unique=False)
 
@@ -52,9 +54,10 @@ class File(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)  # not unique as we can have the same file name in different repositories
     path = db.Column(db.String(255), nullable=True, unique=True)
-    sha = db.Column(db.String(40), nullable=False, unique=False)
+    sha = db.Column(db.String(40), nullable=False, unique=False) # necessary????
     lastUpdated = db.Column(db.DateTime(timezone=True), default=func.now())
-    modified = db.Column(db.Boolean, default=True, nullable=False) # necessary?
+    modified = db.Column(db.Boolean, default=True, nullable=False)
+    shaHash = db.Column(db.String(64), nullable=True, unique=False)   
     repository_name = db.Column(db.String(100), db.ForeignKey('repository.name'), nullable=False)
     folderPath = db.Column(db.String(255), nullable=False, unique=False)
 

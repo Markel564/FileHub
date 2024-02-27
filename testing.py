@@ -1,64 +1,31 @@
-import sys
-import time
-import logging
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
+import hashlib
 import os
-from pathlib import Path
 
-def on_created(event):
-    print(f"{event.src_path} has been created!")
+def calcular_firma_archivo(ruta_archivo):
+    """Calcula la firma (hash) SHA-256 de un archivo."""
+    sha256 = hashlib.sha256()
+    with open(ruta_archivo, 'rb') as archivo:
+        # Lee el archivo en bloques para manejar archivos grandes
+        bloque = archivo.read(4096)
+        while len(bloque) > 0:
+            sha256.update(bloque)
+            bloque = archivo.read(4096)
+    return sha256.hexdigest()
 
-def on_deleted(event):
-    print(f"Someone deleted {event.src_path}!")
 
-def on_modified(event):
-    print(f"{event.src_path} has been modified")
+def calcular_firma_directorio(ruta_directorio):
 
-def on_moved(event):
-    print(f"Moved {event.src_path} to {event.dest_path}")
+    """Calcula la firma (hash) SHA-256 de un directorio."""
+    sha256 = hashlib.sha256()
+    for ruta, directorios, archivos in os.walk(ruta_directorio):
+        for nombre_archivo in sorted(archivos):
+            ruta_archivo = os.path.join(ruta, nombre_archivo)
+            sha256.update(calcular_firma_archivo(ruta_archivo).encode('utf-8'))
+    return sha256.hexdigest()
 
-if __name__ == "__main__":
-
-    windows_path = r"C:\Users\marke\Desktop\test"
-    windows_path2 = r"C:\\Users\\marke\\Desktop\\test"
-
-    unix_path = Path(windows_path).resolve()
-    unix_path2 = Path(windows_path2).resolve()
-
-    print(unix_path)
-
-    print(unix_path2)
-    # Configure logging
-    # logging.basicConfig(level=logging.INFO)
-
-    # event_handler = FileSystemEventHandler()
-
-    # # Assigning event handling functions
-    # event_handler.on_created = on_created
-    # event_handler.on_deleted = on_deleted
-    # event_handler.on_modified = on_modified
-    # event_handler.on_moved = on_moved
-
-    # path = "/mnt/c/Users/marke/Desktop/"
-
-    # if os.path.exists(path):    
-    #     print("Path exists")
-    # else:
-    #     print("Path does not exist")
-    #     sys.exit(1)
-
-    # observer = Observer()
-    # observer.schedule(event_handler, path, recursive=True)
-    # print("Observer started")
-    # observer.start()
-
-    # try:
-    #     while True:
-    #         time.sleep(1)
-    # except KeyboardInterrupt:
-    #     print("Stopped monitoring")
-    #     observer.stop()
-    #     print("Stopped monitoring")
-
-    # observer.join()
+ruta_archivo = '/mnt/c/Users/marke/Desktop/TFG/TestingClone/word1.docx'
+firma = calcular_firma_archivo(ruta_archivo)
+print("Firma SHA-256 del archivo:", firma)
+ruta_directorio = '/mnt/c/Users/marke/Desktop/TFG/TestingClone'
+firma = calcular_firma_directorio(ruta_directorio)
+print("Firma SHA-256 del directorio:", firma)

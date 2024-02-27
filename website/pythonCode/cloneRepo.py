@@ -5,6 +5,7 @@ import github
 import os
 from flask import session
 from git import Repo
+from .getHash import sign_file, sign_folder
 
 
 
@@ -22,7 +23,7 @@ def clone_repo(repoName, path):
 
     # convert the path to unix in case it is windows
     path = windows_to_unix_path(path)
- 
+    
 
     # revise that the path exists
     if not doesPathExist(path):
@@ -53,19 +54,30 @@ def clone_repo(repoName, path):
         repoDB = Repository.query.filter_by(name=repoName).first()
 
         repoDB.isCloned = True
-        repo.path = path    
+        repo.path = path  
+
+        add_shas_to_db(repoName, path)
         db.session.commit()
+
+
         print ("Commited session")
 
         return True
 
     except github.GithubException as e:
-        print (e)
+        print ("Exception is", e)
         return False
 
     except Exception as e:
         print (e)
         return False
+
+
+def add_shas_to_db(repoName, path):
+
+    # obtain the hashes of the files and folders in the repository (re)
+    # maybe modify the 'path' of files and folders to put the unix path
+    pass
 
 
 
@@ -81,6 +93,8 @@ def windows_to_unix_path(windows_path):
         path_without_drive = unix_path[2:]
         unix_path = '/mnt/' + drive_letter + path_without_drive
 
+    if unix_path[-1] == "/":
+        return unix_path
     return unix_path + "/"
 
 

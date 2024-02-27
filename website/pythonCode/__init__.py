@@ -14,5 +14,5 @@ from .deleteRepo import delete_repo
 from .addRepo import add_repo
 from .loadFilesAndFolders import load_files_and_folders, get_files_and_folders
 from .addFile import add_file
-from .cloneRepo import clone_repo
-from .EventHandler import EventHandler
+from .cloneRepo import clone_repo, windows_to_unix_path
+from .reformatDate import reformat_date
