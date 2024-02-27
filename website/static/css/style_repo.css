@@ -5,11 +5,13 @@
     align-items: center;
     justify-content: space-between;
     background-color: #1a1a1d;
-    width: 70vw; 
+    width: 75vw; 
     margin: 20px auto;
     margin-left: 8vw;
     flex-wrap: wrap;
+    /* border: 1px solid #ccc; */
 }
+
 
 .buttons-left {
   display: flex;
@@ -171,7 +173,7 @@
 }
 
 #folder{
-  background-color: #c3073f;
+  background-color: #950740;
 }
 #new-file{
   background-color: #d9d9d9;

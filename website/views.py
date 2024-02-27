@@ -202,7 +202,7 @@ def repo(subpath):
                     
                     files_in_db, folders_in_db = get_files_and_folders(repoName, folder_paths.pop(0))
 
-                    print (f"folders obtained from {folder} are {folders_in_db}")
+
                     for folder in folders_in_db:
                         relative_path = folder[3].split('/',1)
                         folders_to_add.append(relative_path[1] + folder[0])
@@ -309,7 +309,7 @@ def repo(subpath):
             repo = Repository.query.filter_by(name=repoName).first()
             print ("Repo is: ", repo, "cloned: ", repo.isCloned)
             if repo is None:
-                print ("Repo is None")
+  
                 return jsonify({"status": "error"})
             
             if repo.isCloned:
@@ -320,16 +320,13 @@ def repo(subpath):
 
             ack = clone_repo(repoName, absolute_path)
             if not ack:
-                print ("ERROR al clonar")
+ 
                 flash("Error cloning the repository", category='error')
                 return jsonify({"status": "error"})
             
             print ("Clonation OK")
             flash("Repository cloned successfully", category='success')
-            print ("LETS START THE THREAD")
-            clone_thread = threading.Thread(target=monitor, args=(repoName, windows_to_unix_path(absolute_path)))
-            clone_thread.start()
-            print ("It returned True")
+
             return jsonify({"status": "ok"})
 
 

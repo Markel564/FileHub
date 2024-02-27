@@ -54,13 +54,14 @@ def clone_repo(repoName, path):
         repoDB = Repository.query.filter_by(name=repoName).first()
 
         repoDB.isCloned = True
-        repo.path = path  
+        repo.FileSystemPath = path  
 
-        add_shas_to_db(repoName, path)
+        if not add_hashes(repoName, path):
+            return False
+
+        
         db.session.commit()
 
-
-        print ("Commited session")
 
         return True
 
@@ -73,12 +74,55 @@ def clone_repo(repoName, path):
         return False
 
 
+def add_hashes(repoName, path):
+
+
+
+    repo = Repository.query.filter_by(name=repoName).first()
+    files = repo.repository_files
+    folders = repo.repository_folders
+    
+    if not files or not folders:
+        return True
+    
+    try:
+        for file in files:
+            
+            real_path = path + file.path
+            # assign the path to the file
+            file.FileSystemPath = real_path
+            # assign the hash to the file
+            file.shaHash = sign_file(real_path)
+
+        
+        for folder in folders:
+            
+            real_path = path + folder.path
+            # assign the path to the folder
+            folder.FileSystemPath = real_path
+            # assign the hash to the folder
+            folder.shaHash = sign_folder(real_path)
+
+
+        
+        db.session.commit()
+    
+    except Exception as e:
+        print (e)
+        return False
+
+    return True
+
+
 def add_shas_to_db(repoName, path):
 
     # obtain the hashes of the files and folders in the repository (re)
     # maybe modify the 'path' of files and folders to put the unix path
-    pass
 
+    # list all the files and folders in the repository database associated with this repository
+    repo = Repository.query.filter_by(name=repoName).first()
+    files = repo.repository_files
+    folders = repo.repository_folders
 
 
 

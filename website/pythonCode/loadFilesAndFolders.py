@@ -76,7 +76,7 @@ def load_files_and_folders(repoName, path=""):
                     folder_path = repoName + '/' + content_file.path.split(content_file.name)[0]
 
                     file = File(name=content_file.name, sha=content_file.sha ,repository_name=repoName, lastUpdated=last_modified, 
-                    modified=True, path=str(repoName+'/'+content_file.path), folderPath=folder_path)
+                    modified=False, path=str(repoName+'/'+content_file.path), folderPath=folder_path)
 
                     db.session.add(file)
 
@@ -131,7 +131,7 @@ def load_files_and_folders(repoName, path=""):
                     # folder_path = repoName + '/' + content_file.path.split('/').slice(1, -1).join('/');
 
                     folder = Folder(name=content_file.name, sha=content_file.sha, repository_name=repoName, 
-                    lastUpdated=last_modified, modified=True, path=str(repoName+'/'+ content_file.path), folderPath=folder_path) 
+                    lastUpdated=last_modified, modified=False, path=str(repoName+'/'+ content_file.path), folderPath=folder_path) 
                    
                     db.session.add(folder)
 

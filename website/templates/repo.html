@@ -29,10 +29,15 @@
         <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" data-search>
         <button class="btn btn-add-people" id="addPeopleButton">ADD PEOPLE</button>
         <button class="btn btn-clone" id="cloneButton">SYNCHRONIZE</button>
+        <!-- <button class="btn btn-update-ghub" id="updateGhubButton">UPDATE FROM GITHUB</button>
+        <button class="btn btn-update-fs" id="updateFSButton">UPDATE FROM LOCAL SYSTEM</button> -->
     </div>
     
-    <button class="btn btn-refresh" id="refresh">
+    <!-- <button class="btn btn-refresh" id="refresh">
         <img src="{{ url_for('static', filename='images/refresh2.svg')}}" alt="refresh" class="img-refresh">
+    </button> -->
+    <button class="btn btn-refresh" id="refresh">
+        <img src="{{ url_for('static', filename='images/ghubrefresh.svg')}}" alt="refresh" class="img-refresh">
     </button>
 </div>
 
@@ -98,8 +103,11 @@
     <div class="modal-row">
         <p>This repository will be synchronized with your local system</p>
     </div>
+    <div class="modal-row">
+        <p>This means the changes done in the repository at your file system will be shown here</p>
+    </div>
     <div class="absolutePath">
-        <input type="text" id="path" placeholder="Absolute Path" class="form-control">
+        <input type="text" id="path" placeholder="Absolute Path (e.g. C:\Users\User\Dir)" class="form-control">
     </div>
     <div class="modal-row">
     <div class="modal-footer">
