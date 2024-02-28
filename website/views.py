@@ -13,10 +13,13 @@ The views are:
 from flask import Blueprint, render_template, flash, request, jsonify, session, redirect
 from . import db
 from .models import User, Repository, Folder, File
-views = Blueprint('views', __name__)
 import os
 from .pythonCode import *
-import threading
+
+
+views = Blueprint('views', __name__)
+
+
 
 # HOME PAGE
 @views.route('/', methods=['GET','POST'])
@@ -218,11 +221,10 @@ def repo(subpath):
                 last_updated = Repository.query.filter_by(name=repoName).first().lastUpdated
 
 
-
             title = repoName
 
 
-        else:
+        else: # we are in a folder
 
 
             files, folders = get_files_and_folders(repoName, subpath +'/')
@@ -332,27 +334,6 @@ def repo(subpath):
 
 
 
-
-@views.route('/upload-file', methods=['GET','POST'])
-def upload_file():
-    if 'file' in request.files:
-        file = request.files['file']
-        # Save the uploaded file to a directory on the server
-        file.save('uploads/' + file.filename)
-        # add the file to the database
-        path = request.form.get('path')
-        repoName = request.form.get('repoName')
-
-        
-        ack = add_file(repoName, file.filename, path) 
-        if ack:
-            flash("File uploaded successfully", category='success')
-        else:
-            return jsonify({'error': 'Error adding file to the database'}), 400
-        
-        return jsonify({'status': 'ok'})
-    else:
-        return jsonify({'error': 'No file received'}), 400
 
 
     

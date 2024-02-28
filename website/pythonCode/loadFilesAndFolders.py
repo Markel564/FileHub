@@ -75,7 +75,7 @@ def load_files_and_folders(repoName, path=""):
                     # the folder path is the path of the file without the file name
                     folder_path = repoName + '/' + content_file.path.split(content_file.name)[0]
 
-                    file = File(name=content_file.name, sha=content_file.sha ,repository_name=repoName, lastUpdated=last_modified, 
+                    file = File(name=content_file.name, repository_name=repoName, lastUpdated=last_modified, 
                     modified=False, path=str(repoName+'/'+content_file.path), folderPath=folder_path)
 
                     db.session.add(file)
@@ -130,9 +130,9 @@ def load_files_and_folders(repoName, path=""):
                     
                     # folder_path = repoName + '/' + content_file.path.split('/').slice(1, -1).join('/');
 
-                    folder = Folder(name=content_file.name, sha=content_file.sha, repository_name=repoName, 
+                    folder = Folder(name=content_file.name, repository_name=repoName, 
                     lastUpdated=last_modified, modified=False, path=str(repoName+'/'+ content_file.path), folderPath=folder_path) 
-                   
+
                     db.session.add(folder)
 
                     # to keep track of the last updated date of the repository
