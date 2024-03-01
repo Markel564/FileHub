@@ -18,13 +18,11 @@ def clone_repo(repoName, path):
     user = User.query.filter_by(id=user_id).first()
 
     if not user:
-
         return False
 
     # convert the path to unix in case it is windows
     path = windows_to_unix_path(path)
     
-
     # revise that the path exists
     if not doesPathExist(path):
         print ("Path does not exist")
@@ -35,13 +33,11 @@ def clone_repo(repoName, path):
         print ("Path does not have the right permissions")
         return False
     
-    
     # check that the path is a directory
     if not isDirectory(path):
         print ("Path is not a directory")
         return False
 
-    
     try:
         g = github.Github(user.githubG)
         user = g.get_user()
@@ -56,15 +52,13 @@ def clone_repo(repoName, path):
         repoDB.isCloned = True
         repoDB.FileSystemPath = path  
 
-
         if not add_hashes(repoName, path):
             return False
 
-  
         db.session.commit()
 
-
         return True
+
 
     except github.GithubException as e:
         print ("Exception is", e)
@@ -104,7 +98,6 @@ def add_hashes(repoName, path):
             # assign the hash to the folder
             folder.shaHash = sign_folder(real_path)
 
-
         
         db.session.commit()
     
@@ -113,17 +106,6 @@ def add_hashes(repoName, path):
         return False
 
     return True
-
-
-def add_shas_to_db(repoName, path):
-
-    # obtain the hashes of the files and folders in the repository (re)
-    # maybe modify the 'path' of files and folders to put the unix path
-
-    # list all the files and folders in the repository database associated with this repository
-    repo = Repository.query.filter_by(name=repoName).first()
-    files = repo.repository_files
-    folders = repo.repository_folders
 
 
 

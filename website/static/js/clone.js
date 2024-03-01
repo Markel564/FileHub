@@ -39,7 +39,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
             }
             toggleState();
-            console.log(data);
             if (data.status == "ok"  || data.status == "error"){
                 window.location.href = window.location.href;
             }

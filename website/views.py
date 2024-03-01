@@ -323,8 +323,7 @@ def repo(subpath):
                 return jsonify({"status": "error"})
             
             repo = Repository.query.filter_by(name=repoName).first()
-            print (f"Repo file system path: {repo.FileSystemPath} name is {repo.name}")
-            print ("Clonation OK")
+
             flash("Repository cloned successfully", category='success')
 
             return jsonify({"status": "ok"})
@@ -365,7 +364,7 @@ def repo(subpath):
                 return jsonify({"status": "error"})
 
             files, folders = get_files_and_folders(repoName, folderPath) # get the files and folders of the folder
-            print ("Folders obtained: ", folders)
+
             folders_to_add = []
             folder_paths = []
 
@@ -393,17 +392,33 @@ def repo(subpath):
             father_dir = repoName + "/" + path + "/" # the father directory of the folder
             # eliminate the last folder from the path
             father_dir = father_dir.rsplit("/",2)[0] + "/"
-            print ("Initial father dir: ", father_dir)
+ 
             while father_dir != repoName + "/":
                 father_folder = Folder.query.filter_by(repository_name=repoName, folderPath=father_dir).first()
                 father_folder.lastUpdated = folder_origin.lastUpdated
                 
                 father_dir = father_dir.rsplit("/",2)[0] + "/"
-                print ("Father dir: ", father_dir)
+                
 
             return jsonify({"status": "ok"})
 
+        
+        elif type_message == "refresh-filesystem":
 
+
+            repoName = data.get('repoName')
+            
+            repo = Repository.query.filter_by(name=repoName).first()
+
+            if not repo.isCloned:
+                flash ("Repository not cloned", category='error')
+                return jsonify({"status": "errorNotCloned"})
+            
+            check_file_system(repoName)
+
+
+
+            return jsonify({"status": "ok"})
 
 
 

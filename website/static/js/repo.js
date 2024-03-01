@@ -1,4 +1,3 @@
-// const Dropzone = require("dropzone");
 
 const backButton = document.querySelector("#backButton");
 const searchInput = document.querySelector("[data-search");
@@ -156,7 +155,7 @@ if (!document.querySelector('.dropzone').classList.contains('dz-clickable')) {
         url:'/upload-file',
         maxFilesize:104857600, // 100MB (GitHub limit)
         maxFiles:1,
-        acceptedFiles: ".docx",
+        acceptedFiles: ".*",
         addRemoveLinks:false,
         previewTemplate: '<div class="dz-preview dz-file-preview"></div>',
         sending: function(file, xhr, formData) {
@@ -318,6 +317,38 @@ refreshGitHubButton.addEventListener("click", () => {
     })
     .then(function (data) {
         if (data.status == "ok"){
+            window.location.reload();
+        }
+
+    })
+    .catch(function (error) {
+        console.error("Fetch error:", error);
+    });
+});
+
+
+// function to refresh from the file system
+refreshFileSystemButton.addEventListener("click", () => {
+
+   
+    fetch("/repo/"+repoName + "/",{
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ type: "refresh-filesystem", repoName: repoName }),
+    })
+    .then(function (response) {
+        if (response.ok) {
+            return response.json(); 
+        } else {
+            throw new Error("Network response was not ok");
+        }
+    })
+    .then(function (data) {
+        if (data.status == "ok"){
+            window.location.reload();
+        }else{
             window.location.reload();
         }
 

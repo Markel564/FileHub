@@ -6,6 +6,7 @@ import yaml
 from flask import session
 from datetime import datetime
 import os
+from .getHash import sign_file
 
 def add_file(repo, file_name, file_path):
     
@@ -76,6 +77,15 @@ def add_file(repo, file_name, file_path):
                 file.write(content)
             
             file.close()
+
+            # also, add, the path within the file system to the file and sign it
+
+            file = File.query.filter_by(path=path).first()
+            file.FileSystemPath = repo.FileSystemPath + path
+            file.shaHash = sign_file(file.FileSystemPath)
+
+            db.session.commit()
+            
         return True
         
     except github.GithubException as e:
