@@ -7,6 +7,10 @@ var folderName = document.title;
 const repoName = document.querySelector("#headerName").textContent;
 const folders = document.querySelectorAll("#folder");
 const addFileButton = document.querySelector("#add-file");
+const refreshGitHubButton = document.querySelector("#refresh-github");
+const refreshFileSystemButton = document.querySelector("#refresh-filesystem");
+
+
 
 // function to go back to one page before
 backButton.addEventListener("click", () => {
@@ -283,3 +287,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
     });
 }); 
+
+
+// function to refresh from the GitHub repository
+refreshGitHubButton.addEventListener("click", () => {
+
+    // similar to before, we construct the path, because this
+    // time the system is going to update the files from the Github
+    // repository from this path onwards
+    console.log("Im here")
+    let Path = window.location.pathname;
+    let folderPath = Path.substring(6);   
+
+    if (folderPath[folderPath.length-1] != "/"){
+        folderPath = folderPath + "/";
+    }
+    fetch("/repo/"+repoName + "/",{
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ type: "refresh-github", folderPath: folderPath, repoName: repoName }),
+    })
+    .then(function (response) {
+        if (response.ok) {
+            return response.json(); 
+        } else {
+            throw new Error("Network response was not ok");
+        }
+    })
+    .then(function (data) {
+        if (data.status == "ok"){
+            window.location.reload();
+        }
+
+    })
+    .catch(function (error) {
+        console.error("Fetch error:", error);
+    });
+});

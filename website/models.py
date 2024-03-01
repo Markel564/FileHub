@@ -35,13 +35,13 @@ class Repository(db.Model):
 
 class Folder(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(100), nullable=False) # necessary?
     repository_name = db.Column(db.String(100), db.ForeignKey('repository.name'), nullable=False)
     lastUpdated = db.Column(db.DateTime(timezone=True), nullable=False, default=func.now())
     modified = db.Column(db.Boolean, default=True, nullable=False)
     shaHash = db.Column(db.String(64), nullable=True, unique=False)
     path = db.Column(db.String(255), nullable=False, unique=True)
-    folderPath = db.Column(db.String(255), nullable=False, unique=True)
+    folderPath = db.Column(db.String(255), nullable=False, unique=False) #represents the path of his father folder
     FileSystemPath = db.Column(db.String(255), nullable=True, unique=True)
 
     fatherFolder_id = db.Column(db.Integer, db.ForeignKey('folder.id'), nullable=True) # folder where the folder is located
@@ -51,13 +51,13 @@ class Folder(db.Model):
 
 class File(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)  # not unique as we can have the same file name in different repositories
+    name = db.Column(db.String(100), nullable=False)  # necessary?
     path = db.Column(db.String(255), nullable=False, unique=True)
     lastUpdated = db.Column(db.DateTime(timezone=True), default=func.now())
     modified = db.Column(db.Boolean, default=True, nullable=False)
     shaHash = db.Column(db.String(64), nullable=True, unique=False)   
     repository_name = db.Column(db.String(100), db.ForeignKey('repository.name'), nullable=False)
-    folderPath = db.Column(db.String(255), nullable=False, unique=True)
+    folderPath = db.Column(db.String(255), nullable=False, unique=False)
     FileSystemPath = db.Column(db.String(255), nullable=True, unique=True)
 
     folder_id = db.Column(db.Integer, db.ForeignKey('folder.id'), nullable=True) # folder where the file is located 

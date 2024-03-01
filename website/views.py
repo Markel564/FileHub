@@ -184,9 +184,8 @@ def repo(subpath):
 
             
                 files, folders = get_files_and_folders(repoName, subpath) # at first the path of the repository is the same as the name of the repository + '/'
-                last_updated = Repository.query.filter_by(name=repoName).first().lastUpdated
-            
-
+                
+        
                 folders_to_add = []
                 folder_paths = []
 
@@ -202,14 +201,14 @@ def repo(subpath):
                     if not load_files_and_folders(repoName, folder):
                         return jsonify({"status": "error"})
                     
-                    
                     files_in_db, folders_in_db = get_files_and_folders(repoName, folder_paths.pop(0))
-
 
                     for folder in folders_in_db:
                         relative_path = folder[3].split('/',1)
                         folders_to_add.append(relative_path[1] + folder[0])
                         folder_paths.append(folder[3] + folder[0] + "/")
+
+                last_updated = Repository.query.filter_by(name=repoName).first().lastUpdated
 
                 repo.loadedInDB = True
 
@@ -226,9 +225,9 @@ def repo(subpath):
 
         else: # we are in a folder
 
-
             files, folders = get_files_and_folders(repoName, subpath +'/')
-            last_updated = Folder.query.filter_by(repository_name=repoName, path=subpath).first().lastUpdated
+            folder = Folder.query.filter_by(repository_name=repoName, path=subpath).first()
+            last_updated = folder.lastUpdated
 
             title = subpath.split("/")[-1]
 
@@ -252,7 +251,6 @@ def repo(subpath):
 
     else: # POST
         
- 
         data = request.get_json()  
         
         if data is None: # if no data was sent
@@ -309,7 +307,6 @@ def repo(subpath):
             absolute_path = data.get('absolutePath')
 
             repo = Repository.query.filter_by(name=repoName).first()
-            print ("Repo is: ", repo, "cloned: ", repo.isCloned)
             if repo is None:
   
                 return jsonify({"status": "error"})
@@ -317,7 +314,6 @@ def repo(subpath):
             if repo.isCloned:
                 
                 flash("Repository already cloned!", category='error')
-                print ("Repository already cloned")
                 return jsonify({"status": "errorAlreadyCloned"})
 
             ack = clone_repo(repoName, absolute_path)
@@ -330,6 +326,81 @@ def repo(subpath):
             flash("Repository cloned successfully", category='success')
 
             return jsonify({"status": "ok"})
+
+        
+        elif type_message == "refresh-github":
+
+            print ("POSTTT")
+            repoName = data.get('repoName')
+            folderPath = data.get('folderPath')
+
+            repo = Repository.query.filter_by(name=repoName).first()
+            
+
+            # we are going to load into the db the files and folders of the repository
+            # that who have the folderPath as a prefix
+            # e.g. f1/f2, we will load f1/f2/f3, f1/f2/f4, f1/f2, etc
+
+            if folderPath == repoName + "/": # if we are in the root of the repository
+                print ("ROOT")
+                repo.loadedInDB = False # we will change the loaded attribute and when a GET is made, the repository will be loaded again
+                db.session.commit()
+                return jsonify({"status": "ok"})
+            
+            path = folderPath[:-1] # we remove the last '/' from the folder path
+
+            folder_origin = Folder.query.filter_by(repository_name=repoName, path=path).first()
+
+            if folder_origin is None:
+                return jsonify({"status": "error"})
+
+
+            
+            path = path[len(repoName)+1:] # remove repoName/ from the folder path
+
+            if not load_files_and_folders(repoName, path): #load the files and folders of the folder into the db
+                print ("ERROR")
+                return jsonify({"status": "error"})
+
+            files, folders = get_files_and_folders(repoName, folderPath) # get the files and folders of the folder
+            print ("Folders obtained: ", folders)
+            folders_to_add = []
+            folder_paths = []
+
+            for folder in folders:
+                relative_path = folder[3].split('/',1)
+                folders_to_add.append(relative_path[1] + folder[0])
+                folder_paths.append(folder[3] + folder[0] + "/")
+            
+            while len(folders_to_add) > 0:
+                folder = folders_to_add.pop(0)
+
+                if not load_files_and_folders(repoName, folder):
+                    return jsonify({"status": "error"})
+                
+                files_in_db, folders_in_db = get_files_and_folders(repoName, folder_paths.pop(0))
+
+                for folder in folders_in_db:
+                    relative_path = folder[3].split('/',1)
+                    folders_to_add.append(relative_path[1] + folder[0])
+                    folder_paths.append(folder[3] + folder[0] + "/")
+                
+                db.session.commit()
+
+            # also, we have to update the lastUpdated attribute of the folder and all the father folders
+            father_dir = repoName + "/" + path + "/" # the father directory of the folder
+            # eliminate the last folder from the path
+            father_dir = father_dir.rsplit("/",2)[0] + "/"
+            print ("Initial father dir: ", father_dir)
+            while father_dir != repoName + "/":
+                father_folder = Folder.query.filter_by(repository_name=repoName, folderPath=father_dir).first()
+                father_folder.lastUpdated = folder_origin.lastUpdated
+                
+                father_dir = father_dir.rsplit("/",2)[0] + "/"
+                print ("Father dir: ", father_dir)
+
+            return jsonify({"status": "ok"})
+
 
 
 

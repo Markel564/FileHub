@@ -29,6 +29,7 @@ def load_files_and_folders(repoName, path=""):
     It is important to mention that the database will be updated every time the user clicks on the repository,
     and that it stores the files and folders in the / (not recursively)
     """
+    print (f"reponame: {repoName}, path: {path}")
     user_id = session.get('user_id')
     user = User.query.filter_by(id=user_id).first()
 
@@ -127,12 +128,11 @@ def load_files_and_folders(repoName, path=""):
 
                     # the folder path is the repoName + the path of the folder without the folder name
                     
-                    
-                    # folder_path = repoName + '/' + content_file.path.split('/').slice(1, -1).join('/');
 
                     folder = Folder(name=content_file.name, repository_name=repoName, 
                     lastUpdated=last_modified, modified=False, path=str(repoName+'/'+ content_file.path), folderPath=folder_path) 
 
+                    print (f"folder path: {folder_path} and path {str(repoName+'/'+ content_file.path)} and name {content_file.name} added to db")
                     db.session.add(folder)
 
                     # to keep track of the last updated date of the repository
