@@ -54,12 +54,13 @@ def clone_repo(repoName, path):
         repoDB = Repository.query.filter_by(name=repoName).first()
 
         repoDB.isCloned = True
-        repo.FileSystemPath = path  
+        repoDB.FileSystemPath = path  
+
 
         if not add_hashes(repoName, path):
             return False
 
-        
+  
         db.session.commit()
 
 

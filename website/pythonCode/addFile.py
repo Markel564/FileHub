@@ -47,7 +47,7 @@ def add_file(repo, file_name, file_path):
         lastUpdated=datetime.now(), modified = True ,folderPath = folder_path)
         db.session.add(file)
 
-        # repo.lastUpdated = datetime.now() # update the last updated date of the repository
+        repo.lastUpdated = datetime.now() # update the last updated date of the repository
 
         # we also have to update the dates of the folders where the file is located
 
@@ -65,6 +65,17 @@ def add_file(repo, file_name, file_path):
 
 
         db.session.commit()
+
+        # if the repo is cloned, we have to add the file to the file system
+
+        if repo.isCloned:
+            repo = Repository.query.filter_by(name=repo.name).first()
+ 
+            print (f"We are looking for {repo.FileSystemPath}/{path}")
+            with open(repo.FileSystemPath + path, "wb") as file:
+                file.write(content)
+            
+            file.close()
         return True
         
     except github.GithubException as e:

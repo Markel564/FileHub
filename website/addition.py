@@ -17,7 +17,7 @@ def upload_file():
         
         repoName = request.form.get('repoName')
 
-        
+        repo = Repository.query.filter_by(name=repoName).first()
         ack = add_file(repoName, file.filename, path) 
             
         if not ack:

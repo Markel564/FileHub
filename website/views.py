@@ -322,6 +322,8 @@ def repo(subpath):
                 flash("Error cloning the repository", category='error')
                 return jsonify({"status": "error"})
             
+            repo = Repository.query.filter_by(name=repoName).first()
+            print (f"Repo file system path: {repo.FileSystemPath} name is {repo.name}")
             print ("Clonation OK")
             flash("Repository cloned successfully", category='success')
 
