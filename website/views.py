@@ -331,19 +331,16 @@ def repo(subpath):
         
         elif type_message == "refresh-github":
 
-            print ("POSTTT")
             repoName = data.get('repoName')
             folderPath = data.get('folderPath')
 
             repo = Repository.query.filter_by(name=repoName).first()
             
-
             # we are going to load into the db the files and folders of the repository
             # that who have the folderPath as a prefix
             # e.g. f1/f2, we will load f1/f2/f3, f1/f2/f4, f1/f2, etc
 
             if folderPath == repoName + "/": # if we are in the root of the repository
-                print ("ROOT")
                 repo.loadedInDB = False # we will change the loaded attribute and when a GET is made, the repository will be loaded again
                 db.session.commit()
                 return jsonify({"status": "ok"})
@@ -354,13 +351,10 @@ def repo(subpath):
 
             if folder_origin is None:
                 return jsonify({"status": "error"})
-
-
             
             path = path[len(repoName)+1:] # remove repoName/ from the folder path
 
             if not load_files_and_folders(repoName, path): #load the files and folders of the folder into the db
-                print ("ERROR")
                 return jsonify({"status": "error"})
 
             files, folders = get_files_and_folders(repoName, folderPath) # get the files and folders of the folder
@@ -386,7 +380,7 @@ def repo(subpath):
                     folders_to_add.append(relative_path[1] + folder[0])
                     folder_paths.append(folder[3] + folder[0] + "/")
                 
-                db.session.commit()
+                
 
             # also, we have to update the lastUpdated attribute of the folder and all the father folders
             father_dir = repoName + "/" + path + "/" # the father directory of the folder
@@ -397,9 +391,9 @@ def repo(subpath):
                 father_folder = Folder.query.filter_by(repository_name=repoName, folderPath=father_dir).first()
                 father_folder.lastUpdated = folder_origin.lastUpdated
                 
-                father_dir = father_dir.rsplit("/",2)[0] + "/"
-                
+                father_dir = father_dir.rsplit("/",2)[0] + "/" 
 
+            db.session.commit()
             return jsonify({"status": "ok"})
 
         

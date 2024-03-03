@@ -16,6 +16,7 @@ import pytz
 from tzlocal import get_localzone
 import time
 from cachetools import TTLCache
+from .getHash import sign_file
 
 # Define a cache with a time-to-live (TTL) of 1 hour
 cache = TTLCache(maxsize=1000, ttl=3600)
@@ -29,7 +30,6 @@ def load_files_and_folders(repoName, path=""):
     It is important to mention that the database will be updated every time the user clicks on the repository,
     and that it stores the files and folders in the / (not recursively)
     """
-    print (f"reponame: {repoName}, path: {path}")
     user_id = session.get('user_id')
     user = User.query.filter_by(id=user_id).first()
 
@@ -54,7 +54,8 @@ def load_files_and_folders(repoName, path=""):
         
         files, folders, lastupdates = [], [], []
 
-        
+        repository = Repository.query.filter_by(name=repoName).first()
+
         for content_file in contents:
             
             if content_file.type == "file":
@@ -77,14 +78,27 @@ def load_files_and_folders(repoName, path=""):
                     folder_path = repoName + '/' + content_file.path.split(content_file.name)[0]
 
                     file = File(name=content_file.name, repository_name=repoName, lastUpdated=last_modified, 
-                    modified=False, path=str(repoName+'/'+content_file.path), folderPath=folder_path)
+                    modified=True, path=str(repoName+'/'+content_file.path), folderPath=folder_path)
 
+                    print (f"File path: {str(repoName+'/'+content_file.path)} and name {content_file.name} and folder path {folder_path} added to db")
                     db.session.add(file)
 
                     # to keep track of the last updated date of the repository
                     lastupdates.append(last_modified)
 
-                
+                    # also, if the repository is cloned, we have to add the file to the file system
+
+                    
+                    if repository.isCloned:
+                        with open(repository.FileSystemPath + repoName + "/" + content_file.path, 'wb') as file:
+                            file.write(content_file.decoded_content)
+
+                        # sign the file and the file system path
+                        file.FileSystemPath = repository.FileSystemPath + repoName + "/" + content_file.path
+                        file.shaHash = sign_file(file.FileSystemPath)
+                        
+                        file.close()
+         
 
                 else: # if the file is already in db, check if it has been updated and change modified to True if it has
 
@@ -97,15 +111,24 @@ def load_files_and_folders(repoName, path=""):
                         file.modified = True
                         file.lastUpdated = last_commit_utc
 
+                        # again, if the repository is cloned, we have to add the file to the file system
+                        if repository.isCloned:
+                            with open(repository.FileSystemPath + repoName + "/" + content_file.path, 'wb') as file:
+                                file.write(content_file.decoded_content)
 
+
+
+                        file.close()
 
                     else:
                         file.modified = False
 
                     lastupdates.append(file.lastUpdated)
 
-
                 files.append(content_file.name)
+
+                
+                        
             else:
                 
     
@@ -130,7 +153,7 @@ def load_files_and_folders(repoName, path=""):
                     
 
                     folder = Folder(name=content_file.name, repository_name=repoName, 
-                    lastUpdated=last_modified, modified=False, path=str(repoName+'/'+ content_file.path), folderPath=folder_path) 
+                    lastUpdated=last_modified, modified=True, path=str(repoName+'/'+ content_file.path), folderPath=folder_path) 
 
                     print (f"folder path: {folder_path} and path {str(repoName+'/'+ content_file.path)} and name {content_file.name} added to db")
                     db.session.add(folder)
@@ -168,7 +191,7 @@ def load_files_and_folders(repoName, path=""):
         # repo.size does not work always as the cache might be empty and it takes time to update
 
 
-        repository = Repository.query.filter_by(name=repoName).first()
+        
 
         if files == [] and folders == []: # if the repository is empty
 
@@ -239,16 +262,12 @@ def get_files_and_folders(repoName, father_dir):
     # get the files and folders from the database
     user_id = session.get('user_id')
 
-
     files = File.query.filter_by(repository_name=repoName, folderPath=father_dir).all()
     folders = Folder.query.filter_by(repository_name=repoName, folderPath=father_dir).all()
     
-
     # we keep the names of the file and folders as well as the last updated date
     files = [[file.name, file.lastUpdated, file.modified, file.folderPath] for file in files]
     folders = [[folder.name, folder.lastUpdated, folder.modified, folder.folderPath] for folder in folders]
-    
-    
     
     return files, folders
 
