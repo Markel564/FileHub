@@ -18,6 +18,10 @@ def upload_file():
         repoName = request.form.get('repoName')
 
         repo = Repository.query.filter_by(name=repoName).first()
+
+        if not repo.isCloned:
+            flash("The repository is not cloned", category='error')
+            return jsonify({'error': 'The repository is not cloned'}), 400
         ack = add_file(repoName, file.filename, path) 
             
         if not ack:

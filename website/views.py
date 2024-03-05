@@ -227,6 +227,7 @@ def repo(subpath):
 
             files, folders = get_files_and_folders(repoName, subpath +'/')
             folder = Folder.query.filter_by(repository_name=repoName, path=subpath).first()
+            print (f"Searching for folder with path {subpath}")
             last_updated = folder.lastUpdated
 
             title = subpath.split("/")[-1]
@@ -336,6 +337,7 @@ def repo(subpath):
 
             repo = Repository.query.filter_by(name=repoName).first()
             
+
             # we are going to load into the db the files and folders of the repository
             # that who have the folderPath as a prefix
             # e.g. f1/f2, we will load f1/f2/f3, f1/f2/f4, f1/f2, etc
@@ -405,14 +407,32 @@ def repo(subpath):
             repo = Repository.query.filter_by(name=repoName).first()
 
             if not repo.isCloned:
-                flash ("Repository not cloned", category='error')
+                flash ("Repository not synchronized with file system", category='error')
                 return jsonify({"status": "errorNotCloned"})
             
-            check_file_system(repoName)
-
-
+            if not check_file_system(repoName):
+                # flash something
+                return jsonify({"status": "error"})
 
             return jsonify({"status": "ok"})
+
+
+        elif type_message == "commit":
+
+            repoName = data.get('repoName') 
+
+            repo = Repository.query.filter_by(name=repoName).first()
+            if not repo.isCloned:
+                flash ("Repository not synchronized with file system", category='error')
+                return jsonify({"status": "errorNotCloned"})
+
+            if not commit_changes(repoName):
+                # flash something or redirect aftwards to error page
+                return jsonify({"status": "error"})
+            
+            return jsonify({"status": "ok"})
+            
+
 
 
 

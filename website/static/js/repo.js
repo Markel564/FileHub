@@ -8,6 +8,7 @@ const folders = document.querySelectorAll("#folder");
 const addFileButton = document.querySelector("#add-file");
 const refreshGitHubButton = document.querySelector("#refresh-github");
 const refreshFileSystemButton = document.querySelector("#refresh-filesystem");
+const commitButton = document.querySelector("#pushButton");
 
 
 
@@ -181,7 +182,11 @@ if (!document.querySelector('.dropzone').classList.contains('dz-clickable')) {
     });
 
     myDropzone.on("success", function(file, response) {
-        console.log("Success")
+        window.location.reload();
+    });
+
+    // even when it is a failure to upload the file, we reload the page
+    myDropzone.on("error", function(file, response) {
         window.location.reload();
     });
 }
@@ -337,6 +342,38 @@ refreshFileSystemButton.addEventListener("click", () => {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({ type: "refresh-filesystem", repoName: repoName }),
+    })
+    .then(function (response) {
+        if (response.ok) {
+            return response.json(); 
+        } else {
+            throw new Error("Network response was not ok");
+        }
+    })
+    .then(function (data) {
+        if (data.status == "ok"){
+            window.location.reload();
+        }else{
+            window.location.reload();
+        }
+
+    })
+    .catch(function (error) {
+        console.error("Fetch error:", error);
+    });
+});
+
+
+
+// function to commit changes to the repository
+pushButton.addEventListener("click", () => {
+
+    fetch("/repo/"+repoName + "/",{
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ type: "commit", repoName: repoName}),
     })
     .then(function (response) {
         if (response.ok) {

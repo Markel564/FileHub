@@ -59,6 +59,7 @@ class File(db.Model):
     repository_name = db.Column(db.String(100), db.ForeignKey('repository.name'), nullable=False)
     folderPath = db.Column(db.String(255), nullable=False, unique=False)
     FileSystemPath = db.Column(db.String(255), nullable=True, unique=True)
+    addedFirstTime = db.Column(db.Boolean, default=False, nullable=True)
 
     folder_id = db.Column(db.Integer, db.ForeignKey('folder.id'), nullable=True) # folder where the file is located 
 

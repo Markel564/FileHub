@@ -21,7 +21,7 @@ def clone_repo(repoName, path):
         return False
 
     # convert the path to unix in case it is windows
-    path = windows_to_unix_path(path)
+    path = windows_to_unix_path(path, directory=True)
     
     # revise that the path exists
     if not doesPathExist(path):
@@ -110,8 +110,9 @@ def add_hashes(repoName, path):
 
 
 
-def windows_to_unix_path(windows_path):
+def windows_to_unix_path(windows_path, directory=False):
     # Convert backslashes to forward slashes
+
     unix_path = windows_path.replace('\\', '/')
     
     # Check if the path starts with a drive letter
@@ -120,9 +121,10 @@ def windows_to_unix_path(windows_path):
         path_without_drive = unix_path[2:]
         unix_path = '/mnt/' + drive_letter + path_without_drive
 
-    if unix_path[-1] == "/":
-        return unix_path
-    return unix_path + "/"
+    if directory:
+        if unix_path[-1] != "/":
+            return unix_path + "/"
+    return unix_path
 
 
 def doesPathExist(path):

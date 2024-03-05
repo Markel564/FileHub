@@ -11,7 +11,12 @@
     flex-wrap: wrap;
 }
 
+#pushButton{
+  border: 2px solid black;
+  margin-left: 40%;
+}
 
+ 
 .buttons-left {
   display: flex;
   align-items: center;
