@@ -5,7 +5,7 @@ import github
 import os
 from flask import session
 from git import Repo
-from .getHash import sign_file, sign_folder
+from .getHash import sign_file
 
 
 
@@ -95,8 +95,7 @@ def add_hashes(repoName, path):
             real_path = path + folder.path
             # assign the path to the folder
             folder.FileSystemPath = real_path
-            # assign the hash to the folder
-            folder.shaHash = sign_folder(real_path)
+
 
         
         db.session.commit()

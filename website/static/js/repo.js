@@ -367,13 +367,19 @@ refreshFileSystemButton.addEventListener("click", () => {
 
 // function to commit changes to the repository
 pushButton.addEventListener("click", () => {
+    let Path = window.location.pathname;
+    let folderPath = Path.substring(6);
+    if (folderPath[folderPath.length-1] != "/"){
+        folderPath = folderPath + "/";
+    }
+
 
     fetch("/repo/"+repoName + "/",{
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ type: "commit", repoName: repoName}),
+        body: JSON.stringify({ type: "commit", repoName: repoName, folderPath: folderPath}),
     })
     .then(function (response) {
         if (response.ok) {

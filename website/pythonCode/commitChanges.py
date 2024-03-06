@@ -6,7 +6,7 @@ import yaml
 from flask import session
 
 
-def commit_changes(repoName):
+def commit_changes(repoName, folderpath):
     
     user_id = session.get('user_id')
     user = User.query.filter_by(id=user_id).first()
@@ -28,24 +28,42 @@ def commit_changes(repoName):
         for file in repoDB.repository_files:
             # if the file is modified, we have to commit the changes
 
-            if file.addedFirstTime:
+            if file.folderPath == folderpath:
 
-                fileDB = File.query.filter_by(path=file.path).first()
-                content = open(fileDB.FileSystemPath, 'rb').read()
-                repo.create_file(file.path, "Uploaded file", content)
-                file.addedFirstTime = False
-                file.modified = False
-                db.session.commit()
+                if file.addedFirstTime:
+                    
+                    print (f"File {file.path} with name {file.name} added for the first time and systempath {file.FileSystemPath}!")
+                    path_to_pass = file.folderPath.split('/')[1:]
+                    if path_to_pass[0] == '':
+                        path_to_pass = file.name
+                    else:
+                        path_to_pass = path_to_pass[0] + f"/{file.name}"
+                    print (path_to_pass)
+                    content = open(file.FileSystemPath, 'rb').read()
+                    repo.create_file(path_to_pass, "Uploaded file", content)
+                    file.addedFirstTime = False
+                    file.modified = False
+    
 
-            if file.modified:
+                elif file.modified:
+                    
+                    print (f"File {file.path} with name {file.name} and systempath {file.FileSystemPath} modified!")
+                    path_to_pass = file.folderPath.split('/')[1:]
+                    if path_to_pass[0] == '':
+                        path_to_pass = file.name
+                    else:
+                        path_to_pass = path_to_pass[0] + f"/{file.name}"
+                    print (path_to_pass)
 
-                fileDB = File.query.filter_by(path=file.path).first()
-                content = open(fileDB.FileSystemPath, 'rb').read()
-                repo.update_file(file.path, "Updated file", content, fileDB.shaHash)
-                file.modified = False
-                db.session.commit()
-            
+                    file_GB = repo.get_contents(f"{path_to_pass}")
+                    
+                    content = open(file.FileSystemPath, 'rb').read()
+                    repo.update_file(path_to_pass, "Updated file", content, file_GB.sha)
+                    file.modified = False
+        
+        db.session.commit()
         return True
 
-    except:
+    except Exception as e:
+        print (e)
         return False

@@ -1,6 +1,6 @@
 import os
 from ..models import User, Folder, File, Repository
-from .getHash import sign_file, sign_folder
+from .getHash import sign_file
 from .. import db
 from datetime import datetime
 from .cloneRepo import windows_to_unix_path
@@ -56,7 +56,7 @@ def check_file_system(repo):
                             FileSystemPath = windows_to_unix_path(str(repo.FileSystemPath) + father_dir, True)
                             folder = Folder(path=father_dir[:-1], repository_name=repo.name, lastUpdated=datetime.now(), 
                             name=father_dir.rsplit("/",2)[1], modified=True, 
-                            shaHash=sign_folder(FileSystemPath), folderPath=father_dir.rsplit("/",2)[0] + "/", 
+                            folderPath=father_dir.rsplit("/",2)[0] + "/", 
                             FileSystemPath=FileSystemPath)
 
                             print (f"Folder: {folder.name} with path {folder.path} and FileSystemPath {folder.FileSystemPath} and folderPath {folder.folderPath}")

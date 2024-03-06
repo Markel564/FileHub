@@ -14,13 +14,13 @@ def sign_file(file_path):
     return sha.hexdigest()
 
 
-def sign_folder(folder_path):
-    sha = hashlib.sha256()
+# def sign_folder(folder_path):
+#     sha = hashlib.sha256()
 
-    for root, dirs, files in os.walk(folder_path):
-        for file in sorted(files):
-            file_path = os.path.join(root, file)
-            sha.update(sign_file(file_path).encode('utf-8'))
+#     for root, dirs, files in os.walk(folder_path):
+#         for file in sorted(files):
+#             file_path = os.path.join(root, file)
+#             sha.update(sign_file(file_path).encode('utf-8'))
     
-    return sha.hexdigest()
+#     return sha.hexdigest()
 

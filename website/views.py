@@ -178,6 +178,7 @@ def repo(subpath):
             repo = Repository.query.filter_by(name=repoName).first()
 
             if not repo.loadedInDB: # if the repository is not loaded in the database, we load it
+                
 
                 if not load_files_and_folders(repoName): # if there is an error with loading the files and folders
                     return jsonify({"status": "error"})
@@ -227,7 +228,6 @@ def repo(subpath):
 
             files, folders = get_files_and_folders(repoName, subpath +'/')
             folder = Folder.query.filter_by(repository_name=repoName, path=subpath).first()
-            print (f"Searching for folder with path {subpath}")
             last_updated = folder.lastUpdated
 
             title = subpath.split("/")[-1]
@@ -345,6 +345,7 @@ def repo(subpath):
             if folderPath == repoName + "/": # if we are in the root of the repository
                 repo.loadedInDB = False # we will change the loaded attribute and when a GET is made, the repository will be loaded again
                 db.session.commit()
+
                 return jsonify({"status": "ok"})
             
             path = folderPath[:-1] # we remove the last '/' from the folder path
@@ -419,17 +420,20 @@ def repo(subpath):
 
         elif type_message == "commit":
 
-            repoName = data.get('repoName') 
+            repoName = data.get('repoName')
+            folderPath = data.get('folderPath')
+            print (repoName, folderPath)
 
             repo = Repository.query.filter_by(name=repoName).first()
             if not repo.isCloned:
                 flash ("Repository not synchronized with file system", category='error')
                 return jsonify({"status": "errorNotCloned"})
 
-            if not commit_changes(repoName):
+            if not commit_changes(repoName, folderPath):
                 # flash something or redirect aftwards to error page
                 return jsonify({"status": "error"})
             
+            flash("Changes sent to GitHub successfully", category='success')
             return jsonify({"status": "ok"})
             
 

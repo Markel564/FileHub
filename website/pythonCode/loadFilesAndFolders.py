@@ -17,6 +17,8 @@ from tzlocal import get_localzone
 import time
 from cachetools import TTLCache
 from .getHash import sign_file
+import os
+
 
 # Define a cache with a time-to-live (TTL) of 1 hour
 cache = TTLCache(maxsize=1000, ttl=3600)
@@ -58,7 +60,7 @@ def load_files_and_folders(repoName, path=""):
 
         for content_file in contents:
             
-
+            print (content_file.name, content_file.type)
             if content_file.type == "file":
                 
 
@@ -79,17 +81,21 @@ def load_files_and_folders(repoName, path=""):
                     folder_path = repoName + '/' + content_file.path.split(content_file.name)[0]
 
                     file = File(name=content_file.name, repository_name=repoName, lastUpdated=last_modified, 
-                    modified=True, path=str(repoName+'/'+content_file.path), folderPath=folder_path)
+                    modified=False, path=str(repoName+'/'+content_file.path), folderPath=folder_path)
 
-                    print (f"File path: {file.path} with folder path: {file.folderPath} added")
                     db.session.add(file)
 
-                    # to keep track of the last updated date of the repository
-                    lastupdates.append(last_modified)
 
                     # also, if the repository is cloned, we have to add the file to the file system
-                    
+
                     if repository.isCloned:
+
+                        # there is a chance that the new file belongs to a folder which we did not have in the database
+                        directory_path = str(repository.FileSystemPath + repoName + "/" + content_file.path)
+                        directory = os.path.dirname(directory_path)
+
+                        if not os.path.exists(directory):
+                            os.makedirs(directory)
                         with open(str(repository.FileSystemPath + repoName + "/" + content_file.path), 'wb') as fileFS:
                             fileFS.write(content_file.decoded_content)
 
@@ -102,7 +108,8 @@ def load_files_and_folders(repoName, path=""):
          
 
                 else: # if the file is already in db, check if it has been updated and change modified to True if it has
-
+                    
+                   
                     last_commit_utc = get_last_modified(content_file.path, repo)
                     last_commit_str = last_commit_utc.strftime("%Y-%m-%d %H:%M:%S")
 
@@ -117,19 +124,18 @@ def load_files_and_folders(repoName, path=""):
                         if repository.isCloned:
                             with open(repository.FileSystemPath + repoName + "/" + content_file.path, 'wb') as fileFS:
                                 fileFS.write(content_file.decoded_content)
-
-
-                        fileFS.close()
+                            fileFS.close()
+                            file.shaHash = sign_file(repository.FileSystemPath + repoName + "/" + content_file.path)
+                            file.modified = False # it has been updated, but we have to set modified to False
+                                                # since modified is seen from the fs perspective and used to commit changes
 
                     else:
                         file.modified = False
 
 
-                    lastupdates.append(file.lastUpdated)
-
+                lastupdates.append(file.lastUpdated)
                 files.append(content_file.name)
 
-                
                         
             else:
                 
@@ -155,20 +161,14 @@ def load_files_and_folders(repoName, path=""):
                     
 
                     folder = Folder(name=content_file.name, repository_name=repoName, 
-                    lastUpdated=last_modified, modified=True, path=str(repoName+'/'+ content_file.path), folderPath=folder_path) 
+                    lastUpdated=last_modified, modified=False, path=str(repoName+'/'+ content_file.path), folderPath=folder_path) 
 
-                    print (f"Folder with path: {folder.path} with folder path: {folder.folderPath} added")
                     db.session.add(folder)
-
-                    # to keep track of the last updated date of the repository
-
-                    lastupdates.append(last_modified)
                     # the last updated date of the repository will be the last updated date of the file
 
                 
 
                 else: # if the folder is already in db, check if it has been updated and change modified to True if it has
-                    
                     
                     last_commit_utc = get_last_modified(content_file.path, repo)
                     last_commit_str = last_commit_utc.strftime("%Y-%m-%d %H:%M:%S")
@@ -179,13 +179,16 @@ def load_files_and_folders(repoName, path=""):
                         folder.modified = True
                         folder.lastUpdated = last_commit_utc
                         
+                        if repo.isCloned:
+                            folder.modified = False
 
                     else:
                         folder.modified = False
-                    
-                    lastupdates.append(folder.lastUpdated)
+                        
+                        
 
 
+                lastupdates.append(folder.lastUpdated)
                 folders.append(content_file.name)
 
 
@@ -214,8 +217,10 @@ def load_files_and_folders(repoName, path=""):
             return True
 
         # update the last updated date of the repository
-        
-        repository.lastUpdated = max(lastupdates)
+
+        if repository.lastUpdated < max(lastupdates):
+            repository.lastUpdated = max(lastupdates)
+
 
         # also, if we are in a folder, we need to update the last updated date of the folder
         if path != "":
