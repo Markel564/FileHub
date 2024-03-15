@@ -400,3 +400,53 @@ pushButton.addEventListener("click", () => {
         console.error("Fetch error:", error);
     });
 });
+
+
+
+// function to delete a file
+document.addEventListener("DOMContentLoaded", function () {
+
+    var deleteButtons = document.querySelectorAll(".delete-file");
+
+    deleteButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+
+            var fileName = this.closest('#file').getAttribute("name");
+            
+            let path = window.location.pathname;
+            path = path.substring(6);
+            path = path.substring(repoName.length);
+            path = path.substring(1);
+            if (path[path.length-1] != "/"){
+                path = path + "/";
+            }
+
+            fetch("/repo/"+ repoName + "/",{
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ type: "delete-file", repoName: repoName, folderPath: path, fileName: fileName}),
+            })
+            .then(function (response) {
+                if (response.ok) {
+                    return response.json(); 
+                } else {
+                    throw new Error("Network response was not ok");
+                }
+            })
+            .then(function (data) {
+                if (data.status == "ok"){
+                    window.location.reload();
+                }else{
+                    window.location.reload();
+                }
+
+            })
+            .catch(function (error) {
+                console.error("Fetch error:", error);
+            });
+        });
+    }
+    );
+});

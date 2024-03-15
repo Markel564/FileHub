@@ -429,11 +429,46 @@ def repo(subpath):
                 flash ("Repository not synchronized with file system", category='error')
                 return jsonify({"status": "errorNotCloned"})
 
+            # check that there is at least one file with a modification or that was added for the first time
+            files = File.query.filter_by(repository_name=repoName, folderPath=folderPath).all()
+
+            if len(files) == 0:
+                flash("No files to commit", category='error')
+                return jsonify({"status": "errorNoFiles"})
+            
+            # if there are no files modified or added, do not commit
+            if files[0].addedFirstTime == False and files[0].modified == False:
+                flash("No changes detected", category='error')
+                return jsonify({"status": "errorNoFiles"})
+
             if not commit_changes(repoName, folderPath):
                 # flash something or redirect aftwards to error page
                 return jsonify({"status": "error"})
             
             flash("Changes sent to GitHub successfully", category='success')
+            return jsonify({"status": "ok"})
+
+        
+        elif type_message == "delete-file":
+            
+            repoName = data.get('repoName')
+            folderPath = data.get('folderPath')
+            fileName = data.get('fileName')
+
+            print ("Obtained: ", repoName, folderPath, fileName)
+
+            if folderPath == "/": # if we are in the root of the repository
+                path = repoName+"/"+fileName
+            else:
+                path = repoName+"/"+folderPath+fileName
+
+            if not delete_file(repoName, path, fileName):
+                flash("Error deleting file", category='error')
+                return jsonify({"status": "error"})
+            
+            flash("File deleted successfully", category='success')
+            
+
             return jsonify({"status": "ok"})
             
 

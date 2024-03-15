@@ -60,7 +60,6 @@ def load_files_and_folders(repoName, path=""):
 
         for content_file in contents:
             
-            print (content_file.name, content_file.type)
             if content_file.type == "file":
                 
 
@@ -82,6 +81,8 @@ def load_files_and_folders(repoName, path=""):
 
                     file = File(name=content_file.name, repository_name=repoName, lastUpdated=last_modified, 
                     modified=False, path=str(repoName+'/'+content_file.path), folderPath=folder_path)
+
+                    print (f"File {file.name} added with path {file.path} and folder path {file.folderPath}")
 
                     db.session.add(file)
 

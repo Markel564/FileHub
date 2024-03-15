@@ -57,7 +57,8 @@
             <div class="content-box" id="folder" name="{{ folder[0] }}" id="folder">
                 <img src=" {{ url_for('static', filename='images/folder.svg')}}" class="img-content"> 
                 <h1>{{ folder[0] }}</h1> 
-                <h2>{{ folder[1] }}</h2>       
+                <h2>{{ folder[1] }}</h2>  
+                <img src="{{ url_for('static', filename='images/trash-bin.svg')}}" alt="Delete repository" class="delete-folder">     
             </div>
         {% endfor %}
         {% endif %}
@@ -65,16 +66,18 @@
         {% if files %}
             {% for file in files %}
                 {% if file[2] == True %}
-                <div class="content-box-new" name="{{ file[0] }}">
+                <div class="content-box-new" name="{{ file[0] }}" id="file">
                     <img src="{{url_for('static', filename='images/file-regular.svg')}}" class="img-content">
                     <h1>{{ file[0] }}</h1>     
                     <h2>{{ file[1] }}</h2>   
+                    <img src="{{ url_for('static', filename='images/trash-bin.svg')}}" alt="Delete repository" class="delete-file"> 
                 </div>
                 {% else %}
-                <div class="content-box" name="{{ file[0] }}">
+                <div class="content-box" name="{{ file[0] }}" id="file">
                     <img src="{{url_for('static', filename='images/file-regular.svg')}}" class="img-content">
                     <h1>{{ file[0] }}</h1>     
                     <h2>{{ file[1] }}</h2>   
+                    <img src="{{ url_for('static', filename='images/trash-bin.svg')}}" alt="Delete repository" class="delete-file"> 
                 </div>
                 {% endif %}
             {% endfor %}

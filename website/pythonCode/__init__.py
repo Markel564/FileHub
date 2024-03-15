@@ -18,3 +18,4 @@ from .cloneRepo import clone_repo, windows_to_unix_path
 from .reformatDate import reformat_date
 from .checkFileSystem import check_file_system
 from .commitChanges import commit_changes
+from .deleteFilesAndFolders import *
