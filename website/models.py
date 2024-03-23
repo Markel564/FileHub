@@ -29,7 +29,7 @@ class Repository(db.Model):
     loadedInDB = db.Column(db.Boolean, default=False, nullable=False)
 
     repository_files = db.relationship('File', backref='belongs_repository', lazy=True)
-    repository_folders = db.relationship('Folder', backref='belongs_repository', lazy=True)  
+    repository_folders = db.relationship('Folder', backref='belongs_repository', lazy=True) 
     
  
 
@@ -59,8 +59,11 @@ class File(db.Model):
     folderPath = db.Column(db.String(255), nullable=False, unique=False)
     FileSystemPath = db.Column(db.String(255), nullable=True, unique=True)
     addedFirstTime = db.Column(db.Boolean, default=False, nullable=True)
+    deleted = db.Column(db.Boolean, default = False, nullable=True)
 
-    folder_id = db.Column(db.Integer, db.ForeignKey('folder.id'), nullable=True) # folder where the file is located 
+    folder_id = db.Column(db.Integer, db.ForeignKey('folder.id'), nullable=True) # folder where the file is located
+
+
 
     
 

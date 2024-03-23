@@ -39,11 +39,16 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
             }
             toggleState();
+
             if (data.status == "ok"  || data.status == "error"){
+                var synchronizeButton = document.querySelector("#cloneButton");
+                if (data.status == "ok"){
+                    synchronizeButton.textContent = "STOP SYNCHRO";
+                }
                 window.location.href = window.location.href;
             }
             if (data.status == "errorAlreadyCloned"){
-                console.log("The repository is already cloned");
+                
                 // alert("The repository is already cloned");
                 // window.location.reload();
                 window.location.href = window.location.href;

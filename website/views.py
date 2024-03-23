@@ -243,7 +243,7 @@ def repo(subpath):
             
         #  change the date format to a more readable one
         last_updated = reformat_date(last_updated)
-
+        
         return render_template("repo.html", title=title, header_name=repoName,avatar=user.avatarUrl, whole_path=subpath,
         files=files, folders=folders, last_updated=last_updated)
 
@@ -288,15 +288,22 @@ def repo(subpath):
 
         elif type_message == "clone-request":
 
-            repoName = data.get('repoName')
+            repoName, option = data.get('repoName'), data.get('option')
 
+            print (f"repoName: {repoName}, option: {option}")
             # search for the repository in the database
             repo = Repository.query.filter_by(name=repoName).first()
             if repo is None:
                 return jsonify({"status": "error"})
+
+            if option == "SYNCHRONIZE": #user wants to clone repository with file system
+                return jsonify({"status": "ok"})
             
-            
-            return jsonify({"status": "ok"})
+            # user wants to stop clonation
+            repo.isCloned = False
+            db.session.commit()
+            flash("Repository not synchronized anymore with file system", category='success')
+            return jsonify({"status": "ok", "option": "Stop"}) 
 
         elif type_message == "clone-cancel":
 
@@ -330,10 +337,9 @@ def repo(subpath):
             return jsonify({"status": "ok"})
 
         
-        elif type_message == "refresh-github":
+        elif type_message == "refresh-github": #to refresh the data based on the one in github
 
-            repoName = data.get('repoName')
-            folderPath = data.get('folderPath')
+            repoName, folderPath = data.get('repoName'), data.get('folderPath')
 
             repo = Repository.query.filter_by(name=repoName).first()
             
@@ -348,11 +354,12 @@ def repo(subpath):
 
                 return jsonify({"status": "ok"})
             
-            path = folderPath[:-1] # we remove the last '/' from the folder path
+            path = folderPath[:-1] # remove the last '/' from the folder path
 
-            folder_origin = Folder.query.filter_by(repository_name=repoName, path=path).first()
+            folder_origin = Folder.query.filter_by(repository_name=repoName, path=path).first() 
 
             if folder_origin is None:
+                # flash something
                 return jsonify({"status": "error"})
             
             path = path[len(repoName)+1:] # remove repoName/ from the folder path
@@ -412,7 +419,7 @@ def repo(subpath):
                 return jsonify({"status": "errorNotCloned"})
             
             if not check_file_system(repoName):
-                # flash something
+                flash("Error checking the file system", category='error')
                 return jsonify({"status": "error"})
 
             return jsonify({"status": "ok"})
@@ -420,9 +427,7 @@ def repo(subpath):
 
         elif type_message == "commit":
 
-            repoName = data.get('repoName')
-            folderPath = data.get('folderPath')
-            print (repoName, folderPath)
+            repoName, folderPath = data.get('repoName'), data.get('folderPath') 
 
             repo = Repository.query.filter_by(name=repoName).first()
             if not repo.isCloned:
@@ -432,12 +437,23 @@ def repo(subpath):
             # check that there is at least one file with a modification or that was added for the first time
             files = File.query.filter_by(repository_name=repoName, folderPath=folderPath).all()
 
+            modifications, insertions, deletions = False, False, False
+            for file in files:
+                if file.modified:
+                    modifications = True
+                if file.addedFirstTime:
+                    insertions = True
+                if file.deleted:
+                    deletions = True
+
+            print (f"modifications: {modifications}, insertions: {insertions}, deletions: {deletions}")
+
             if len(files) == 0:
                 flash("No files to commit", category='error')
                 return jsonify({"status": "errorNoFiles"})
             
-            # if there are no files modified or added, do not commit
-            if files[0].addedFirstTime == False and files[0].modified == False:
+            # if there are no files modified or added (or deletions), do not commit
+            if not modifications and not insertions and not deletions:
                 flash("No changes detected", category='error')
                 return jsonify({"status": "errorNoFiles"})
 
@@ -451,16 +467,27 @@ def repo(subpath):
         
         elif type_message == "delete-file":
             
-            repoName = data.get('repoName')
-            folderPath = data.get('folderPath')
-            fileName = data.get('fileName')
+            repoName, folderPath, fileName = data.get('repoName'), data.get('folderPath'), data.get('fileName')
 
-            print ("Obtained: ", repoName, folderPath, fileName)
 
             if folderPath == "/": # if we are in the root of the repository
                 path = repoName+"/"+fileName
+                inRoot = True
             else:
                 path = repoName+"/"+folderPath+fileName
+
+            file = File.query.filter_by(repository_name=repoName, path=path).first()
+
+
+            repo = Repository.query.filter_by(name=repoName).first()
+
+            if not repo.isCloned:
+                flash ("Repository not synchronized with file system", category='error')
+                return jsonify({"status": "errorNotCloned"})
+            
+            if file.deleted:
+                flash("File already deleted in file system!", category='error')
+                return jsonify({"status": "error"})
 
             if not delete_file(repoName, path, fileName):
                 flash("Error deleting file", category='error')
@@ -468,7 +495,8 @@ def repo(subpath):
             
             flash("File deleted successfully", category='success')
             
-
+            repo.loadedInDB = False # we will change the loaded attribute and when a GET is made, the repository will be loaded again
+                                    # showing the changes made
             return jsonify({"status": "ok"})
             
 

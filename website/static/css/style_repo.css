@@ -128,7 +128,7 @@
   justify-items: center; 
 }
 
-.content-box, .content-box-new{
+.content-box, .content-box-new, .content-box-deleted{
   height: 220px;
   width: 220px;
   display: flex;
@@ -152,7 +152,11 @@
 .content-box-new{
   background: linear-gradient(45deg, #588157 50%, #A3b18a 50%);
 }
-.content-box:hover, .content-box-new:hover{
+
+.content-box-deleted{
+  background: linear-gradient(45deg, #950740 50%, #d9d9d9 50%);
+}
+.content-box:hover, .content-box-new:hover, .content-box-deleted:hover{
   cursor: pointer;
   opacity: 0.8;
 }
@@ -163,7 +167,7 @@
   width: auto;
 }
 
-.content-box h1, .content-box-new h1{
+.content-box h1, .content-box-new h1, .content-box-deleted h1{
   color: black;
   font-size: 1.5rem;
   font-weight: bold;
@@ -175,7 +179,7 @@
   max-width: 90%;
 }
 
-.content-box h2, .content-box-new h2{
+.content-box h2, .content-box-new h2, .content-box-deleted h2{
   color: black;
   font-size: 1.2rem;
   font-weight: bold;

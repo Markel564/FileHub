@@ -12,93 +12,110 @@ def check_file_system(repo):
     if not repo:
         return False
     
+    try:
+        # we have to check for new files in the file system that the user has entered manually
+        # and add them to the database
 
-    # we have to check for new files in the file system that the user has entered manually
-    # and add them to the database
+        for root, dirs, files in os.walk(str(repo.FileSystemPath)+repo.name+"/"):
+            
 
-    for root, dirs, files in os.walk(str(repo.FileSystemPath)+repo.name+"/"):
-        
+            if not root.startswith(repo.FileSystemPath+repo.name+"/.git"):
 
-        if not root.startswith(repo.FileSystemPath+repo.name+"/.git"):
+                for file in files:
 
-            for file in files:
+                    if file.startswith('~$'): # if the file is a temporary file, we don't want to add it to the database
+                        continue
 
-                if file.startswith('~$'): # if the file is a temporary file, we don't want to add it to the database
-                    continue
+                    full_file_path = os.path.join(root, file)
+                    relative_file_path = os.path.relpath(full_file_path, str(repo.FileSystemPath) + repo.name + "/")
 
-                full_file_path = os.path.join(root, file)
-                relative_file_path = os.path.relpath(full_file_path, str(repo.FileSystemPath) + repo.name + "/")
+                    relative_file_path_with_repo = os.path.join(repo.name, relative_file_path)
 
-                relative_file_path_with_repo = os.path.join(repo.name, relative_file_path)
-                print("buscamos el archivo:", relative_file_path_with_repo, "con full path:", full_file_path)
-
-                fileDB = File.query.filter_by(path=relative_file_path_with_repo).first()
-                
-                if not fileDB:
-                    # we add the file to the database
-                    folderPath = relative_file_path_with_repo.rsplit("/",1)[0] + "/"
-                    FileSystemPath = windows_to_unix_path(full_file_path)
-                    hash_of_file = sign_file(FileSystemPath)
-                    file = File(name=file, path=relative_file_path_with_repo, repository_name=repo.name, 
-                    lastUpdated=datetime.now(), modified=True, folderPath=folderPath, FileSystemPath=FileSystemPath, 
-                    shaHash=hash_of_file, addedFirstTime=True)
-                    db.session.add(file)
-
-                    # we have to update the date of the folder where the file is located and the repository
-                    father_dir = folderPath
-                    print (f"Initial father_dir: {father_dir}")
-
-                    while father_dir != repo.name + "/":
-                        folder = Folder.query.filter_by(path=father_dir, repository_name=repo.name).first()
-
-                        # there is a chance that the user created the directory manually, so we have to add it to the database
-                        if not folder:
-                            FileSystemPath = windows_to_unix_path(str(repo.FileSystemPath) + father_dir, True)
-                            folder = Folder(path=father_dir[:-1], repository_name=repo.name, lastUpdated=datetime.now(), 
-                            name=father_dir.rsplit("/",2)[1], modified=True, 
-                            folderPath=father_dir.rsplit("/",2)[0] + "/", 
-                            FileSystemPath=FileSystemPath)
-
-                            print (f"Folder: {folder.name} with path {folder.path} and FileSystemPath {folder.FileSystemPath} and folderPath {folder.folderPath}")
-                            db.session.add(folder)
-
-
-                        else:
-                            folder.lastUpdated = datetime.now()
-                        
-                        father_dir = father_dir.rsplit("/",2)[0] + "/"
+                    fileDB = File.query.filter_by(path=relative_file_path_with_repo).first()
                     
-                    repo.lastUpdated = datetime.now()
-   
-        
-            db.session.commit()
+                    if not fileDB: # if file not in database
+                        # we add the file to the database
+                        folderPath = relative_file_path_with_repo.rsplit("/",1)[0] + "/"
+                        FileSystemPath = windows_to_unix_path(full_file_path)
+                        hash_of_file = sign_file(FileSystemPath)
+                        file = File(name=file, path=relative_file_path_with_repo, repository_name=repo.name, 
+                        lastUpdated=datetime.now(), modified=True, folderPath=folderPath, FileSystemPath=FileSystemPath, 
+                        shaHash=hash_of_file, addedFirstTime=True)
+                        db.session.add(file)
+
+                        # we have to update the date of the folder where the file is located and the repository
+                        father_dir = folderPath
+                        print (f"Initial father_dir: {father_dir}")
+
+                        while father_dir != repo.name + "/":
+                            folder = Folder.query.filter_by(path=father_dir, repository_name=repo.name).first()
+
+                            # there is a chance that the user created the directory manually, so we have to add it to the database
+                            if not folder:
+                                FileSystemPath = windows_to_unix_path(str(repo.FileSystemPath) + father_dir, True)
+                                folder = Folder(path=father_dir[:-1], repository_name=repo.name, lastUpdated=datetime.now(), 
+                                name=father_dir.rsplit("/",2)[1], modified=True, 
+                                folderPath=father_dir.rsplit("/",2)[0] + "/", 
+                                FileSystemPath=FileSystemPath)
+
+                                print (f"Folder: {folder.name} with path {folder.path} and FileSystemPath {folder.FileSystemPath} and folderPath {folder.folderPath}")
+                                db.session.add(folder)
+
+
+                            else:
+                                folder.lastUpdated = datetime.now()
+                            
+                            father_dir = father_dir.rsplit("/",2)[0] + "/"
+                        
+                        repo.lastUpdated = datetime.now()
     
-    # second, we have to check for modifications in the files that are already in the database
-    for file_repo in repo.repository_files:
-
-        print (f"file_repo: {file_repo.name}")
-        file = File.query.filter_by(path=file_repo.path).first()
-        hash_of_file = sign_file(file.FileSystemPath)
-
-        # if the hashes are different, there is a modification in the file
-        # and so, we have to update the database (NOT GITHUB YET)
-        
-        if hash_of_file != file.shaHash:
-            file.modified = True
-            file.shaHash = hash_of_file
-            file.lastUpdated = datetime.now()
-
-            # update the date of the folder where the file is located and the repository
-            father_dir = file.folderPath
             
-            while father_dir != repo.name + "/":
-                print (f"father_dir: {father_dir}")
-                folder = Folder.query.filter_by(path=father_dir[:-1], repository_name=repo.name).first()
-                folder.lastUpdated = datetime.now()
+                db.session.commit()
+        
+        # second, we have to check for modifications in the files that are already in the database
+        for file_repo in repo.repository_files:
+
+            print (f"file_repo: {file_repo.name}")
+            file = File.query.filter_by(path=file_repo.path).first()
+            hash_of_file = sign_file(file.FileSystemPath)
+
+            if not hash_of_file: # if the file is not found, we have to delete it from the database, as it has been deleted
+                db.session.delete(file)
+
+                # we have to update the date of the folder where the file is located and the repository
+                father_dir = file.folderPath
+                update_dates(father_dir)
+                db.session.commit()
+
+                continue
+        
+            # if the hashes are different, there is a modification in the file
+            # and so, we have to update the database (NOT GITHUB YET, this is done when user commits changes)
+            
+            if hash_of_file != file.shaHash:
+                file.modified = True
+                file.shaHash = hash_of_file
+                file.lastUpdated = datetime.now()
+
+                # update the date of the folder where the file is located and the repository
+                father_dir = file.folderPath
                 
-                father_dir = father_dir.rsplit("/",2)[0] + "/"
+                update_dates(father_dir)
             
-            repo.lastUpdated = datetime.now()
-        
-        db.session.commit()
-    return True
+            db.session.commit()
+        return True
+
+    except Exception as e:
+        print (f"Error in check_file_system: {e}")
+        return False
+
+
+def update_dates(father_dir):
+
+    while father_dir != repo.name + "/":
+        folder = Folder.query.filter_by(path=father_dir, repository_name=repo.name).first()
+        folder.lastUpdated = datetime.now()
+        father_dir = father_dir.rsplit("/",2)[0] + "/"
+    
+    repo.lastUpdated = datetime.now()
+    db.session.commit()

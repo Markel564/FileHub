@@ -23,12 +23,12 @@ def delete_file(repo, path, name):
         if not repoDB:
             return False
         
-        # deletion will always involve deleting the file in github and from the d
+        # deletion will always involve deleting the file from the db
         # and, if the repository is cloned, from the local file system
+        # moreover, if the repository is cloned, it will involve adding them to a new type of file
+        # (different to Files as it will not be shown in the interface) which can later be deleted
+        # when user commits changes
 
-        g = github.Github(user.githubG)
-        user = g.get_user()
-        repo = user.get_repo(repo)
 
         file = File.query.filter_by(path=path, name=name).first()
 
@@ -38,19 +38,10 @@ def delete_file(repo, path, name):
         # the file could not be submitted to github yet as the user has not committed the changes
         # then, we will only delete the file from the database (and the file system if the repository is cloned)
 
-        
-
-        # first, we delete the file from the github repository
-        if not file.addedFirstTime:
-            # remove the repoName + / from the path
-            file_path = path[len(repoDB.name) + 1:] 
-            file_GB = repo.get_contents(file_path)
-
-
-            repo.delete_file(file_GB.path, "Deleted file", file_GB.sha)
-
-        # then, we delete the file from the database
-        db.session.delete(file)
+        # First, if the repository is cloned, we make it so that the file is deleted in the db (so that the user then
+        # commits the deletion). It will be deleted from the database when the user commits the message
+        if repoDB.isCloned:
+            file.deleted = True
 
         # also, the repositories lastUpdated field is updated
         repoDB.lastUpdated = datetime.now()
@@ -58,7 +49,6 @@ def delete_file(repo, path, name):
         # we also have to update the dates of the folders where the file is located
 
         folder_path = file.folderPath[:-1] # remove the last character
-        print (folder_path)
 
         while folder_path != repoDB.name:
                 
@@ -83,6 +73,7 @@ def delete_file(repo, path, name):
                 print (e)
                 return False
         
+        print (f"File {file.name} with path {file.path} deleted!. Property deleted: {file.deleted}")
         return True
 
         

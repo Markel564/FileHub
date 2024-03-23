@@ -6,6 +6,7 @@ import yaml
 from flask import session
 
 
+
 def commit_changes(repoName, folderpath):
     
     user_id = session.get('user_id')
@@ -27,12 +28,27 @@ def commit_changes(repoName, folderpath):
 
         for file in repoDB.repository_files:
             # if the file is modified, we have to commit the changes
-
+            print (f"File: {file.name} with path {file.folderPath}")
             if file.folderPath == folderpath:
+                
+                # if the user deleted the file (from the local file system), eliminate it from github
+                if file.deleted:
+                    if not file.addedFirstTime:
+                        path_to_pass = file.folderPath.split('/')[1:]
+                        if path_to_pass[0] == '':
+                            path_to_pass = file.name
+                        else:
+                            path_to_pass = path_to_pass[0] + f"/{file.name}"
 
-                if file.addedFirstTime:
+                        file_GB = repo.get_contents(f"{path_to_pass}")
+                        
+                        repo.delete_file(file_GB.path, "Deleted file", file_GB.sha)
+                        # we can now delete the file from the db
+                        db.session.delete(file)
+
+                # if the user created a file
+                elif file.addedFirstTime:
                     
-                    print (f"File {file.path} with name {file.name} added for the first time and systempath {file.FileSystemPath}!")
                     path_to_pass = file.folderPath.split('/')[1:]
                     if path_to_pass[0] == '':
                         path_to_pass = file.name
@@ -44,10 +60,9 @@ def commit_changes(repoName, folderpath):
                     file.addedFirstTime = False
                     file.modified = False
     
-
+                # if user modified a file
                 elif file.modified:
                     
-                    print (f"File {file.path} with name {file.name} and systempath {file.FileSystemPath} modified!")
                     path_to_pass = file.folderPath.split('/')[1:]
                     if path_to_pass[0] == '':
                         path_to_pass = file.name
@@ -61,9 +76,15 @@ def commit_changes(repoName, folderpath):
                     repo.update_file(path_to_pass, "Updated file", content, file_GB.sha)
                     file.modified = False
         
+
+    
         db.session.commit()
         return True
 
+    except github.GithubException as e:
+        print (e)
+        return False 
+        
     except Exception as e:
         print (e)
         return False

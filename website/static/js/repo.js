@@ -181,12 +181,13 @@ if (!document.querySelector('.dropzone').classList.contains('dz-clickable')) {
         }
     });
 
-    myDropzone.on("success", function(file, response) {
+    myDropzone.on("success", function() {
         window.location.reload();
     });
 
     // even when it is a failure to upload the file, we reload the page
-    myDropzone.on("error", function(file, response) {
+    myDropzone.on("error", function() {
+        console.log("ERROR")
         window.location.reload();
     });
 }
@@ -236,8 +237,12 @@ document.getElementById('file-input').addEventListener('change', function(e) {
                 console.log("RELOAD")
                 window.location.reload();
             }
+            else{
+                window.location.reload();
+            }
         }) 
         .catch(function (error) {
+            window.location.reload();
             console.error("Fetch error:", error);
         });
     }
@@ -251,13 +256,15 @@ document.addEventListener("DOMContentLoaded", function () {
     var synchronizeButton = document.querySelector("#cloneButton");
 
     synchronizeButton.addEventListener("click", () => {
+        let option = synchronizeButton.textContent;
+
 
         fetch("/repo/" + repoName + "/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({type: "clone-request", repoName: repoName }),
+            body: JSON.stringify({type: "clone-request", repoName: repoName, option: option}),
         })
         .then(function (response) {
             if (response.ok) {
@@ -268,21 +275,27 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(function (data) {
             if (data.status == "ok"){
-
-                var errorContainer = document.getElementById("modal-content");
-                var state = false; 
-                function toggleState() {
-                        
-                    if (state){ // if state is true, then hide the modal
-                        errorContainer.classList.remove("modal-content");
-                        errorContainer.classList.add("hide")
-                    }else{
-                        errorContainer.classList.remove("hide");
-                        errorContainer.classList.add("modal-content");
+                console.log("option", option)
+                if (option == "SYNCHRONIZE"){
+                    var errorContainer = document.getElementById("modal-content");
+                    var state = false; 
+                    function toggleState() {
+                            
+                        if (state){ // if state is true, then hide the modal
+                            errorContainer.classList.remove("modal-content");
+                            errorContainer.classList.add("hide")
+                        }else{
+                            errorContainer.classList.remove("hide");
+                            errorContainer.classList.add("modal-content");
+                        }
                     }
+                        
+                    toggleState();
                 }
-                    
-                toggleState();
+                else{
+                    synchronizeButton.textContent = "SYNCHRONIZE";
+                    window.location.reload();
+                }
             }
         })
         .catch(function (error) {
@@ -290,7 +303,10 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
     });
-}); 
+
+});
+
+
 
 
 // function to refresh from the GitHub repository
@@ -299,7 +315,6 @@ refreshGitHubButton.addEventListener("click", () => {
     // similar to before, we construct the path, because this
     // time the system is going to update the files from the Github
     // repository from this path onwards
-    console.log("Im here")
     let Path = window.location.pathname;
     let folderPath = Path.substring(6);   
 

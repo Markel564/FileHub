@@ -65,7 +65,14 @@
 
         {% if files %}
             {% for file in files %}
-                {% if file[2] == True %}
+                {% if file[4] == True %}
+                <div class="content-box-deleted" name="{{ file[0] }}" id="file">
+                    <img src="{{url_for('static', filename='images/file-regular.svg')}}" class="img-content">
+                    <h1>{{ file[0] }}</h1>     
+                    <h2>{{ file[1] }}</h2>   
+                    <img src="{{ url_for('static', filename='images/trash-bin.svg')}}" alt="Delete repository" class="delete-file"> 
+                </div>
+                {% elif file[2] == True %}
                 <div class="content-box-new" name="{{ file[0] }}" id="file">
                     <img src="{{url_for('static', filename='images/file-regular.svg')}}" class="img-content">
                     <h1>{{ file[0] }}</h1>     

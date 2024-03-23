@@ -167,6 +167,7 @@ def load_files_and_folders(repoName, path=""):
                     db.session.add(folder)
                     # the last updated date of the repository will be the last updated date of the file
 
+                    print (f"Added folder {folder.name} with path {folder.path} and folder path {folder.folderPath}")
                 
 
                 else: # if the folder is already in db, check if it has been updated and change modified to True if it has
@@ -180,7 +181,7 @@ def load_files_and_folders(repoName, path=""):
                         folder.modified = True
                         folder.lastUpdated = last_commit_utc
                         
-                        if repo.isCloned:
+                        if repository.isCloned:
                             folder.modified = False
 
                     else:
@@ -273,8 +274,11 @@ def get_files_and_folders(repoName, father_dir):
     files = File.query.filter_by(repository_name=repoName, folderPath=father_dir).all()
     folders = Folder.query.filter_by(repository_name=repoName, folderPath=father_dir).all()
     
+
+    # UPDATE AND ADD FOLDER.DELETED
+    
     # we keep the names of the file and folders as well as the last updated date
-    files = [[file.name, file.lastUpdated, file.modified, file.folderPath] for file in files]
+    files = [[file.name, file.lastUpdated, file.modified, file.folderPath, file.deleted] for file in files]
     folders = [[folder.name, folder.lastUpdated, folder.modified, folder.folderPath] for folder in folders]
     
     return files, folders

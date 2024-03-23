@@ -73,8 +73,11 @@ def add_file(repoName, file_name, file_path):
             
         return True
 
+    except FileNotFoundError:
+        return False
+    
+    except PermissionError:
+        return False
         
-        
-    except Exception as e:
-        print (e)
+    except Exception:  
         return False
