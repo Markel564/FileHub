@@ -54,7 +54,4 @@ def reformat_date(last_updated):
         return str(minutes) + " minutes ago"
     
     else:
-        seconds = round((datetime.now() - last_updated).seconds, 0)
-        if seconds == 1:
-            return "just now"
-        return str(seconds) + " seconds ago"
+        return "just now"

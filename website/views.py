@@ -422,6 +422,7 @@ def repo(subpath):
                 flash("Error checking the file system", category='error')
                 return jsonify({"status": "error"})
 
+            flash("File system checked successfully", category='success')
             return jsonify({"status": "ok"})
 
 

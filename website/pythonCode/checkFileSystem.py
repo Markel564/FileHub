@@ -78,13 +78,18 @@ def check_file_system(repo):
             print (f"file_repo: {file_repo.name}")
             file = File.query.filter_by(path=file_repo.path).first()
             hash_of_file = sign_file(file.FileSystemPath)
+            
+            if file.deleted: # if the file has been deleted, it will not be checked
+                print (f"File {file.name} was deleted previously")
+                continue
 
-            if not hash_of_file: # if the file is not found, we have to delete it from the database, as it has been deleted
-                db.session.delete(file)
+            elif not hash_of_file: # if the file is not found, we have to delete it from the database, as it has been deleted
+                file.deleted = True
+                print (f"File {file.name} was deleted")
 
                 # we have to update the date of the folder where the file is located and the repository
                 father_dir = file.folderPath
-                update_dates(father_dir)
+                update_dates(father_dir, repo.name)
                 db.session.commit()
 
                 continue
@@ -93,6 +98,7 @@ def check_file_system(repo):
             # and so, we have to update the database (NOT GITHUB YET, this is done when user commits changes)
             
             if hash_of_file != file.shaHash:
+                print (f"File {file.name} was modified")
                 file.modified = True
                 file.shaHash = hash_of_file
                 file.lastUpdated = datetime.now()
@@ -100,7 +106,7 @@ def check_file_system(repo):
                 # update the date of the folder where the file is located and the repository
                 father_dir = file.folderPath
                 
-                update_dates(father_dir)
+                update_dates(father_dir, repo.name)
             
             db.session.commit()
         return True
@@ -110,10 +116,14 @@ def check_file_system(repo):
         return False
 
 
-def update_dates(father_dir):
+def update_dates(father_dir, repo_name):
+
+    print (f"Father dir: {father_dir}")
+    repo = Repository.query.filter_by(name=repo_name).first()  
 
     while father_dir != repo.name + "/":
-        folder = Folder.query.filter_by(path=father_dir, repository_name=repo.name).first()
+        print (f"Father dir: {father_dir}")
+        folder = Folder.query.filter_by(path=father_dir[:-1], repository_name=repo.name).first()
         folder.lastUpdated = datetime.now()
         father_dir = father_dir.rsplit("/",2)[0] + "/"
     

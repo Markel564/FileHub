@@ -4,6 +4,8 @@ from github import Github, Auth
 import github
 import yaml
 from flask import session
+import os
+from .getHash import sign_file
 
 
 
@@ -35,16 +37,26 @@ def commit_changes(repoName, folderpath):
                 if file.deleted:
                     if not file.addedFirstTime:
                         path_to_pass = file.folderPath.split('/')[1:]
+                        
+                        print ("Path to pass:", path_to_pass)
                         if path_to_pass[0] == '':
                             path_to_pass = file.name
                         else:
-                            path_to_pass = path_to_pass[0] + f"/{file.name}"
-
+                            path_to_pass = '/'.join(path_to_pass) + f"{file.name}"
+    
                         file_GB = repo.get_contents(f"{path_to_pass}")
-                        
+
                         repo.delete_file(file_GB.path, "Deleted file", file_GB.sha)
                         # we can now delete the file from the db
+
                         db.session.delete(file)
+                        db.session.commit()
+
+                    # also, if file is not in the filesystem, that means the user deleted it manually from the file system
+                    # if it does, we have to eliminate it from the file system
+                    if os.path.exists(file.FileSystemPath):
+                        print ("eliminated from file system")
+                        os.remove(file.FileSystemPath)
 
                 # if the user created a file
                 elif file.addedFirstTime:

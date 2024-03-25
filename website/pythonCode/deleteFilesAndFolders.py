@@ -24,11 +24,8 @@ def delete_file(repo, path, name):
             return False
         
         # deletion will always involve deleting the file from the db
-        # and, if the repository is cloned, from the local file system
-        # moreover, if the repository is cloned, it will involve adding them to a new type of file
-        # (different to Files as it will not be shown in the interface) which can later be deleted
-        # when user commits changes
-
+        # moreover, if the repository is cloned, it will involve changing the file.deleted property to True
+        # so that it can be later deleted from the file system when the user commits the changes
 
         file = File.query.filter_by(path=path, name=name).first()
 
@@ -38,7 +35,17 @@ def delete_file(repo, path, name):
         # the file could not be submitted to github yet as the user has not committed the changes
         # then, we will only delete the file from the database (and the file system if the repository is cloned)
 
-        # First, if the repository is cloned, we make it so that the file is deleted in the db (so that the user then
+        
+        # if the file was added for the first time, we can delete it from the database
+        # as if not, it will stay there, and will be recognized as a deleted file when the user commits the changes
+        # when it does not in fact exist in the file system
+
+        if file.addedFirstTime:
+            db.session.delete(file)
+            db.session.commit()
+            return True
+
+        # if the repository is cloned, we make it so that the file is deleted in the db (so that the user then
         # commits the deletion). It will be deleted from the database when the user commits the message
         if repoDB.isCloned:
             file.deleted = True
@@ -63,17 +70,6 @@ def delete_file(repo, path, name):
         
 
         db.session.commit()
-
-        # if the file is cloned, we delete it from the local file system
-
-        if repoDB.isCloned:
-            try:
-                os.remove(file.FileSystemPath)
-            except Exception as e:
-                print (e)
-                return False
-        
-        print (f"File {file.name} with path {file.path} deleted!. Property deleted: {file.deleted}")
         return True
 
         
