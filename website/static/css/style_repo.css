@@ -150,11 +150,13 @@
 }
 
 .content-box-new{
-  background: linear-gradient(45deg, #588157 50%, #A3b18a 50%);
+  /* background: linear-gradient(green, #d9d9d9); */
+  background-color: green;
 }
 
 .content-box-deleted{
-  background: linear-gradient(45deg, #950740 50%, #d9d9d9 50%);
+  /* background: linear-gradient(#950740, #d9d9d9); */
+  background-color: #c3073f;
 }
 .content-box:hover, .content-box-new:hover, .content-box-deleted:hover{
   cursor: pointer;
@@ -205,7 +207,7 @@
 }
 
 #new-file:hover{
-  background-color: #365486;
+  background-color: #950740;
 }
 .img-content-new{
   height: 70%;
@@ -263,8 +265,6 @@
 .hide {
   display: none;
 }
-
-
 
 
 

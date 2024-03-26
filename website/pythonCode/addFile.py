@@ -10,10 +10,14 @@ def add_file(repoName, file_name, file_path):
     
     user_id = session.get('user_id')
     user = User.query.filter_by(id=user_id).first()
-
-    if not user:
-        return False
     
+    if not user:
+        return 1
+    
+    repo = Repository.query.filter_by(name=repoName).first()
+
+    if not repo.isCloned:
+        return 2
     try:
         
         with open("./uploads/"+file_name, 'rb') as file:
@@ -71,13 +75,16 @@ def add_file(repoName, file_name, file_path):
 
             db.session.commit()
             
-        return True
+        return 0
 
     except FileNotFoundError:
-        return False
+        return 3
     
     except PermissionError:
-        return False
+        return 4
+    
+    except SQLAlchemyError: 
+        return 5
         
     except Exception:  
-        return False
+        return 6

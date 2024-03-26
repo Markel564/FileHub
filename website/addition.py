@@ -8,7 +8,7 @@ addition = Blueprint('addition', __name__)
 @addition.route('/upload-file', methods=['GET','POST'])
 def upload_file():
     if 'file' in request.files:
-        print ("File received")
+
         file = request.files['file']
         # Save the uploaded file to a directory on the server
         file.save('uploads/' + file.filename)
@@ -19,17 +19,32 @@ def upload_file():
 
         repo = Repository.query.filter_by(name=repoName).first()
 
-        if not repo.isCloned:
-            flash("The repository is not cloned", category='error')
-            return jsonify({'error': 'The repository is not cloned'}), 400
         ack = add_file(repoName, file.filename, path) 
-            
-        if not ack:
-            flash("Error adding file to the database", category='error')
-            return jsonify({'error': 'Error adding file to the database'}), 400
-        
 
-        flash("File uploaded successfully", category='success')
-        return jsonify({'status': 'ok'})
+        if ack == 0:
+            flash ("File uploaded successfully", category='success')
+            print ("File uploaded successfully")
+            return jsonify({'status': 'ok'})
+        if ack == 1:
+            flash ("User not identified!", category='error')
+            return jsonify({'error': 'User not identified'}) 
+        elif ack == 2:
+            flash ("The repository is not cloned!", category='error') 
+            return jsonify({'error', 'The repository is not cloned'})
+        elif ack == 3:
+            flash ("Error finding file!", category='error')
+            return jsonify({'error', 'Error finding file'})
+        elif ack == 4:
+            flash ("No permissions to add file!", category='error')
+            return jsonify({'error', 'No permissions to add file'})
+        elif ack == 5:
+            flash ("Error adding file to the database!", category='error')
+            return jsonify({'error', 'Error adding file to the database'})
+        else:
+            flash ("An unexpected error occurred!", category='error')
+            return jsonify({'error', 'An unexpected error occurred!'})
+            
+
     else:
-        return jsonify({'error': 'No file received'}), 400
+        flash ("An unexpected error occurred!", category='error')
+        return jsonify({'error', 'An unexpected error occurred!'})

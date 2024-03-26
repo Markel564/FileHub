@@ -233,8 +233,6 @@ document.getElementById('file-input').addEventListener('change', function(e) {
         .then(function (data) {
             console.log("DATA", data)
             if (data.status == "ok"){
-                // we reload the page
-                console.log("RELOAD")
                 window.location.reload();
             }
             else{

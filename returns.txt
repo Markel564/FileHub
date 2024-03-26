@@ -1,10 +1,11 @@
-ADD FILE
+ADD FILE            DONE
 0 --> ok
 1 --> user not found
-2 --> file not found
-3 --> no permissions
-4 --> error adding file to db
-4 --> other
+2 --> repo not cloned
+3 --> file not found
+4 --> no permissions
+5 --> error adding file to db
+6 --> other
 
 
 ADD REPO
