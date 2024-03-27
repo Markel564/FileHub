@@ -17,32 +17,32 @@ def upload_file():
         
         repoName = request.form.get('repoName')
 
-        repo = Repository.query.filter_by(name=repoName).first()
-
         ack = add_file(repoName, file.filename, path) 
 
         if ack == 0:
             flash ("File uploaded successfully", category='success')
-            print ("File uploaded successfully")
             return jsonify({'status': 'ok'})
         if ack == 1:
             flash ("User not identified!", category='error')
-            return jsonify({'error': 'User not identified'}) 
+            return jsonify({'status': 'errorUser'})
         elif ack == 2:
-            flash ("The repository is not cloned!", category='error') 
-            return jsonify({'error', 'The repository is not cloned'})
+            flash ("The repository does not exist!", category='error')
+            return jsonify({'status', 'errorRepoDoesNotExist'})
         elif ack == 3:
-            flash ("Error finding file!", category='error')
-            return jsonify({'error', 'Error finding file'})
+            flash ("The repository is not cloned!", category='error') 
+            return jsonify({'status', 'errorRepoNotCloned'})
         elif ack == 4:
-            flash ("No permissions to add file!", category='error')
-            return jsonify({'error', 'No permissions to add file'})
+            flash ("Error finding file!", category='error')
+            return jsonify({'status', 'fileError'})
         elif ack == 5:
+            flash ("No permissions to add file!", category='error')
+            return jsonify({'status', 'permissionError'})
+        elif ack == 6:
             flash ("Error adding file to the database!", category='error')
-            return jsonify({'error', 'Error adding file to the database'})
+            return jsonify({'status', 'errorDB'})
         else:
             flash ("An unexpected error occurred!", category='error')
-            return jsonify({'error', 'An unexpected error occurred!'})
+            return jsonify({'status', 'unexpectedError'})
             
 
     else:

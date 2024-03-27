@@ -16,8 +16,11 @@ def add_file(repoName, file_name, file_path):
     
     repo = Repository.query.filter_by(name=repoName).first()
 
-    if not repo.isCloned:
+    if repo is None:
         return 2
+
+    if not repo.isCloned:
+        return 3
     try:
         
         with open("./uploads/"+file_name, 'rb') as file:
@@ -78,13 +81,13 @@ def add_file(repoName, file_name, file_path):
         return 0
 
     except FileNotFoundError:
-        return 3
-    
-    except PermissionError:
         return 4
     
-    except SQLAlchemyError: 
+    except PermissionError:
         return 5
+    
+    except SQLAlchemyError: 
+        return 6
         
     except Exception:  
-        return 6
+        return 7

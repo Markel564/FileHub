@@ -15,12 +15,12 @@ from datetime import datetime
 def add_repo(project_name, project_description, readme, isPrivate=False):
     """
     input: 
-        - project_name (string): name of the project
+        - project_name (string): name of the project/repository
         - project_description (string): description of the project
         - readme (boolean): True if the user wants to create a readme file, False if not
         - isPrivate (boolean): True if the user wants to create a private repo, False if not (default is False)
         
-    output: True if repo has been added to the database, False if not
+    output: 
 
     This function adds the repo to github account and database
     """
@@ -31,7 +31,13 @@ def add_repo(project_name, project_description, readme, isPrivate=False):
 
     # if the user is not in the database, return False
     if not user:
-        return False
+        return 1
+
+    # check if there are other repos with the same name
+    repo = Repository.query.filter_by(name=project_name).first()
+
+    if repo is not None:
+        return 2
 
     try:
 
@@ -53,7 +59,13 @@ def add_repo(project_name, project_description, readme, isPrivate=False):
             repo.create_file("README.md", "Initial commit", "New Repository Created!", branch="main")
         
         g.close()
-        return True
+        return 0
     
-    except github.GithubException as e:
-        return False
+    except github.GithubException:
+        return 3
+
+    except SQLAlchemyError:
+        return 4
+    
+    except:
+        return 5

@@ -1,36 +1,38 @@
 ADD FILE            DONE
 0 --> ok
-1 --> user not found
-2 --> repo not cloned
-3 --> file not found
-4 --> no permissions
-5 --> error adding file to db
-6 --> other
+1 --> user not found (errorUser)
+2 --> repo not found (errorRepoDoesNotExist)
+3 --> repo not cloned (errorRepoNotCloned)
+4 --> file not found (fileError)
+5 --> no permissions (permissionError)
+6 --> error adding file to db (errorDB)
+7 --> other (unexpectedError)
 
 
-ADD REPO
+ADD REPO            DONE
+0 --> ok 
+1 --> user not found (errorUser)
+2 --> repo already exists (errorRepoAlreadyExists)
+3 --> github exception (githubError)
+4 --> error adding repo to db (errorDB)
+5 --> other (unexpectedError)
+
+
+ADD USER        DONE    
 0 --> ok
-1 --> user not found
-2 --> github exception
-3 --> error adding repo to db
-4 --> other 
-
-
-ADD USER 
-0 --> ok
-1 --> no api token
-2 --> user not authenticated in github
-3 --> error adding user to db
-4 --> other
+1 --> no api token, (githubError)
+2 --> error adding user to db (errorDB)
+3 --> other
 
 
 CHECK FILE SYSTEM
 0 --> ok
-1 --> no repository found in db
-2 --> no repository at filesystempath
-3 --> error signing file
-4 --> error adding file to db
-5 --> other
+1 --> user not found (errorUser)
+2 --> no repository found (errorRepoDoesNotExist)
+3 --> repo not cloned (errorRepo)
+4 --> error signing file (fileError)
+5 --> error adding file to db (errorDB)
+6 --> other
 
 
 CLONE REPO

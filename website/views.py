@@ -26,15 +26,18 @@ views = Blueprint('views', __name__)
 def home():
 
     if request.method == 'GET':
-
         
-        if not add_user():  # error with the api token
-            
-            return render_template("error.html")
+        ack = add_user()
 
-        
-
-        
+        if ack == 0: # user added successfully
+            pass
+        elif ack == 1: # user not identified
+            flash("User not identified!", category='error')
+        elif ack == 2: # error with database
+            flash("Error adding user to the database", category='error')
+        else:
+            flash("An unexpected error occurred!", category='error')
+             
         # get the user from the database
         user_id = session.get('user_id')
         user = User.query.filter_by(id=user_id).first()
@@ -133,20 +136,28 @@ def add():
             isPrivate = data.get('private')
 
             
-            # check if there are no other repos with the same name
-            repo = Repository.query.filter_by(name=project_name).first()
-
-            if repo is not None:
-                return jsonify({"status": "errorDuplicate"})
-
             # create the repo
             ack = add_repo(project_name, project_description, readme, isPrivate)
             
-            if ack:
+            if ack == 0:
                 flash("Repository created successfully", category='success')
                 return jsonify({"status": "ok"})
+            elif ack == 1:
+                flash("User not identified!", category='error')
+                return jsonify({"status": "errorUser"})
+            elif ack == 2:
+                flash("There is already a repository with the same name!", category='error')
+                return jsonify({"status": "errorRepoAlreadyExists"})
+            elif ack == 3:
+                flash("There was a Github error!", category='error')
+                return jsonify({"status": "githubError"})
+            elif ack == 4:
+                flash("Error adding repository to the database!", category='error')
+                return jsonify({"status": "errorDB"})
+            else:
+                flash("An unexpected error occurred!", category='error')
+                return jsonify({"status": "unexpectedError"})
 
-            return jsonify({"status": "errorCreation"})
         
   
 
@@ -412,18 +423,30 @@ def repo(subpath):
 
             repoName = data.get('repoName')
             
-            repo = Repository.query.filter_by(name=repoName).first()
+            ack = check_file_system(repoName)
 
-            if not repo.isCloned:
-                flash ("Repository not synchronized with file system", category='error')
-                return jsonify({"status": "errorNotCloned"})
-            
-            if not check_file_system(repoName):
-                flash("Error checking the file system", category='error')
-                return jsonify({"status": "error"})
+            if ack == 0:
+                flash("File system checked successfully", category='success')
+                return jsonify({"status": "ok"})
+            elif ack == 1:
+                flash("User not identified!", category='error')
+                return jsonify({"status": "errorUser"})
+            elif ack == 2:
+                flash("The repository does not exist!", category='error')
+                return jsonify({"status": "errorRepoDoesNotExist"})
+            elif ack == 3:
+                flash("The repository is not cloned!", category='error')
+                return jsonify({"status": "errorRepoNotCloned"})
+            elif ack == 4:
+                flash("An error with the file occurred!", category='error')
+                return jsonify({"status": "fileError"})
+            elif ack == 5:
+                flash("Error adding file to the database!", category='error')
+                return jsonify({"status": "errorDB"})
+            else:
+                flash("An unexpected error occurred!", category='error')
+                return jsonify({"status": "unexpectedError"})
 
-            flash("File system checked successfully", category='success')
-            return jsonify({"status": "ok"})
 
 
         elif type_message == "commit":
