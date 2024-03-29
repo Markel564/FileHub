@@ -61,6 +61,9 @@ def add_user():
             # load the user's repos to the database
             repos = get_repos()
 
+            if not repos:
+                return 3
+
 
         print (f"Authenticated as {user.login}")
 
@@ -71,6 +74,6 @@ def add_user():
         return 2
     
     except:
-        return 3
+        return 4
 
 

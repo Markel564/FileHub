@@ -35,6 +35,8 @@ def home():
             flash("User not identified!", category='error')
         elif ack == 2: # error with database
             flash("Error adding user to the database", category='error')
+        elif ack == 3:
+            flash("Error loading repositories from GitHub", category='error')
         else:
             flash("An unexpected error occurred!", category='error')
              
@@ -325,27 +327,37 @@ def repo(subpath):
             repoName = data.get('repoName')
             absolute_path = data.get('absolutePath')
 
-            repo = Repository.query.filter_by(name=repoName).first()
-            if repo is None:
-  
-                return jsonify({"status": "error"})
-            
-            if repo.isCloned:
-                
-                flash("Repository already cloned!", category='error')
-                return jsonify({"status": "errorAlreadyCloned"})
 
             ack = clone_repo(repoName, absolute_path)
-            if not ack:
- 
-                flash("Error cloning the repository", category='error')
-                return jsonify({"status": "error"})
-            
-            repo = Repository.query.filter_by(name=repoName).first()
 
-            flash("Repository cloned successfully", category='success')
+            if ack == 0:
+                flash("Repository cloned successfully", category='success')
+                return jsonify({"status": "ok"})
+            elif ack == 1:
+                flash("User not identified!", category='error')
+                return jsonify({"status": "errorUser"})
+            elif ack == 2:
+                flash("The repository does not exist!", category='error')
+                return jsonify({"status": "errorRepoDoesNotExist"})
+            elif ack == 3:
+                flash("The repository is already cloned!", category='error')
+                return jsonify({"status": "errorRepoAlreadyCloned"})
+            elif ack == 4:
+                flash("An error with the file occurred!", category='error')
+                return jsonify({"status": "fileError"})
+            elif ack == 5:
+                flash("There was a permission error!", category='error')
+                return jsonify({"status": "permissionError"})
+            elif ack == 6:
+                flash ("The path is not a directory!", category='error')
+                return jsonify({"status": "notDirectoryError"})
+            elif ack == 7:
+                flash("There was a Github error!", category='error')
+                return jsonify({"status": "githubError"})
+            else:
+                flash("An unexpected error occurred!", category='error')
+                return jsonify({"status": "unexpectedError"})
 
-            return jsonify({"status": "ok"})
 
         
         elif type_message == "refresh-github": #to refresh the data based on the one in github
@@ -453,11 +465,6 @@ def repo(subpath):
 
             repoName, folderPath = data.get('repoName'), data.get('folderPath') 
 
-            repo = Repository.query.filter_by(name=repoName).first()
-            if not repo.isCloned:
-                flash ("Repository not synchronized with file system", category='error')
-                return jsonify({"status": "errorNotCloned"})
-
             # check that there is at least one file with a modification or that was added for the first time
             files = File.query.filter_by(repository_name=repoName, folderPath=folderPath).all()
 
@@ -470,8 +477,6 @@ def repo(subpath):
                 if file.deleted:
                     deletions = True
 
-            print (f"modifications: {modifications}, insertions: {insertions}, deletions: {deletions}")
-
             if len(files) == 0:
                 flash("No files to commit", category='error')
                 return jsonify({"status": "errorNoFiles"})
@@ -481,12 +486,30 @@ def repo(subpath):
                 flash("No changes detected", category='error')
                 return jsonify({"status": "errorNoFiles"})
 
-            if not commit_changes(repoName, folderPath):
-                # flash something or redirect aftwards to error page
-                return jsonify({"status": "error"})
+            ack = commit_changes(repoName, folderPath)
+
+            if ack == 0:
+                flash("Changes sent to GitHub successfully", category='success')
+                return jsonify({"status": "ok"})
+            elif ack == 1:
+                flash("User not identified!", category='error')
+                return jsonify({"status": "errorUser"})
+            elif ack == 2:
+                flash("The repository does not exist!", category='error')
+                return jsonify({"status": "errorRepoDoesNotExist"})
+            elif ack == 3:
+                flash("The repository is not cloned!", category='error')
+                return jsonify({"status": "errorRepoNotCloned"})
+            elif ack == 4:
+                flash("There was an error with a file!", category='error')
+                return jsonify({"status": "fileError"})
+            elif ack == 5:
+                flash("There was a Github error!", category='error')
+                return jsonify({"status": "githubError"})
+            else:
+                flash("An unexpected error occurred!", category='error')
+                return jsonify({"status": "unexpectedError"})
             
-            flash("Changes sent to GitHub successfully", category='success')
-            return jsonify({"status": "ok"})
 
         
         elif type_message == "delete-file":
@@ -500,28 +523,35 @@ def repo(subpath):
             else:
                 path = repoName+"/"+folderPath+fileName
 
-            file = File.query.filter_by(repository_name=repoName, path=path).first()
+            ack = delete_file(repoName, path, fileName)
 
+            if ack == 0:
+                flash("File deleted successfully", category='success')
+                repo = Repository.query.filter_by(name=repoName).first()
+                repo.loadedInDB = False # we will change the loaded attribute and when a GET is made, the repository will be loaded again
+                                        # showing the changes made
+                return jsonify({"status": "ok"})
+            elif ack == 1:
+                flash("User not identified!", category='error')
+                return jsonify({"status": "errorUser"})
+            elif ack == 2:
+                flash("The repository does not exist!", category='error')
+                return jsonify({"status": "errorRepoDoesNotExist"})
+            elif ack == 3:
+                flash("The repository is not cloned!", category='error')
+                return jsonify({"status": "errorRepoNotCloned"})
+            elif ack == 4:
+                flash("File not found!", category='error')
+                return jsonify({"status": "fileError"})
+            elif ack == 5:
+                flash("The file is already deleted! Commit the changes to send them!", category='error')
+                return jsonify({"status": "errorFileAlreadyDeleted"})
+            else:
+                flash("An unexpected error occurred!", category='error')
+                return jsonify({"status": "unexpectedError"})
 
-            repo = Repository.query.filter_by(name=repoName).first()
-
-            if not repo.isCloned:
-                flash ("Repository not synchronized with file system", category='error')
-                return jsonify({"status": "errorNotCloned"})
             
-            if file.deleted:
-                flash("File already deleted in file system!", category='error')
-                return jsonify({"status": "error"})
-
-            if not delete_file(repoName, path, fileName):
-                flash("Error deleting file", category='error')
-                return jsonify({"status": "error"})
             
-            flash("File deleted successfully", category='success')
-            
-            repo.loadedInDB = False # we will change the loaded attribute and when a GET is made, the repository will be loaded again
-                                    # showing the changes made
-            return jsonify({"status": "ok"})
             
 
 

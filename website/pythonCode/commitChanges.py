@@ -5,8 +5,6 @@ import github
 import yaml
 from flask import session
 import os
-from .getHash import sign_file
-
 
 
 def commit_changes(repoName, folderpath):
@@ -15,22 +13,25 @@ def commit_changes(repoName, folderpath):
     user = User.query.filter_by(id=user_id).first()
 
     if not user:
-        return False
+        return 1
+    
+    repoDB = Repository.query.filter_by(name=repoName).first()
+
+    if not repoDB:
+        return 2
+    
+    if not repoDB.isCloned:
+        return 3
     
     try:
-
-        repoDB = Repository.query.filter_by(name=repoName).first()
-
-        if not repoDB:
-            return False
         
         g = github.Github(user.githubG)
         user = g.get_user()
         repo = user.get_repo(repoName)
 
         for file in repoDB.repository_files:
+
             # if the file is modified, we have to commit the changes
-            print (f"File: {file.name} with path {file.folderPath}")
             if file.folderPath == folderpath:
                 
                 # if the user deleted the file (from the local file system), eliminate it from github
@@ -38,7 +39,6 @@ def commit_changes(repoName, folderpath):
                     if not file.addedFirstTime:
                         path_to_pass = file.folderPath.split('/')[1:]
                         
-                        print ("Path to pass:", path_to_pass)
                         if path_to_pass[0] == '':
                             path_to_pass = file.name
                         else:
@@ -48,29 +48,31 @@ def commit_changes(repoName, folderpath):
 
                         repo.delete_file(file_GB.path, "Deleted file", file_GB.sha)
                         # we can now delete the file from the db
-
                         db.session.delete(file)
                         db.session.commit()
 
                     # also, if file is not in the filesystem, that means the user deleted it manually from the file system
-                    # if it does, we have to eliminate it from the file system
+                    # however, if it does, we have to eliminate it from the file system
                     if os.path.exists(file.FileSystemPath):
-                        print ("eliminated from file system")
                         os.remove(file.FileSystemPath)
 
-                # if the user created a file
+                # if the user created a file for the first time
                 elif file.addedFirstTime:
-                    
+                    print("added first time")
                     path_to_pass = file.folderPath.split('/')[1:]
                     if path_to_pass[0] == '':
                         path_to_pass = file.name
                     else:
                         path_to_pass = path_to_pass[0] + f"/{file.name}"
-                    print (path_to_pass)
+                    
                     content = open(file.FileSystemPath, 'rb').read()
+
+                    print (path_to_pass)
                     repo.create_file(path_to_pass, "Uploaded file", content)
                     file.addedFirstTime = False
                     file.modified = False
+                    
+                    db.session.commit()
     
                 # if user modified a file
                 elif file.modified:
@@ -80,23 +82,26 @@ def commit_changes(repoName, folderpath):
                         path_to_pass = file.name
                     else:
                         path_to_pass = path_to_pass[0] + f"/{file.name}"
-                    print (path_to_pass)
 
                     file_GB = repo.get_contents(f"{path_to_pass}")
                     
                     content = open(file.FileSystemPath, 'rb').read()
                     repo.update_file(path_to_pass, "Updated file", content, file_GB.sha)
                     file.modified = False
-        
 
     
         db.session.commit()
-        return True
+        return 0
+
+    except FileNotFoundError as e:
+        return 4
 
     except github.GithubException as e:
-        print (e)
-        return False 
+        print(e)
+        
+        return 5
         
     except Exception as e:
-        print (e)
-        return False
+        print(e)
+        return 6
+    

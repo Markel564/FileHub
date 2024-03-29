@@ -27,22 +27,25 @@ def upload_file():
             return jsonify({'status': 'errorUser'})
         elif ack == 2:
             flash ("The repository does not exist!", category='error')
-            return jsonify({'status', 'errorRepoDoesNotExist'})
+            return jsonify({'status': 'errorRepoDoesNotExist'})
         elif ack == 3:
             flash ("The repository is not cloned!", category='error') 
-            return jsonify({'status', 'errorRepoNotCloned'})
+            return jsonify({'status': 'errorRepoNotCloned'})
         elif ack == 4:
             flash ("Error finding file!", category='error')
-            return jsonify({'status', 'fileError'})
+            return jsonify({'status': 'fileError'})
         elif ack == 5:
             flash ("No permissions to add file!", category='error')
-            return jsonify({'status', 'permissionError'})
+            return jsonify({'status': 'permissionError'})
         elif ack == 6:
             flash ("Error adding file to the database!", category='error')
-            return jsonify({'status', 'errorDB'})
+            return jsonify({'status': 'errorDB'})
+        elif ack == 7:
+            flash ("That file already exists in the repository!", category='error')
+            return jsonify({'status': 'errorFileAlreadyExists'})
         else:
             flash ("An unexpected error occurred!", category='error')
-            return jsonify({'status', 'unexpectedError'})
+            return jsonify({'status': 'unexpectedError'})
             
 
     else:

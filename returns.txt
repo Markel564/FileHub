@@ -6,7 +6,8 @@ ADD FILE            DONE
 4 --> file not found (fileError)
 5 --> no permissions (permissionError)
 6 --> error adding file to db (errorDB)
-7 --> other (unexpectedError)
+7 --> file already exists (errorFileAlreadyExists)
+8 --> other (unexpectedError)
 
 
 ADD REPO            DONE
@@ -22,45 +23,50 @@ ADD USER        DONE
 0 --> ok
 1 --> no api token, (githubError)
 2 --> error adding user to db (errorDB)
-3 --> other
+3 --> error adding user to github (githubError)
+4 --> other (unexpectedError)
 
 
-CHECK FILE SYSTEM
+CHECK FILE SYSTEM   DONE
 0 --> ok
 1 --> user not found (errorUser)
 2 --> no repository found (errorRepoDoesNotExist)
 3 --> repo not cloned (errorRepo)
 4 --> error signing file (fileError)
 5 --> error adding file to db (errorDB)
-6 --> other
+6 --> other (unexpectedError)
 
 
-CLONE REPO
+CLONE REPO          DONE
 0 --> ok 
-1 --> user not found
-2 --> path does not exist
-3 --> no permissions
-4 --> not a directory
-5 --> signing files
-6 --> github exception
-7 --> other
+1 --> user not found (errorUser)
+2 --> repo not found (errorRepoDoesNotExist)
+3 --> repo already cloned (errorRepoAlreadyCloned)
+4 --> path does not exist (fileError)
+5 --> no permissions (permissionError)
+6 --> not a directory (notDirectoryError)
+7 --> github exception (githubError)
+8 --> other (unexpectedError)
 
 
-COMMIT CHANGES
+COMMIT CHANGES          DONE
 0 --> ok 
-1 --> user not found
-2 --> repository not found
-3 --> error opening files
-4 --> github exception
-5 --> other
+1 --> user not found (errorUser)
+2 --> repository not found (errorRepoDoesNotExist)
+3 --> repository not cloned (errorRepoNotCloned)
+4 --> error opening files (fileError)
+5 --> github exception (githubError)
+6 --> other (unexpectedError)
 
 
-DELETE FILE 
+DELETE FILE             DONE
 0 --> ok 
-1 --> user not found
-2 --> repo not found
-3 --> file not found 
-4 --> 
+1 --> user not found (errorUser)
+2 --> repo not found (errorRepoDoesNotExist)
+3 --> repo not cloned (errorRepoNotCloned)
+4 --> file not found  (fileError)
+5 --> file already deleted (errorFileAlreadyDeleted)
+6 --> other (unexpectedError)
 
 
 DELETE FOLDER

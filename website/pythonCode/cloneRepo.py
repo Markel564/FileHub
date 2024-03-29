@@ -11,32 +11,37 @@ from .getHash import sign_file
 
 def clone_repo(repoName, path):
 
-    
-    path = rf"{path}"
-
     user_id = session.get('user_id')
     user = User.query.filter_by(id=user_id).first()
 
     if not user:
-        return False
+        return 1
+
+    repo = Repository.query.filter_by(name=repoName).first()
+
+    if not repo:
+        return 2
+    
+    if repo.isCloned:
+        return 3
+
+    path = rf"{path}"
+
 
     # convert the path to unix in case it is windows
     path = windows_to_unix_path(path, directory=True)
     
     # revise that the path exists
     if not doesPathExist(path):
-        print ("Path does not exist")
-        return False
+        return 4
     
     # revise that the path has the right permissions
     if not permissions(path):
-        print ("Path does not have the right permissions")
-        return False
+        return 5
     
     # check that the path is a directory
     if not isDirectory(path):
-        print ("Path is not a directory")
-        return False
+        return 6
 
     try:
         g = github.Github(user.githubG)
@@ -53,57 +58,50 @@ def clone_repo(repoName, path):
         repoDB.FileSystemPath = path  
 
         if not add_hashes(repoName, path):
-            return False
+            return 4
 
         db.session.commit()
 
-        return True
+        return 0
 
 
-    except github.GithubException as e:
-        print ("Exception is", e)
-        return False
+    except github.GithubException:
+        return 7
 
-    except Exception as e:
-        print (e)
-        return False
+    except Exception:
+        return 8
 
 
 def add_hashes(repoName, path):
-
 
 
     repo = Repository.query.filter_by(name=repoName).first()
     files = repo.repository_files
     folders = repo.repository_folders
     
-    if not files or not folders:
+    if not files or not folders: # if there are no files or folders, return True
         return True
     
-    try:
-        for file in files:
+    for file in files:
             
-            real_path = path + file.path
-            # assign the path to the file
-            file.FileSystemPath = real_path
-            # assign the hash to the file
-            file.shaHash = sign_file(real_path)
+        real_path = path + file.path
+        # assign the path to the file
+        file.FileSystemPath = real_path
+        # assign the hash to the file
+        file.shaHash = sign_file(real_path)
+            
+        if not file.shaHash:
+            return False
+        
+    for folder in folders:
+            
+        real_path = path + folder.path
+        # assign the path to the folder
+        folder.FileSystemPath = real_path
+
 
         
-        for folder in folders:
-            
-            real_path = path + folder.path
-            # assign the path to the folder
-            folder.FileSystemPath = real_path
-
-
-        
-        db.session.commit()
-    
-    except Exception as e:
-        print (e)
-        return False
-
+    db.session.commit()
     return True
 
 

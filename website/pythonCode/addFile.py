@@ -37,6 +37,10 @@ def add_file(repoName, file_name, file_path):
         path = str(repo.name + file_path + file_name)
         folder_path = str(repo.name + file_path)
         
+        if file_name in [f.name for f in repo.repository_files]:
+            return 7
+
+
         file = File(name=file_name, path = path, repository_name=repo.name, 
         lastUpdated=datetime.now(), modified = True ,folderPath = folder_path, addedFirstTime = True)
         db.session.add(file)
@@ -76,6 +80,9 @@ def add_file(repoName, file_name, file_path):
             file.FileSystemPath = repo.FileSystemPath + path
             file.shaHash = sign_file(file.FileSystemPath)
 
+            if not file.shaHash:
+                return 4
+                
             db.session.commit()
             
         return 0
@@ -90,4 +97,4 @@ def add_file(repoName, file_name, file_path):
         return 6
         
     except Exception:  
-        return 7
+        return 8

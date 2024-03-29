@@ -15,14 +15,18 @@ def delete_file(repo, path, name):
     user = User.query.filter_by(id=user_id).first()
 
     if not user:
-        return False
+        return 1
     
-    try:
-        repoDB = Repository.query.filter_by(name=repo).first()
+    repoDB = Repository.query.filter_by(name=repo).first()
 
-        if not repoDB:
-            return False
-        
+    if not repoDB:
+        return 2
+    
+    if not repoDB.isCloned:
+        return 3
+
+    try:
+    
         # deletion will always involve deleting the file from the db
         # moreover, if the repository is cloned, it will involve changing the file.deleted property to True
         # so that it can be later deleted from the file system when the user commits the changes
@@ -30,7 +34,7 @@ def delete_file(repo, path, name):
         file = File.query.filter_by(path=path, name=name).first()
 
         if not file:
-            return False
+            return 4
 
         # the file could not be submitted to github yet as the user has not committed the changes
         # then, we will only delete the file from the database (and the file system if the repository is cloned)
@@ -43,12 +47,18 @@ def delete_file(repo, path, name):
         if file.addedFirstTime:
             db.session.delete(file)
             db.session.commit()
-            return True
 
-        # if the repository is cloned, we make it so that the file is deleted in the db (so that the user then
+            # since the file is in the file system, we have to delete it
+            if os.path.exists(file.FileSystemPath):
+                os.remove(file.FileSystemPath)
+
+            return 0
+
+        # if the repository is cloned (which it has to be), we make it so that the file is deleted in the db (so that the user then
         # commits the deletion). It will be deleted from the database when the user commits the message
-        if repoDB.isCloned:
-            file.deleted = True
+        if file.deleted: # if the file is already deleted, the user will not be able to delete it again
+            return 5
+        file.deleted = True
 
         # also, the repositories lastUpdated field is updated
         repoDB.lastUpdated = datetime.now()
@@ -59,7 +69,6 @@ def delete_file(repo, path, name):
 
         while folder_path != repoDB.name:
                 
-                print (f"Folder path: {folder_path}")
                 # open all the folders that have that folder_path as their path
                 folder = Folder.query.filter_by(path=folder_path, repository_name=repoDB.name).first()
     
@@ -68,15 +77,15 @@ def delete_file(repo, path, name):
                 # remove until the last slash
                 folder_path = folder_path[:folder_path.rfind("/")]
         
-
+        # since the file is in the file system, we have to delete it
+        if os.path.exists(file.FileSystemPath):
+            os.remove(file.FileSystemPath)
         db.session.commit()
-        return True
+        return 0
 
         
-
-    except Exception as e:
-        print (e)
-        return False
+    except Exception:
+        return 6
     pass 
 
 def delete_folder(repo, path, name):
