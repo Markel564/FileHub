@@ -23,21 +23,23 @@ def delete_repo():
     user = User.query.filter_by(id=user_id).first()
 
     if not user:
-        return False
+        session['repo_to_remove'] = None
+        return 1
+    # get the repo to be deleted previously saved in the session
+    repo_name = session.get('repo_to_remove')
+
+    repo = Repository.query.filter_by(name=repo_name).first()
+    # if the repository is not in the database, return an error
+    if not repo:
+        session['repo_to_remove'] = None
+        return 2
+    
 
     try:
+
         # authenticate the user
         g = github.Github(user.githubG)
         user = g.get_user()
-
-        # get the repo to be deleted previously saved in the session
-        repo_name = session.get('repo_to_remove')
-        # search for the repo in the database
-        repo = Repository.query.filter_by(name=repo_name).first()
-        # if the repository is not in the database, return False
-        if repo is None:
-            g.close()
-            return False
 
         # delete the repo from the user's github account
         repo = user.get_repo(repo_name)
@@ -52,6 +54,13 @@ def delete_repo():
         session['repo_to_remove'] = None
         
         g.close()
-        return True
-    except github.GithubException as e:
-        return False
+        return 0
+    
+    except github.GithubException:
+        return 3
+    
+    except SQLAlchemyError:
+        return 4
+    
+    except:
+        return 5

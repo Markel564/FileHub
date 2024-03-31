@@ -76,10 +76,25 @@ def home():
             # delete the repository
             ack = delete_repo()
 
-            if ack:
+            if ack == 0:
+                flash("Repository deleted successfully", category='success')
                 return jsonify({"status": "ok"})
-            
-            return jsonify({"status": "error"})
+            elif ack == 1:
+                flash("User not identified!", category='error')
+                return jsonify({"status": "errorUser"})
+            elif ack == 2:
+                flash("The repository does not exist!", category='error')
+                return jsonify({"status": "errorRepoDoesNotExist"})
+            elif ack == 3:
+                flash("There was a Github error!", category='error')
+                return jsonify({"status": "githubError"})
+            elif ack == 4:
+                flash("Error deleting repository from the database!", category='error')
+                return jsonify({"status": "errorDB"})
+            else:
+                flash("An unexpected error occurred!", category='error')
+                return jsonify({"status": "unexpectedError"})
+
 
         elif type_message == "eliminate-cancel":
             
@@ -192,13 +207,33 @@ def repo(subpath):
 
             if not repo.loadedInDB: # if the repository is not loaded in the database, we load it
                 
+                ack = load_files_and_folders(repoName) # load the files and folders of the repository into the db
 
-                if not load_files_and_folders(repoName): # if there is an error with loading the files and folders
-                    return jsonify({"status": "error"})
-
-            
+                if ack == 0:
+                    pass
+                elif ack == 1:
+                    flash("User not identified!", category='error')
+                    return render_template("generic_error.html")
+                elif ack == 2:
+                    flash("The repository does not exist!", category='error')
+                    return render_template("generic_error.html")
+                elif ack == 3:
+                    flash("There was a file error!", category='error')
+                    return render_template("generic_error.html")
+                elif ack == 4:
+                    flash("There was a github error!", category='error')
+                    return render_template("generic_error.html")
+                elif ack == 5:
+                    flash("There was an error with the database!", category='error')
+                    return render_template("generic_error.html")
+                else:
+                    flash("An unexpected error occurred!", category='error')
+                    return render_template("generic_error.html")
+         
                 files, folders = get_files_and_folders(repoName, subpath) # at first the path of the repository is the same as the name of the repository + '/'
                 
+                if not files and not folders:
+                    return render_template("error.html")
         
                 folders_to_add = []
                 folder_paths = []
@@ -208,14 +243,38 @@ def repo(subpath):
                     folders_to_add.append(relative_path[1] + folder[0])
                     folder_paths.append(folder[3] + folder[0] + "/")
 
-                while len(folders_to_add) > 0:
+                while len(folders_to_add) > 0: # we are going to load into the db the files and folders of the repository for the folders that are in the path
                 
                     folder = folders_to_add.pop(0)
 
-                    if not load_files_and_folders(repoName, folder):
-                        return jsonify({"status": "error"})
+                    ack = load_files_and_folders(repoName, folder)
+
+                    if ack == 0:
+                        pass
+                    elif ack == 1:
+                        flash("User not identified!", category='error')
+                        return render_template("generic_error.html")
+                    elif ack == 2:
+                        flash("The repository does not exist!", category='error')
+                        return render_template("generic_error.html")
+                    elif ack == 3:
+                        flash("There was a file error!", category='error')
+                        return render_template("generic_error.html")
+                    elif ack == 4:
+                        flash("There was a github error!", category='error')
+                        return render_template("generic_error.html")
+                    elif ack == 5:
+                        flash("There was an error with the database!", category='error')
+                        return render_template("generic_error.html")
+                    else:
+                        flash("An unexpected error occurred!", category='error')
+                        return render_template("generic_error.html")
+
                     
                     files_in_db, folders_in_db = get_files_and_folders(repoName, folder_paths.pop(0))
+
+                    if not files_in_db and not folders_in_db:
+                        return render_template("error.html")
 
                     for folder in folders_in_db:
                         relative_path = folder[3].split('/',1)
@@ -228,16 +287,15 @@ def repo(subpath):
 
                 db.session.commit()
 
-            else:
+            else: # the repository is already loaded in the database, so no need to be loaded again
 
                 files, folders = get_files_and_folders(repoName, subpath)
                 last_updated = Repository.query.filter_by(name=repoName).first().lastUpdated
 
-
             title = repoName
 
 
-        else: # we are in a folder
+        else: # we are in a folder, and not in the root of the repository
 
             files, folders = get_files_and_folders(repoName, subpath +'/')
             folder = Folder.query.filter_by(repository_name=repoName, path=subpath).first()
@@ -387,10 +445,34 @@ def repo(subpath):
             
             path = path[len(repoName)+1:] # remove repoName/ from the folder path
 
-            if not load_files_and_folders(repoName, path): #load the files and folders of the folder into the db
-                return jsonify({"status": "error"})
+            ack = load_files_and_folders(repoName, path) # load the files and folders of the folder into the db
+
+            if ack == 0:
+                pass
+            elif ack == 1:
+                flash("User not identified!", category='error')
+                return jsonify({"status": "errorUser"})
+            elif ack == 2:
+                flash("The repository does not exist!", category='error')
+                return jsonify({"status": "errorRepoDoesNotExist"})
+            elif ack == 3:
+                flash("There was a file error!", category='error')
+                return jsonify({"status": "errorFile"})
+            elif ack == 4:
+                flash("There was a github error!", category='error')
+                return jsonify({"status": "errorGithub"})
+            elif ack == 5:
+                flash("There was an error with the database!", category='error')
+                return jsonify({"status": "errorDB"})
+            else:
+                flash("An unexpected error occurred!", category='error')
+                return jsonify({"status": "unexpectedError"})
+
 
             files, folders = get_files_and_folders(repoName, folderPath) # get the files and folders of the folder
+
+            if not files and not folders:
+                return jsonify({"status": "error"})
 
             folders_to_add = []
             folder_paths = []
@@ -403,10 +485,34 @@ def repo(subpath):
             while len(folders_to_add) > 0:
                 folder = folders_to_add.pop(0)
 
-                if not load_files_and_folders(repoName, folder):
+                ack = load_files_and_folders(repoName, folder)
+
+                if ack == 0:
+                    pass
+                elif ack == 1:
+                    flash("User not identified!", category='error')
                     return jsonify({"status": "error"})
+                elif ack == 2:
+                    flash("The repository does not exist!", category='error')
+                    return jsonify({"status": "error"})
+                elif ack == 3:
+                    flash("There was a file error!", category='error')
+                    return jsonify({"status": "error"})
+                elif ack == 4:
+                    flash("There was a github error!", category='error')
+                    return jsonify({"status": "error"})
+                elif ack == 5:
+                    flash("There was an error with the database!", category='error')
+                    return jsonify({"status": "error"})
+                else:
+                    flash("An unexpected error occurred!", category='error')
+                    return jsonify({"status": "error"})
+
                 
                 files_in_db, folders_in_db = get_files_and_folders(repoName, folder_paths.pop(0))
+
+                if not files_in_db and not folders_in_db:
+                    return jsonify({"status": "error"})
 
                 for folder in folders_in_db:
                     relative_path = folder[3].split('/',1)

@@ -37,14 +37,13 @@ def load_files_and_folders(repoName, path=""):
 
     # if the user is not in the database, return False
     if not user:
-        return False
+        return 1
     
     
     try:
 
         # authenticate the user
         g = github.Github(user.githubG)
-
         user = g.get_user()
 
 
@@ -57,6 +56,9 @@ def load_files_and_folders(repoName, path=""):
         files, folders, lastupdates = [], [], []
 
         repository = Repository.query.filter_by(name=repoName).first()
+
+        if not repository:
+            return 2
 
         for content_file in contents:
             
@@ -82,8 +84,6 @@ def load_files_and_folders(repoName, path=""):
                     file = File(name=content_file.name, repository_name=repoName, lastUpdated=last_modified, 
                     modified=False, path=str(repoName+'/'+content_file.path), folderPath=folder_path)
 
-                    print (f"File {file.name} added with path {file.path} and folder path {file.folderPath}")
-
                     db.session.add(file)
 
 
@@ -95,19 +95,24 @@ def load_files_and_folders(repoName, path=""):
                         directory_path = str(repository.FileSystemPath + repoName + "/" + content_file.path)
                         directory = os.path.dirname(directory_path)
 
-                        if not os.path.exists(directory):
+                        if not os.path.exists(directory): # if the directory does not exist, create it
                             os.makedirs(directory)
+                        
+                        # and we add the file to the file system
                         with open(str(repository.FileSystemPath + repoName + "/" + content_file.path), 'wb') as fileFS:
                             fileFS.write(content_file.decoded_content)
 
-                        # sign the file and the file system path
+                        fileFS.close()
+
+                        # sign the file and add the file system path
                         file.FileSystemPath = repository.FileSystemPath + repoName + "/" + content_file.path
                         file.shaHash = sign_file(file.FileSystemPath)
-                        
-                        fileFS.close()
-                    
-         
 
+                        if file.shaHash == None:
+                            return 3
+                        
+                        
+                    
                 else: # if the file is already in db, check if it has been updated and change modified to True if it has
                     
                    
@@ -127,6 +132,10 @@ def load_files_and_folders(repoName, path=""):
                                 fileFS.write(content_file.decoded_content)
                             fileFS.close()
                             file.shaHash = sign_file(repository.FileSystemPath + repoName + "/" + content_file.path)
+
+                            if file.shaHash == None:
+                                return 3
+
                             file.modified = False # it has been updated, but we have to set modified to False
                                                 # since modified is seen from the fs perspective and used to commit changes
 
@@ -153,11 +162,9 @@ def load_files_and_folders(repoName, path=""):
                     last_modified = get_last_modified(content_file.path, repo)
 
                     # the folder path is the path of the folder without the folder name
-
                 
                     folder_path = repoName + '/' + content_file.path[0:len(content_file.path)-len(content_file.name)]
                     
-
                     # the folder path is the repoName + the path of the folder without the folder name
                     
 
@@ -166,8 +173,6 @@ def load_files_and_folders(repoName, path=""):
 
                     db.session.add(folder)
                     # the last updated date of the repository will be the last updated date of the file
-
-                    print (f"Added folder {folder.name} with path {folder.path} and folder path {folder.folderPath}")
                 
 
                 else: # if the folder is already in db, check if it has been updated and change modified to True if it has
@@ -187,9 +192,7 @@ def load_files_and_folders(repoName, path=""):
                     else:
                         folder.modified = False
                         
-                        
-
-
+        
                 lastupdates.append(folder.lastUpdated)
                 folders.append(content_file.name)
 
@@ -197,8 +200,6 @@ def load_files_and_folders(repoName, path=""):
         # the size of the repo might be empty, but it should return a valid response
         # repo.size does not work always as the cache might be empty and it takes time to update
 
-
-        
 
         if files == [] and folders == []: # if the repository is empty
 
@@ -216,7 +217,7 @@ def load_files_and_folders(repoName, path=""):
             repository.lastUpdated = last_updated
             db.session.commit()
 
-            return True
+            return 0
 
         # update the last updated date of the repository
 
@@ -258,11 +259,17 @@ def load_files_and_folders(repoName, path=""):
 
         g.close()
 
-        return True
+        return 0
         
     
-    except github.GithubException as e: 
-        return False
+    except github.GithubException: 
+        return 4
+    
+    except SQLAlchemyError:
+        return 5
+    
+    except:
+        return 6
 
 
 
@@ -270,6 +277,9 @@ def get_files_and_folders(repoName, father_dir):
 
     # get the files and folders from the database
     user_id = session.get('user_id')
+
+    if not user_id:
+        return False, False
 
     files = File.query.filter_by(repository_name=repoName, folderPath=father_dir).all()
     folders = Folder.query.filter_by(repository_name=repoName, folderPath=father_dir).all()
@@ -307,7 +317,7 @@ def get_last_modified(path, repo):
 
         return last_modified
 
-    except Exception as e:
+    except Exception:
         return None
 
 

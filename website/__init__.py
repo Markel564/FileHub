@@ -10,6 +10,7 @@ def create_app():
     app.config['SECRET_KEY'] = 'secret-key123'
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
     db.init_app(app)
+    
     from .views import views
     from .addition import addition
 

@@ -41,7 +41,6 @@ def get_repos():
         for repo in repositories:
             # if one repository from GitHub account is not in the database, add it
             if not Repository.query.filter_by(name=repo.name).first():
-                print (f"ADDED --> {repo} to db")
                 new_repo = Repository(name=repo.name, lastUpdated=repo.updated_at)
                 db.session.add(new_repo)
                 db.session.commit()

@@ -71,13 +71,38 @@ DELETE FILE             DONE
 
 DELETE FOLDER
 
-DELETE REPO
+DELETE REPO     DONE
+0 --> ok
+1 --> user not found (errorUser)
+2 --> repo not found (errorRepoDoesNotExist)
+3 --> github exception (githubError)
+4 --> error deleting repo from db (errorDB)
+5 --> other (unexpectedError)
 
-SIGN FILE 
 
-GET REPOS
+SIGN FILE       DONE
+True --> ok
+False --> error signing file 
 
-LOAD FILES AND FOLDERS (MORE?)
+
+GET REPOS       DONE
+repo list --> ok
+False --> error getting repos
+
+
+LOAD FILES AND FOLDERS
+0 --> ok
+1 --> user not found (errorUser)
+2 --> repo not found (errorRepoDoesNotExist)
+3 --> error signing file (fileError)
+4 --> github exception (githubError)
+5 --> error with db (errorDB)
+6 --> other (unexpectedError)
+
+
+GET FILES AND FOLDERS
+file and folder list --> ok
+False, False --> error getting files and folders
 
 REFORMAT DATE
 
