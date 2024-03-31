@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
     })
     .then(function (data) {
         if (data.status == "ok"){
-            var errorContainer = document.getElementById("info-container");
+            var errorContainer = document.getElementById("modal-content");
             
             var state = false;
             function toggleState() {

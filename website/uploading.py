@@ -1,11 +1,11 @@
 from flask import Blueprint, flash, request, jsonify
 from .pythonCode import *
 
-addition = Blueprint('addition', __name__)
+uploading = Blueprint('uploading', __name__)
 
 
 
-@addition.route('/upload-file', methods=['GET','POST'])
+@uploading.route('/upload-file', methods=['GET','POST'])
 def upload_file():
     if 'file' in request.files:
 
