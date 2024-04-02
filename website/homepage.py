@@ -12,7 +12,7 @@ The views are:
 
 from flask import Blueprint, render_template, flash, request, jsonify, session
 from . import db
-from .models import User
+from .models import User, Repository
 from .pythonCode import add_user, get_repos, delete_repo
 
 

@@ -484,3 +484,41 @@ def repo(subpath):
             else:
                 flash("An unexpected error occurred!", category='error')
                 return jsonify({"status": "unexpectedError"})
+
+        elif type_message == "delete-folder":
+            pass # not implemented yet
+
+        elif type_message == "open-file":
+
+            repoName, folderPath, fileName = data.get('repoName'), data.get('folderPath'), data.get('fileName')
+
+            if folderPath == "/":  # if we are in the root of the repository
+                path = repoName+"/"+fileName
+            else:
+                path = repoName+"/"+folderPath+fileName
+
+            ack = open_file(repoName, path)
+
+            if ack == 0:
+                return jsonify({"status": "ok"})
+            elif ack == 1:
+                flash("User not identified!", category='error')
+                return jsonify({"status": "errorUser"})
+            elif ack == 2:
+                flash("The repository does not exist!", category='error')
+                return jsonify({"status": "errorRepoDoesNotExist"})
+            elif ack == 3:
+                flash("The repository is not cloned!", category='error')
+                return jsonify({"status": "errorRepoNotCloned"})
+            elif ack == 4:
+                flash("File not found!", category='error')
+                return jsonify({"status": "fileError"})
+            elif ack == 5:
+                flash("Error opening the file!", category='error')
+                return jsonify({"status": "fileError"})
+            elif ack == 6:
+                flash("The operating system is not supported!", category='error')
+                return jsonify({"status": "errorOS"})
+            else:
+                flash("An unexpected error occurred!", category='error')
+                return jsonify({"status": "unexpectedError"})

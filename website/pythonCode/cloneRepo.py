@@ -6,6 +6,7 @@ import os
 from flask import session
 from git import Repo
 from .getHash import sign_file
+from sqlalchemy.exc import SQLAlchemyError
 
 
 

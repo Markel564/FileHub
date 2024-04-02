@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
                 window.location.href = window.location.href;
             }
-            if (data.status == "errorAlreadyCloned"){
+            else{
                 
                 // alert("The repository is already cloned");
                 // window.location.reload();

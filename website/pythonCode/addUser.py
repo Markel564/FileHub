@@ -11,6 +11,8 @@ import github
 import yaml
 from flask import session
 from .getRepos import get_repos
+from sqlalchemy.exc import SQLAlchemyError
+
 
 
 def add_user():

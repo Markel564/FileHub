@@ -5,6 +5,8 @@ import github
 import yaml
 from flask import session
 import os
+from sqlalchemy.exc import SQLAlchemyError
+
 
 
 def commit_changes(repoName, folderpath):

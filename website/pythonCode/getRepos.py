@@ -10,6 +10,8 @@ from github import Github, Auth
 import github
 import yaml
 from flask import session
+from sqlalchemy.exc import SQLAlchemyError
+
 
 def get_repos():
     """

@@ -18,6 +18,7 @@ import time
 from cachetools import TTLCache
 from .getHash import sign_file
 import os
+from sqlalchemy.exc import SQLAlchemyError
 
 
 # Define a cache with a time-to-live (TTL) of 1 hour
@@ -171,6 +172,7 @@ def load_files_and_folders(repoName, path=""):
                     folder = Folder(name=content_file.name, repository_name=repoName, 
                     lastUpdated=last_modified, modified=False, path=str(repoName+'/'+ content_file.path), folderPath=folder_path) 
 
+                    print (f"Created folder with folder.path: {folder.path} and folder.folderPath: {folder.folderPath}")
                     db.session.add(folder)
                     # the last updated date of the repository will be the last updated date of the file
                 
@@ -284,11 +286,13 @@ def get_files_and_folders(repoName, father_dir):
     files = File.query.filter_by(repository_name=repoName, folderPath=father_dir).all()
     folders = Folder.query.filter_by(repository_name=repoName, folderPath=father_dir).all()
     
-
+    for file in files[:]:
+        if file.deleted:
+            files.remove(file)
     # UPDATE AND ADD FOLDER.DELETED
     
     # we keep the names of the file and folders as well as the last updated date
-    files = [[file.name, file.lastUpdated, file.modified, file.folderPath, file.deleted] for file in files]
+    files = [[file.name, file.lastUpdated, file.modified, file.folderPath] for file in files]
     folders = [[folder.name, folder.lastUpdated, folder.modified, folder.folderPath] for folder in folders]
     
     return files, folders

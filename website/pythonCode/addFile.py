@@ -5,6 +5,8 @@ from flask import session
 from datetime import datetime
 import os
 from .getHash import sign_file
+from sqlalchemy.exc import SQLAlchemyError
+
 
 def add_file(repoName, file_name, file_path):
     

@@ -10,6 +10,8 @@ import github
 import yaml
 from flask import session
 from datetime import datetime
+from sqlalchemy.exc import SQLAlchemyError
+
 
 
 def add_repo(project_name, project_description, readme, isPrivate=False):

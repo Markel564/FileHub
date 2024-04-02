@@ -11,6 +11,9 @@
     flex-wrap: wrap;
 }
 
+
+
+
 #pushButton{
   border: 2px solid black;
   margin-left: 40%;
@@ -171,7 +174,7 @@
 
 .content-box h1, .content-box-new h1, .content-box-deleted h1{
   color: black;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: bold;
   margin: 0 auto;
   text-align: center;
@@ -183,7 +186,7 @@
 
 .content-box h2, .content-box-new h2, .content-box-deleted h2{
   color: black;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: bold;
   margin: 0 auto;
   text-align: center;
@@ -207,8 +210,10 @@
 }
 
 #new-file:hover{
-  background-color: #950740;
+  cursor: pointer;
+  opacity: 0.8;
 }
+
 .img-content-new{
   height: 70%;
   width: auto;

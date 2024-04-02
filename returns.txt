@@ -100,11 +100,26 @@ LOAD FILES AND FOLDERS
 6 --> other (unexpectedError)
 
 
-GET FILES AND FOLDERS
+GET FILES AND FOLDERS       DONE
 file and folder list --> ok
 False, False --> error getting files and folders
 
-REFORMAT DATE
+
+OPEN FILE
+1 --> user not found (errorUser)
+2 --> repo not found (errorRepoDoesNotExist)
+3 --> repo not cloned (errorRepoNotCloned)
+4 --> file not found (fileError)
+5 --> error opening file (fileError)
+6 --> not linux or windows (errorOS)
+7 --> other (unexpectedError)
+
+
+REFORMAT DATE               DONE
+Dates in the format YYYY-MM-DD HH:MM:SS --> ok
+
+
+
 
 
 

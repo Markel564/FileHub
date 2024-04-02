@@ -5,6 +5,8 @@ from .. import db
 from datetime import datetime
 from .cloneRepo import windows_to_unix_path
 from flask import session
+from sqlalchemy.exc import SQLAlchemyError
+
 
 def check_file_system(repo):
 
@@ -65,8 +67,7 @@ def check_file_system(repo):
                         father_dir = folderPath
 
                         while father_dir != repo.name + "/":
-                            folder = Folder.query.filter_by(path=father_dir, repository_name=repo.name).first()
-
+                            folder = Folder.query.filter_by(path=father_dir[:-1], repository_name=repo.name).first()
                             # there is a chance that the user created the directory manually, so we have to add it to the database
                             if not folder:
                                 FileSystemPath = windows_to_unix_path(str(repo.FileSystemPath) + father_dir, True)
@@ -94,6 +95,8 @@ def check_file_system(repo):
             file = File.query.filter_by(path=file_repo.path).first()
         
             hash_of_file = sign_file(file.FileSystemPath)
+            print (f"Value of hash_of_file: {hash_of_file} for file: {file.name}")
+
 
             if file.deleted: # if the file has been deleted, it will not be checked for modifications
                 continue
@@ -126,9 +129,11 @@ def check_file_system(repo):
             db.session.commit()
         return 0
 
-    except SQLAlchemyError:
+    except SQLAlchemyError as e:
+        print(e)
         return 5
-    except Exception:
+    except Exception as e:
+        print(e)
         return 6
 
 
