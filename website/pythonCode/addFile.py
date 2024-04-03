@@ -24,20 +24,34 @@ def add_file(repoName, file_name, file_path):
     if not repo.isCloned:
         return 3
     try:
-        
-        with open("./uploads/"+file_name, 'rb') as file:
-            content = file.read()
-        
-        os.remove("./uploads/"+file_name)
-        
-        # add the file to the database
-        repo = Repository.query.filter_by(name=repoName).first()
 
         if file_path[0] != "/":
             file_path = "/" + file_path
 
         path = str(repo.name + file_path + file_name)
         folder_path = str(repo.name + file_path)
+
+        print (f"Path: {path}")
+        print (f"Folder path: {folder_path}")
+
+        with open("./uploads/"+file_name, 'rb') as file:
+            content = file.read()
+
+            if repo.isCloned: # write the file to the file system if the repo is cloned
+                # we create the file in the file system of the repository
+                repo = Repository.query.filter_by(name=repo.name).first()
+
+                with open(repo.FileSystemPath + path, "wb") as file:
+                    file.write(content)
+                file.close()
+
+        
+        os.remove("./uploads/"+file_name)
+        
+        # add the file to the database
+        repo = Repository.query.filter_by(name=repoName).first()
+
+        
         
         if file_name in [f.name for f in repo.repository_files]:
             return 7
@@ -64,39 +78,31 @@ def add_file(repoName, file_name, file_path):
             folder_path = folder_path[:folder_path.rfind("/")]
 
 
-        db.session.commit()
-
-        # if the repo is cloned, we have to add the file to the file system
-
+        # if the repo is cloned, we have to hash the file
         if repo.isCloned:
-            repo = Repository.query.filter_by(name=repo.name).first()
- 
-            with open(repo.FileSystemPath + path, "wb") as file:
-                file.write(content)
-            
-            file.close()
-
-            # also, add, the path within the file system to the file and sign it
-
-            file = File.query.filter_by(path=path).first()
             file.FileSystemPath = repo.FileSystemPath + path
+  
+            print (f"About to hash {file.FileSystemPath}")
             file.shaHash = sign_file(file.FileSystemPath)
 
             if not file.shaHash:
                 return 4
-                
-            db.session.commit()
+        db.session.commit()
+
             
         return 0
 
-    except FileNotFoundError:
+    except FileNotFoundError as e:
+        print (e)
         return 4
     
     except PermissionError:
         return 5
     
-    except SQLAlchemyError: 
+    except SQLAlchemyError as e: 
+        print (e)
         return 6
         
-    except Exception:  
+    except Exception as e:
+        print (e)  
         return 8

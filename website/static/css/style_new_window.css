@@ -4,7 +4,7 @@
   width: auto;
 }
 
-.modal-content {
+.modal-content, .modal-folder {
   display: block;
   position: fixed;
   border-radius: 25px;
@@ -36,7 +36,7 @@
   /* border: 2px solid yellow; */
 }
 
-.modal-content h2 p {
+.modal-content h2 p, .modal-folder h2 p {
   margin: 0;
   height: 10%;
   width: 100%;

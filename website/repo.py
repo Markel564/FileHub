@@ -522,3 +522,52 @@ def repo(subpath):
             else:
                 flash("An unexpected error occurred!", category='error')
                 return jsonify({"status": "unexpectedError"})
+
+
+        elif type_message == "new-folder-request":
+
+            return jsonify({"status": "ok"})
+        
+        elif type_message == "create-folder":
+
+            folderName, repoName, folderPath = data.get('folderName'), data.get('repoName'), data.get('folderPath')
+
+            print(f"folderName: {folderName}, repoName: {repoName}, folderPath: {folderPath}")
+
+            if folderPath == "/":
+                path = repoName + "/" + folderName
+            else:
+                path = repoName + "/" + folderPath + folderName
+
+            ack = create_folder(repoName, folderName, path)
+
+            if ack == 0:
+                flash("Folder created successfully", category='success')
+                return jsonify({"status": "ok"})    
+            elif ack == 1:
+                flash("User not identified!", category='error')
+                return jsonify({"status": "errorUser"})
+            elif ack == 2:
+                flash("The repository does not exist!", category='error')
+                return jsonify({"status": "errorRepoDoesNotExist"})
+            elif ack == 3:
+                flash("The repository is not cloned!", category='error')
+                return jsonify({"status": "errorRepoNotCloned"})
+            elif ack == 4:
+                flash("Folder already exists!", category='error')
+                return jsonify({"status": "errorFolderExists"})
+            elif ack == 5:
+                flash("Error creating the folder in the file system!", category='error')
+                return jsonify({"status": "errorFolder"})
+            elif ack == 6:
+                flash("Error adding the folder to the database!", category='error')
+                return jsonify({"status": "errorDB"})
+            else:
+                flash("An unexpected error occurred!", category='error')
+                return jsonify({"status": "unexpectedError"})
+
+            return jsonify({"status": "ok"})
+
+        elif type_message == "cancel-folder":
+
+            return jsonify({"status": "ok"})

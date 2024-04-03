@@ -9,6 +9,7 @@ const addFileButton = document.querySelector("#add-file");
 const refreshGitHubButton = document.querySelector("#refresh-github");
 const refreshFileSystemButton = document.querySelector("#refresh-filesystem");
 const commitButton = document.querySelector("#pushButton");
+const newFolderButton = document.querySelector("#new-folder");
 
 
 
@@ -273,7 +274,6 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(function (data) {
             if (data.status == "ok"){
-                console.log("option", option)
                 if (option == "SYNCHRONIZE"){
                     var errorContainer = document.getElementById("modal-content");
                     var state = false; 
@@ -464,9 +464,47 @@ document.addEventListener("DOMContentLoaded", function () {
     );
 });
 
+// Function to open window to create folder
+newFolderButton.addEventListener("click", () => {
+
+    let path = window.location.pathname;
+    path = path.substring(6);
+    path = path.substring(repoName.length);
+    path = path.substring(1);
+    if (path[path.length-1] != "/"){
+        path = path + "/";
+    }
+
+    fetch("/repo/"+ repoName + "/",{
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ type: "new-folder-request", repoName: repoName, folderPath: path}),
+    })
+    .then(function (response) {
+        if (response.ok) {
+            return response.json(); 
+        } else {
+            throw new Error("Network response was not ok");
+        }
+    })
+    .then(function (data) {
+        
+        var folderWindow = document.getElementById("modal-folder");
+
+        if (data.status == "ok"){
+            folderWindow.classList.remove("hide");
+            folderWindow.classList.add("modal-folder");
+        }
+    })
+    .catch(function (error) {
+        console.error("Fetch error:", error);
+    });
+});
+
 
 // Function to open a file by clicking it
-
 document.addEventListener("DOMContentLoaded", function () {
 
     var files = document.querySelectorAll("#file");

@@ -85,6 +85,8 @@ def load_files_and_folders(repoName, path=""):
                     file = File(name=content_file.name, repository_name=repoName, lastUpdated=last_modified, 
                     modified=False, path=str(repoName+'/'+content_file.path), folderPath=folder_path)
 
+                    print (f"Created file with file.path: {file.path} and file.folderPath: {file.folderPath}")
+
                     db.session.add(file)
 
 

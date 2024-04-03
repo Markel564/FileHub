@@ -59,6 +59,16 @@ COMMIT CHANGES          DONE
 6 --> other (unexpectedError)
 
 
+CREATE FOLDER           DONE
+0 --> ok
+1 --> user not found (errorUser)
+2 --> repo not found (errorRepoDoesNotExist)
+3 --> repo not cloned (errorRepoNotCloned)
+4 --> folder already exists (errorFolderAlreadyExists)
+5 --> error creating folder in fs (errorFolder)
+6 --> error adding folder to db (errorDB)
+7 --> other (unexpectedError)
+
 DELETE FILE             DONE
 0 --> ok 
 1 --> user not found (errorUser)
