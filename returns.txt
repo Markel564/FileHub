@@ -80,6 +80,13 @@ DELETE FILE             DONE
 
 
 DELETE FOLDER
+0 --> ok 
+1 --> user not found (errorUser)
+2 --> repo not found (errorRepoDoesNotExist)
+3 --> repo not cloned (errorRepoNotCloned)
+4 --> folder not found (errorFolderDoesNotExist)
+5 --> folder already deleted (errorFolderAlreadyDeleted)
+6 --> other (unexpectedError)
 
 DELETE REPO     DONE
 0 --> ok

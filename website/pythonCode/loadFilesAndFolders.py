@@ -291,7 +291,10 @@ def get_files_and_folders(repoName, father_dir):
     for file in files[:]:
         if file.deleted:
             files.remove(file)
-    # UPDATE AND ADD FOLDER.DELETED
+
+    for folder in folders[:]:
+        if folder.deleted:
+            folders.remove(folder)
     
     # we keep the names of the file and folders as well as the last updated date
     files = [[file.name, file.lastUpdated, file.modified, file.folderPath] for file in files]

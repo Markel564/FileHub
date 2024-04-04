@@ -42,8 +42,9 @@ class Folder(db.Model):
     path = db.Column(db.String(255), nullable=False, unique=True)
     folderPath = db.Column(db.String(255), nullable=False, unique=False) #represents the path of his father folder
     FileSystemPath = db.Column(db.String(255), nullable=True, unique=True)
-
+    deleted = db.Column(db.Boolean, default = False, nullable=True)
     fatherFolder_id = db.Column(db.Integer, db.ForeignKey('folder.id'), nullable=True) # folder where the folder is located
+    addedFirstTime = db.Column(db.Boolean, default=False, nullable=True)
 
     folder_files = db.relationship('File', backref='belonging_folder', lazy=True) # files in the folder
     subfolders = db.relationship('Folder', backref='parent_folder', lazy=True, remote_side=id) # subfolders of the folder

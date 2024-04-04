@@ -33,19 +33,19 @@ def create_folder(repoName,folder_name, path):
         # for folder path, we select the part of the path that is not the folder name itself
         folderPath = path[:-len(folder_name)] 
         folder = Folder(name=folder_name, repository_name=repo.name,  path = path, lastUpdated = datetime.now(), modified = True,
-        folderPath=folderPath)
+        folderPath=folderPath, FileSystemPath=repo.FileSystemPath + path, addedFirstTime=True)
 
         print (f"Folder with path {path} and folderpath: {folderPath}")
         repo.lastUpdated = datetime.now() # update the last updated date of the repository
         # we also have to update the dates of the folders where the folder is located
 
-        folderPath = folderPath[:-1] # remove the last character
+        # folderPath = folderPath[:-1] # remove the last character
 
-        while folderPath != repo.name:
+        while folderPath != repo.name+"/":
             
             print (f"Folders: {folderPath} updated")
             # open all the folders that have that folder_path as their path
-            fatherFolder = Folder.query.filter_by(path=folderPath, repository_name=repo.name).first()
+            fatherFolder = Folder.query.filter_by(path=folderPath[:-1], repository_name=repo.name).first()
 
             fatherFolder.lastUpdated = datetime.now()
             fatherFolder.modified = True

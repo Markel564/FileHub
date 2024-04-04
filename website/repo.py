@@ -190,7 +190,6 @@ def repo(subpath):
 
             repoName, option = data.get('repoName'), data.get('option')
 
-            print (f"repoName: {repoName}, option: {option}")
             # search for the repository in the database
             repo = Repository.query.filter_by(name=repoName).first()
             if repo is None:
@@ -402,7 +401,8 @@ def repo(subpath):
 
             # check that there is at least one file with a modification or that was added for the first time
             files = File.query.filter_by(repository_name=repoName, folderPath=folderPath).all()
-
+            folders = Folder.query.filter_by(repository_name=repoName, folderPath=folderPath).all()
+            
             modifications, insertions, deletions = False, False, False
             for file in files:
                 if file.modified:
@@ -411,9 +411,17 @@ def repo(subpath):
                     insertions = True
                 if file.deleted:
                     deletions = True
+            
+            for folder in folders:
+                if folder.modified:
+                    modifications = True
+                if folder.deleted:
+                    deletions = True
+                if folder.addedFirstTime:
+                    insertions = True
 
-            if len(files) == 0:
-                flash("No files to commit", category='error')
+            if len(files) == 0 and len(folders) == 0:
+                flash("No changes to commit", category='error')
                 return jsonify({"status": "errorNoFiles"})
             
             # if there are no files modified or added (or deletions), do not commit
@@ -485,21 +493,20 @@ def repo(subpath):
                 flash("An unexpected error occurred!", category='error')
                 return jsonify({"status": "unexpectedError"})
 
+
         elif type_message == "delete-folder":
-            pass # not implemented yet
+  
+            repoName, folderPath, folderName = data.get('repoName'), data.get('folderPath'), data.get('folderName')
 
-        elif type_message == "open-file":
-
-            repoName, folderPath, fileName = data.get('repoName'), data.get('folderPath'), data.get('fileName')
-
-            if folderPath == "/":  # if we are in the root of the repository
-                path = repoName+"/"+fileName
+            if folderPath == "/":
+                path = repoName+"/"+folderName
             else:
-                path = repoName+"/"+folderPath+fileName
-
-            ack = open_file(repoName, path)
+                path = repoName+"/"+folderPath+folderName
+            
+            ack = delete_folder(repoName, path, folderName)
 
             if ack == 0:
+                flash("Folder deleted successfully", category='success')
                 return jsonify({"status": "ok"})
             elif ack == 1:
                 flash("User not identified!", category='error')
@@ -511,17 +518,52 @@ def repo(subpath):
                 flash("The repository is not cloned!", category='error')
                 return jsonify({"status": "errorRepoNotCloned"})
             elif ack == 4:
-                flash("File not found!", category='error')
-                return jsonify({"status": "fileError"})
+                flash("Folder not found!", category='error')
+                return jsonify({"status": "folderError"})
             elif ack == 5:
-                flash("Error opening the file!", category='error')
-                return jsonify({"status": "fileError"})
-            elif ack == 6:
-                flash("The operating system is not supported!", category='error')
-                return jsonify({"status": "errorOS"})
+                flash("The folder is already deleted! Commit the changes to send them!", category='error')
+                return jsonify({"status": "errorFolderAlreadyDeleted"})
             else:
                 flash("An unexpected error occurred!", category='error')
                 return jsonify({"status": "unexpectedError"})
+
+
+        elif type_message == "open-file":
+
+            return jsonify({"status": "ok"})
+
+            # repoName, folderPath, fileName = data.get('repoName'), data.get('folderPath'), data.get('fileName')
+
+            # if folderPath == "/":  # if we are in the root of the repository
+            #     path = repoName+"/"+fileName
+            # else:
+            #     path = repoName+"/"+folderPath+fileName
+
+            # ack = open_file(repoName, path)
+
+            # if ack == 0:
+            #     return jsonify({"status": "ok"})
+            # elif ack == 1:
+            #     flash("User not identified!", category='error')
+            #     return jsonify({"status": "errorUser"})
+            # elif ack == 2:
+            #     flash("The repository does not exist!", category='error')
+            #     return jsonify({"status": "errorRepoDoesNotExist"})
+            # elif ack == 3:
+            #     flash("The repository is not cloned!", category='error')
+            #     return jsonify({"status": "errorRepoNotCloned"})
+            # elif ack == 4:
+            #     flash("File not found!", category='error')
+            #     return jsonify({"status": "fileError"})
+            # elif ack == 5:
+            #     flash("Error opening the file!", category='error')
+            #     return jsonify({"status": "fileError"})
+            # elif ack == 6:
+            #     flash("The operating system is not supported!", category='error')
+            #     return jsonify({"status": "errorOS"})
+            # else:
+            #     flash("An unexpected error occurred!", category='error')
+            #     return jsonify({"status": "unexpectedError"})
 
 
         elif type_message == "new-folder-request":
@@ -531,8 +573,6 @@ def repo(subpath):
         elif type_message == "create-folder":
 
             folderName, repoName, folderPath = data.get('folderName'), data.get('repoName'), data.get('folderPath')
-
-            print(f"folderName: {folderName}, repoName: {repoName}, folderPath: {folderPath}")
 
             if folderPath == "/":
                 path = repoName + "/" + folderName

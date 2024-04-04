@@ -4,7 +4,7 @@ const searchInput = document.querySelector("[data-search");
 const filesAndFolders = document.querySelectorAll(".content-box");
 var folderName = document.title;
 const repoName = document.querySelector("#headerName").textContent;
-const folders = document.querySelectorAll("#folder");
+// const folders = document.querySelectorAll("#folder");
 const addFileButton = document.querySelector("#add-file");
 const refreshGitHubButton = document.querySelector("#refresh-github");
 const refreshFileSystemButton = document.querySelector("#refresh-filesystem");
@@ -95,46 +95,97 @@ searchInput.addEventListener("input", (e) => {
 
 
 // function to open a folder
-folders.forEach(folder => {
-    
-    folder.addEventListener("click", () => {
-        const folderName = folder.querySelector("h1").textContent;
-        
-        let Path = window.location.pathname;
-        // eliminate "/repo/" from the folder path which is the first 6 characters
-        let folderPath = Path.substring(6);
-        
-        
-        // since the location of the folder does have a final "/", if there is not a final "/", we add it
-        if (folderPath[folderPath.length-1] != "/"){
-            folderPath = folderPath + "/";
-        } 
-   
-        fetch("/repo/"+folderPath, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ type: "open", folder: folderName, folderPath: folderPath }),
-        })
-        .then(function (response) { 
-            if (response.ok) {
-                return response.json(); 
-            } else {
-                throw new Error("Network response was not ok");
+document.addEventListener("DOMContentLoaded", function () {
+    const folders = document.querySelectorAll("#folder");
+
+    folders.forEach(folder => {
+        folder.addEventListener("click", (event) => {
+            // Ensure click doesn't propagate when clicking delete button
+            if (event.target.classList.contains('delete-folder')) {
+                event.stopPropagation();
+                return;
             }
-        })
-        .then(function (data) {
-            let path = data.path;
-            if (data.status == "ok"){
-                window.location.replace("/repo/"+path);
+
+            const folderName = folder.querySelector("h1").textContent;
+
+            let Path = window.location.pathname;
+            let folderPath = Path.substring(6);
+
+            if (folderPath[folderPath.length-1] != "/") {
+                folderPath = folderPath + "/";
             }
-        })
-        .catch(function (error) {
-            console.error("Fetch error:", error);
+
+            fetch("/repo/"+folderPath, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ type: "open", folder: folderName, folderPath: folderPath }),
+            })
+            .then(function (response) { 
+                if (response.ok) {
+                    return response.json(); 
+                } else {
+                    throw new Error("Network response was not ok");
+                }
+            })
+            .then(function (data) {
+                let path = data.path;
+                if (data.status == "ok"){
+                    window.location.replace("/repo/"+path);
+                }
+            })
+            .catch(function (error) {
+                console.error("Fetch error:", error);
+            });
+        });
+    });
+
+    var deleteButtons = document.querySelectorAll(".delete-folder");
+
+    deleteButtons.forEach(function (button) {
+        button.addEventListener("click", function (event) {
+            event.stopPropagation(); // Prevent propagation to content box click listener
+
+            var folderName = this.closest('#folder').querySelector("h1").textContent;
+            
+            let path = window.location.pathname;
+            path = path.substring(6);
+            path = path.substring(repoName.length);
+            path = path.substring(1);
+            if (path[path.length-1] != "/"){
+                path = path + "/";
+            }
+
+            fetch("/repo/"+ repoName + "/",{
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ type: "delete-folder", repoName: repoName, folderPath: path, folderName: folderName}),
+            })
+            .then(function (response) {
+                if (response.ok) {
+                    return response.json(); 
+                } else {
+                    throw new Error("Network response was not ok");
+                }
+            })
+            .then(function (data) {
+                if (data.status == "ok"){
+                    window.location.reload();
+                }else{
+                    window.location.reload();
+                }
+
+            })
+            .catch(function (error) {
+                console.error("Fetch error:", error);
+            });
         });
     });
 });
+
 
 
 // Drag and drop functionality
@@ -464,6 +515,54 @@ document.addEventListener("DOMContentLoaded", function () {
     );
 });
 
+// // function to delete a folder
+// document.addEventListener("DOMContentLoaded", function () {
+
+//     var deleteButtons = document.querySelectorAll(".delete-folder");
+
+//     deleteButtons.forEach(function (button) {
+//         button.addEventListener("click", function () {
+
+//             var folderName = this.closest('#folder').querySelector("h1").textContent;
+            
+//             let path = window.location.pathname;
+//             path = path.substring(6);
+//             path = path.substring(repoName.length);
+//             path = path.substring(1);
+//             if (path[path.length-1] != "/"){
+//                 path = path + "/";
+//             }
+
+//             fetch("/repo/"+ repoName + "/",{
+//                 method: "POST",
+//                 headers: {
+//                     "Content-Type": "application/json",
+//                 },
+//                 body: JSON.stringify({ type: "delete-folder", repoName: repoName, folderPath: path, folderName: folderName}),
+//             })
+//             .then(function (response) {
+//                 if (response.ok) {
+//                     return response.json(); 
+//                 } else {
+//                     throw new Error("Network response was not ok");
+//                 }
+//             })
+//             .then(function (data) {
+//                 if (data.status == "ok"){
+//                     window.location.reload();
+//                 }else{
+//                     window.location.reload();
+//                 }
+
+//             })
+//             .catch(function (error) {
+//                 console.error("Fetch error:", error);
+//             });
+//         });
+//     }
+//     );
+// });
+
 // Function to open window to create folder
 newFolderButton.addEventListener("click", () => {
 
@@ -551,8 +650,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-// Function to delete a folder
-// TO DO
 
 
 
