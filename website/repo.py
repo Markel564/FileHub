@@ -246,7 +246,7 @@ def repo(subpath):
 
 
         
-        elif type_message == "refresh-github": #to refresh the data based on the one in github
+        elif type_message == "refresh-github": #to refresh the data based on the one in github (like a pull)
 
             repoName, folderPath = data.get('repoName'), data.get('folderPath')
 
@@ -405,6 +405,7 @@ def repo(subpath):
             
             modifications, insertions, deletions = False, False, False
             for file in files:
+                print (file.name, file.modified, file.addedFirstTime, file.deleted)
                 if file.modified:
                     modifications = True
                 if file.addedFirstTime:
@@ -413,6 +414,7 @@ def repo(subpath):
                     deletions = True
             
             for folder in folders:
+                print (folder.name, folder.modified, folder.addedFirstTime, folder.deleted)
                 if folder.modified:
                     modifications = True
                 if folder.deleted:

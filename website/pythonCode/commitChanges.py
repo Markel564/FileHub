@@ -68,7 +68,7 @@ def commit_changes(repoName, folderpath):
                     path_to_pass = '/'.join(path_to_pass) + f"{file.name}"
                     
                 content = open(file.FileSystemPath, 'rb').read()
-                print (f"Path to pass: {path_to_pass}")
+
                 repo.create_file(path_to_pass, "Uploaded file", content)
                 file.addedFirstTime = False
                 file.modified = False
@@ -96,12 +96,13 @@ def commit_changes(repoName, folderpath):
         for folder in repoDB.repository_folders:
 
             if folder.deleted:
-                print (f"DELETING FOLDER {folder.path}")
+                print (f"DELETING FOLDER {folder.path} (first time)")
                 db.session.delete(folder)
             
-            else:
-                file.addedFirstTime = False
-                file.modified = False
+            if not folder.deleted:
+                folder.addedFirstTime = False
+                folder.modified = False
+
 
         
 

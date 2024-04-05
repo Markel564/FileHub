@@ -120,14 +120,15 @@ def delete_folder(repo, path, name):
             return 4
         
 
-        # if the folder was added for the first time, we can delete it from the database 
+        # if the folder was added for the first time (it is not in GitHub), we can delete it from the database 
         if folder.addedFirstTime:
+            print ("Folder added for the first time")
             db.session.delete(folder)
             db.session.commit()
 
             # since the folder is in the file system, we have to delete it
             if os.path.exists(folder.FileSystemPath):
-                os.rmdir(folder.FileSystemPath)
+                shutil.rmtree(folder.FileSystemPath)
 
             return 0
 
