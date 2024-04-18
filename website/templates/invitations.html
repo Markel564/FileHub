@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Invitations{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_invitations.css') }}">
+
+{% endblock %}
+
+{% block js %}
+<script src="{{ url_for('static', filename='js/invitations.js') }}" defer></script>
+{% endblock %}
+
+{% block content %}
+
+<div class = "container">
+
+    <div class="content-header">
+        <button class="btn btn-back" id="backButton">
+            <span>
+                <img src="{{ url_for('static', filename='images/arrow-left2.svg')}}" alt="back-arrow" class="img-back">
+                BACK
+            </span>
+        </button>
+        <h1>Invitations</h1>
+    </div>
+
+    {% if not invitations %}
+
+    <div class="no-results">
+        <h1>No invitations found</h1>
+        <img src="../static/images/sad-face.svg" alt="No results found" class="img-no-results">
+    </div>
+    
+    {% else %}
+
+
+    <div class="invitation-container">
+        {% for key, value in invitations.items() %}
+            <h1>{{ key }}</h1>
+            <h2>{{ value }}</h2>
+            <button class="btn btn-accept" id="acceptButton_{{ loop.index }}">Accept</button>
+            <button class="btn btn-decline" id="declineButton_{{ loop.index }}">Decline</button>
+        {% endfor %}
+    </div>
+
+    {% endif %}
+</div>
+
+{% endblock %}

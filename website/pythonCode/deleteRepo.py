@@ -50,6 +50,7 @@ def delete_repo():
         # delete the repo from the database
         repo = Repository.query.filter_by(name=repo_name).first()
         db.session.delete(repo)
+        print (f"Repo {repo_name} deleted from the database")
         db.session.commit()
 
         # remove the repo to be deleted from the session

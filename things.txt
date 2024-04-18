@@ -5,4 +5,4 @@ explicar en memoria que intente watchdogs pero no funciona
 
 uso de cache para reducir tiempo de ejecucion
 
-hacer lo mismo con directorios que con archivos
+puse mi correo publico en github

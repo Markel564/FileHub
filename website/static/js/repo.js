@@ -4,7 +4,6 @@ const searchInput = document.querySelector("[data-search");
 const filesAndFolders = document.querySelectorAll(".content-box");
 var folderName = document.title;
 const repoName = document.querySelector("#headerName").textContent;
-// const folders = document.querySelectorAll("#folder");
 const addFileButton = document.querySelector("#add-file");
 const refreshGitHubButton = document.querySelector("#refresh-github");
 const refreshFileSystemButton = document.querySelector("#refresh-filesystem");

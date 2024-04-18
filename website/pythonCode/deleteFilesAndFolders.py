@@ -16,6 +16,10 @@ def delete_file(repo, path, name):
     user_id = session.get('user_id')
     user = User.query.filter_by(id=user_id).first()
 
+    print (f"Dentro de delete_file")
+
+    print (f"Arguments: {repo}, {path}, {name}")
+    print (f"Types: {type(repo)}, {type(path)}, {type(name)}")
     if not user:
         return 1
     
@@ -35,6 +39,7 @@ def delete_file(repo, path, name):
 
         file = File.query.filter_by(path=path, name=name).first()
 
+        print (f"File: {file}")
         if not file:
             return 4
 
@@ -46,6 +51,7 @@ def delete_file(repo, path, name):
         # as if not, it will stay there, and will be recognized as a deleted file when the user commits the changes
         # when it does not in fact exist in the file system
 
+        print (f"File added for the first time: {file.addedFirstTime}")
         if file.addedFirstTime:
             db.session.delete(file)
             db.session.commit()
@@ -69,6 +75,7 @@ def delete_file(repo, path, name):
 
         folder_path = file.folderPath[:-1] # remove the last character
 
+        print (f"Folder path: {folder_path}")
         while folder_path != repoDB.name:
                 
                 # open all the folders that have that folder_path as their path
@@ -79,16 +86,21 @@ def delete_file(repo, path, name):
                 # remove until the last slash
                 folder_path = folder_path[:folder_path.rfind("/")]
         
+        print (f"Time to remove the file from the database")
+        print (f"File path: {file.FileSystemPath}")
         # since the file is in the file system, we have to delete it
         if os.path.exists(file.FileSystemPath):
             os.remove(file.FileSystemPath)
         db.session.commit()
+
+        print (f"File deleted from the database")
         return 0
 
         
-    except Exception:
+    except Exception as e:
+        print (e)
         return 6
-    pass 
+
 
 def delete_folder(repo, path, name):
 

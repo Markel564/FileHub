@@ -41,7 +41,7 @@ class Folder(db.Model):
     modified = db.Column(db.Boolean, default=True, nullable=False)
     path = db.Column(db.String(255), nullable=False, unique=True)
     folderPath = db.Column(db.String(255), nullable=False, unique=False) #represents the path of his father folder
-    FileSystemPath = db.Column(db.String(255), nullable=True, unique=True)
+    FileSystemPath = db.Column(db.String(255), nullable=True, unique=True) # necessary?
     deleted = db.Column(db.Boolean, default = False, nullable=True)
     fatherFolder_id = db.Column(db.Integer, db.ForeignKey('folder.id'), nullable=True) # folder where the folder is located
     addedFirstTime = db.Column(db.Boolean, default=False, nullable=True)

@@ -15,11 +15,13 @@ def create_app():
     from .uploading import uploading
     from .additionRepo import additionRepo
     from .repo import repository
+    from .invitations import invitations
 
     app.register_blueprint(homePage, url_prefix='/')
     app.register_blueprint(uploading, url_prefix='/')
     app.register_blueprint(additionRepo, url_prefix='/')
     app.register_blueprint(repository, url_prefix='/repo')
+    app.register_blueprint(invitations, url_prefix='/')
 
 
     return app

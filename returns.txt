@@ -102,6 +102,10 @@ True --> ok
 False --> error signing file 
 
 
+GET INVITATIONS        DONE
+ok --> invitations 
+Error --> False
+
 GET REPOS       DONE
 repo list --> ok
 False --> error getting repos

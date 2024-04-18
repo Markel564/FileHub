@@ -99,6 +99,11 @@ def home():
             
             # js handles cancelation (just eliminates the pop screen)
             return jsonify({"status": "ok"})
+        
+        elif type_message == "invitations":
+
+            print ("INVITATIONS")
+            return jsonify({"status": "ok"})
 
         elif type_message =="add":
 

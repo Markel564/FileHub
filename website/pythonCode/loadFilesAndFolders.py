@@ -47,7 +47,7 @@ def load_files_and_folders(repoName, path=""):
         g = github.Github(user.githubG)
         user = g.get_user()
 
-
+        print (f"USER: {user.name} EMAIL: {user.email} REPO: {repoName}")
         # get the repo
         repo = user.get_repo(repoName)
 
@@ -135,6 +135,7 @@ def load_files_and_folders(repoName, path=""):
                                 fileFS.write(content_file.decoded_content)
                             fileFS.close()
                             file.shaHash = sign_file(repository.FileSystemPath + repoName + "/" + content_file.path)
+                            file.FileSystemPath = repository.FileSystemPath + repoName + "/" + content_file.path
 
                             if file.shaHash == None:
                                 return 3
@@ -142,8 +143,17 @@ def load_files_and_folders(repoName, path=""):
                             file.modified = False # it has been updated, but we have to set modified to False
                                                 # since modified is seen from the fs perspective and used to commit changes
 
-                    else:
+                    else: # if the file has not been updated
                         file.modified = False
+
+                        if repository.isCloned:
+                            file.modified = False
+
+                            file.FileSystemPath = repository.FileSystemPath + repoName + "/" + content_file.path
+                            file.shaHash = sign_file(repository.FileSystemPath + repoName + "/" + content_file.path)
+
+                            if file.shaHash == None:
+                                return 3
 
 
                 lastupdates.append(file.lastUpdated)
@@ -265,8 +275,8 @@ def load_files_and_folders(repoName, path=""):
 
         return 0
         
-    
-    except github.GithubException: 
+    except github.GithubException as e: 
+        print (e)
         return 4
     
     except SQLAlchemyError:

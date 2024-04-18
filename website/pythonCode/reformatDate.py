@@ -1,4 +1,7 @@
 from datetime import datetime
+import pytz
+from tzlocal import get_localzone
+
 def reformat_date(last_updated):
 
     # if the date is None, return None
@@ -55,3 +58,20 @@ def reformat_date(last_updated):
     
     else:
         return "just now"
+
+
+def change_format_date(date):
+
+    try:
+
+        date = date.astimezone(pytz.utc)
+
+        local_timezone = get_localzone()
+        converted_date = date.astimezone(local_timezone)
+
+        converted_date = converted_date.replace(tzinfo=None)
+
+        return reformat_date(converted_date)
+    
+    except Exception as e:
+        return False

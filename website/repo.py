@@ -213,11 +213,19 @@ def repo(subpath):
             repoName = data.get('repoName')
             absolute_path = data.get('absolutePath')
 
+            repo = Repository.query.filter_by(name=repoName).first()
+
+            if repo is not None:
+                flash("The repository is already cloned!", category='error')
+                return jsonify({"status": "errorRepoAlreadyCloned"})
 
             ack = clone_repo(repoName, absolute_path)
 
             if ack == 0:
                 flash("Repository cloned successfully", category='success')
+                repo = Repository.query.filter_by(name=repoName).first()
+                repo.loadedInDB = False # we will change the loaded attribute and when a GET is made, the repository will be loaded again
+                db.session.commit()
                 return jsonify({"status": "ok"})
             elif ack == 1:
                 flash("User not identified!", category='error')
@@ -468,6 +476,7 @@ def repo(subpath):
             else:
                 path = repoName+"/"+folderPath+fileName
 
+            print (f"Le pasa a delete_file: {repoName}, {path}, {fileName}")
             ack = delete_file(repoName, path, fileName)
 
             if ack == 0:

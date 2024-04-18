@@ -2,6 +2,7 @@ const searchInput = document.querySelector("[data-search")
 const repositoryElements = document.querySelectorAll(".repository");
 const addRepoButton = document.querySelector("#addRepo");
 const repositories = document.querySelectorAll('.repository-name');
+const viewInvitations = document.querySelector("#viewInvitations");
 
 // function to search for a repository
 searchInput.addEventListener("input", (e) => {
@@ -149,4 +150,32 @@ repositories.forEach(repository => {
             }
         })
     });
+});
+
+
+// function to view invitations. It will take you to a new page with invitations
+
+viewInvitations.addEventListener("click", () => {
+
+    fetch("/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({type: "invitations"}),
+    })
+    .then(function (response) {
+        if (response.ok) {
+            return response.json(); 
+        } else {
+            throw new Error("Network response was not ok");
+        }
+    }).then(function (data) {
+        if (data.status == "ok"){
+            window.location.replace("/invitations");
+        }
+        else{
+            console.log("Error");
+        }
+    })
 });
