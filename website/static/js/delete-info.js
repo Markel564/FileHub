@@ -33,6 +33,8 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             toggleState();
             window.location.replace("/");
+        }else{
+            window.location.replace("/");
         }
     })
     .catch(function (error) {

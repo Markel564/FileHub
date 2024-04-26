@@ -8,7 +8,6 @@ def reformat_date(last_updated):
     if last_updated is None:
         return None
 
-
     # Sometimes, datetime.now() is delayed by a few seconds. In case that this happens
     # we will return 'just now' if the difference is less than 60 seconds
     if (datetime.now() - last_updated).total_seconds() < 0:

@@ -6,3 +6,5 @@ explicar en memoria que intente watchdogs pero no funciona
 uso de cache para reducir tiempo de ejecucion
 
 puse mi correo publico en github
+
+poner que se va a hacer uso del token

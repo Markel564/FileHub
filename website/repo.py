@@ -11,13 +11,14 @@ repository = Blueprint('repository', __name__)
 # REPO page
 @repository.route('/<path:subpath>', methods=['GET','POST'])
 def repo(subpath):
+
     # the path could be the name of the repository or a folder path such as 'repoName/folder1/folder2'
     repoName = subpath.split("/")[0]
 
     if request.method == 'GET':
 
         if repoName is None:
-            return render_template("generic_error.html")
+            return render_template("error.html")
         
         # get the user's name and photo
         user_id = session.get('user_id')
@@ -29,6 +30,7 @@ def repo(subpath):
 
         if directory == '': # we are in a folder, if not, we are in the repository main page
             root_of_project = True
+        
             
         if root_of_project:
             
@@ -42,22 +44,22 @@ def repo(subpath):
                     pass
                 elif ack == 1:
                     flash("User not identified!", category='error')
-                    return render_template("generic_error.html")
+                    return render_template("error.html")
                 elif ack == 2:
                     flash("The repository does not exist!", category='error')
-                    return render_template("generic_error.html")
+                    return render_template("error.html")
                 elif ack == 3:
                     flash("There was a file error!", category='error')
-                    return render_template("generic_error.html")
+                    return render_template("error.html")
                 elif ack == 4:
                     flash("There was a github error!", category='error')
-                    return render_template("generic_error.html")
+                    return render_template("error.html")
                 elif ack == 5:
                     flash("There was an error with the database!", category='error')
-                    return render_template("generic_error.html")
+                    return render_template("error.html")
                 else:
                     flash("An unexpected error occurred!", category='error')
-                    return render_template("generic_error.html")
+                    return render_template("error.html")
          
                 files, folders = get_files_and_folders(repoName, subpath) # at first the path of the repository is the same as the name of the repository + '/'
                 
@@ -72,9 +74,11 @@ def repo(subpath):
                     folders_to_add.append(relative_path[1] + folder[0])
                     folder_paths.append(folder[3] + folder[0] + "/")
 
+
                 while len(folders_to_add) > 0: # we are going to load into the db the files and folders of the repository for the folders that are in the path
                 
                     folder = folders_to_add.pop(0)
+
 
                     ack = load_files_and_folders(repoName, folder)
 
@@ -82,26 +86,25 @@ def repo(subpath):
                         pass
                     elif ack == 1:
                         flash("User not identified!", category='error')
-                        return render_template("generic_error.html")
+                        return render_template("error.html")
                     elif ack == 2:
                         flash("The repository does not exist!", category='error')
-                        return render_template("generic_error.html")
+                        return render_template("error.html")
                     elif ack == 3:
                         flash("There was a file error!", category='error')
-                        return render_template("generic_error.html")
+                        return render_template("error.html")
                     elif ack == 4:
                         flash("There was a github error!", category='error')
-                        return render_template("generic_error.html")
+                        return render_template("error.html")
                     elif ack == 5:
                         flash("There was an error with the database!", category='error')
-                        return render_template("generic_error.html")
+                        return render_template("error.html")
                     else:
                         flash("An unexpected error occurred!", category='error')
-                        return render_template("generic_error.html")
+                        return render_template("error.html")
 
                     
                     files_in_db, folders_in_db = get_files_and_folders(repoName, folder_paths.pop(0))
-
                     if not files_in_db and not folders_in_db:
                         return render_template("error.html")
 
@@ -116,6 +119,7 @@ def repo(subpath):
 
                 db.session.commit()
 
+
             else: # the repository is already loaded in the database, so no need to be loaded again
 
                 files, folders = get_files_and_folders(repoName, subpath)
@@ -125,8 +129,10 @@ def repo(subpath):
 
 
         else: # we are in a folder, and not in the root of the repository
-
+            
             files, folders = get_files_and_folders(repoName, subpath +'/')
+
+            
             folder = Folder.query.filter_by(repository_name=repoName, path=subpath).first()
             last_updated = folder.lastUpdated
 
@@ -215,9 +221,6 @@ def repo(subpath):
 
             repo = Repository.query.filter_by(name=repoName).first()
 
-            if repo is not None:
-                flash("The repository is already cloned!", category='error')
-                return jsonify({"status": "errorRepoAlreadyCloned"})
 
             ack = clone_repo(repoName, absolute_path)
 
@@ -255,7 +258,8 @@ def repo(subpath):
 
         
         elif type_message == "refresh-github": #to refresh the data based on the one in github (like a pull)
-
+            
+            print("refresh-github")
             repoName, folderPath = data.get('repoName'), data.get('folderPath')
 
             repo = Repository.query.filter_by(name=repoName).first()
@@ -268,7 +272,7 @@ def repo(subpath):
             if folderPath == repoName + "/": # if we are in the root of the repository
                 repo.loadedInDB = False # we will change the loaded attribute and when a GET is made, the repository will be loaded again
                 db.session.commit()
-
+                flash("Project updated from Github successfully", category='success')
                 return jsonify({"status": "ok"})
             
             path = folderPath[:-1] # remove the last '/' from the folder path
@@ -276,13 +280,13 @@ def repo(subpath):
             folder_origin = Folder.query.filter_by(repository_name=repoName, path=path).first() 
 
             if folder_origin is None:
-                # flash something
+                flash("Folder not found!", category='error')
                 return jsonify({"status": "error"})
             
             path = path[len(repoName)+1:] # remove repoName/ from the folder path
 
             ack = load_files_and_folders(repoName, path) # load the files and folders of the folder into the db
-
+            
             if ack == 0:
                 pass
             elif ack == 1:
@@ -369,6 +373,8 @@ def repo(subpath):
                 father_dir = father_dir.rsplit("/",2)[0] + "/" 
 
             db.session.commit()
+            flash("Project updated from Github successfully", category='success') 
+            print("Project updated from Github successfully")
             return jsonify({"status": "ok"})
 
         
@@ -413,7 +419,6 @@ def repo(subpath):
             
             modifications, insertions, deletions = False, False, False
             for file in files:
-                print (file.name, file.modified, file.addedFirstTime, file.deleted)
                 if file.modified:
                     modifications = True
                 if file.addedFirstTime:
@@ -422,7 +427,6 @@ def repo(subpath):
                     deletions = True
             
             for folder in folders:
-                print (folder.name, folder.modified, folder.addedFirstTime, folder.deleted)
                 if folder.modified:
                     modifications = True
                 if folder.deleted:
@@ -476,7 +480,6 @@ def repo(subpath):
             else:
                 path = repoName+"/"+folderPath+fileName
 
-            print (f"Le pasa a delete_file: {repoName}, {path}, {fileName}")
             ack = delete_file(repoName, path, fileName)
 
             if ack == 0:

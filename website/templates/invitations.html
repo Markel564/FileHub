@@ -25,6 +25,7 @@
         <h1>Invitations</h1>
     </div>
 
+    <br/>
     {% if not invitations %}
 
     <div class="no-results">
@@ -35,14 +36,28 @@
     {% else %}
 
 
-    <div class="invitation-container">
-        {% for key, value in invitations.items() %}
-            <h1>{{ key }}</h1>
-            <h2>{{ value }}</h2>
-            <button class="btn btn-accept" id="acceptButton_{{ loop.index }}">Accept</button>
-            <button class="btn btn-decline" id="declineButton_{{ loop.index }}">Decline</button>
+    <div class="invitations-container">
+        {% for invitation in invitations %}
+            <div class="invitation" id="invitation-{{ invitation['repository'] }}">
+
+                <div class="invitation-header">
+                    <div class="column"> <h2>{{ invitation['repository'] }}</h2></div>
+                    <div class="column" id="inviter"><h2>{{ invitation['inviter']}}</h2></div>
+                    <div class="column"><h2>{{ invitation['date']}}</h2></div>
+                    <div class="image-inviter">
+                        <img class="profile-pic-inviter" src="{{ invitation['avatar']}}">
+                    </div>
+                    <button class="btn btn-accept" id="{{invitation['repository']}}">Accept</button>
+                    <button class="btn btn-decline" id ="{{invitation['repository']}}">Decline</button>
+                </div>
+            
+
+            </div>
+
+            <div class="separator"></div>
         {% endfor %}
-    </div>
+
+    
 
     {% endif %}
 </div>

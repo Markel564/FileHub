@@ -94,7 +94,8 @@ DELETE REPO     DONE
 2 --> repo not found (errorRepoDoesNotExist)
 3 --> github exception (githubError)
 4 --> error deleting repo from db (errorDB)
-5 --> other (unexpectedError)
+5 --> does not own repo (errorRepoNotOwned)
+6 --> other (unexpectedError)
 
 
 SIGN FILE       DONE
@@ -110,6 +111,13 @@ GET REPOS       DONE
 repo list --> ok
 False --> error getting repos
 
+
+HANDLE INVITATIONS 
+0 --> ok
+1 --> user not found (errorUser)
+2 --> invalid request (errorInvalidRequest)
+3 --> github exception (githubError)
+4 --> other (unexpectedError)
 
 LOAD FILES AND FOLDERS
 0 --> ok

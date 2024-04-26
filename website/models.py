@@ -22,7 +22,8 @@ class User(db.Model, UserMixin):
 
 class Repository(db.Model):
     name = db.Column(db.String(100), primary_key=True)
-    FileSystemPath = db.Column(db.String(256), nullable=True, unique=True)
+    FileSystemPath = db.Column(db.String(256), nullable=True, unique=False) # unlile files and folders, this filesystemPath represents the folderit is in
+                                                                            # and there can be multiple repositories in the same folder
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     isCloned = db.Column(db.Boolean, default=False)
     lastUpdated = db.Column(db.DateTime(timezone=True), nullable=False, default=func.now())

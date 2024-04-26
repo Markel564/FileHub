@@ -22,3 +22,4 @@ from .deleteFilesAndFolders import *
 from .openFile import open_file
 from .createFolder import create_folder
 from .getInvitations import get_invitations
+from .handleInvitations import handle_invitation

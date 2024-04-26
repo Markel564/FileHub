@@ -3,9 +3,9 @@ body {
 }
 
 .header-container {
-    display: flex; /* Flexbox for header and user image */
-    justify-content: space-between; /* Aligns children with space between */
-    align-items: center; /* Aligns children vertically */
+    display: flex;
+    justify-content: space-between;
+    align-items: center; 
 }
 .header {
     background-color: #c3073f;

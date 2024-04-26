@@ -142,7 +142,7 @@ repositories.forEach(repository => {
         }).then(function (data) {
             repoName = data.repoName;
             if (data.status == "ok"){
-
+                
                 window.location.replace("/repo/"+repoName);
             }
             else{

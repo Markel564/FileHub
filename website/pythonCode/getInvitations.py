@@ -23,14 +23,15 @@ def get_invitations():
 
         invitations = user.get_invitations()
 
-        print (f"User name: {user.name}, user email: {user.email}")
-        invites = {}
+        invites = []
         for invitation in invitations:
-            # print the repository name, the date and the user who sent the invitation
-            invites['inviter'] = invitation.inviter.login
-            invites['repository'] = invitation.repository.name
-            invites['date'] = change_format_date(invitation.created_at)
-            invites['avatar'] = invitation.inviter.avatar_url
+            
+            invites.append({
+                'inviter': invitation.inviter.login,
+                'repository': invitation.repository.name,
+                'date': change_format_date(invitation.created_at),
+                'avatar': invitation.inviter.avatar_url
+            })
 
         return invites
     except Exception as e:

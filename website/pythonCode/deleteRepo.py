@@ -42,8 +42,19 @@ def delete_repo():
         # authenticate the user
         g = github.Github(user.githubG)
         user = g.get_user()
+        
+        repositories = user.get_repos()
 
-        # delete the repo from the user's github account
+        for repo in repositories:
+            if repo.name == repo_name:
+                owner = repo.owner.login
+                break
+        
+        if owner != user.login:
+            session['repo_to_remove'] = None
+            return 5
+
+        # if the owner is the same, delete the repo from the user's github account
         repo = user.get_repo(repo_name)
         repo.delete()
 
@@ -66,4 +77,4 @@ def delete_repo():
         return 4
     
     except:
-        return 5
+        return 6

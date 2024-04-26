@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, flash, request, jsonify, session
 from . import db
 from .models import User, Repository
-from .pythonCode import get_invitations
+from .pythonCode import get_invitations, handle_invitation
 
 
 invitations = Blueprint('invitations', __name__)
@@ -17,16 +17,68 @@ def view_invitations():
         user_id = session.get('user_id')
         user = User.query.filter_by(id=user_id).first()
 
-        print ("GET INVITATIONS")
         invitations = get_invitations()
 
+    
         return render_template("invitations.html", header_name=user.username, avatar=user.avatarUrl, invitations=invitations)
 
 
     if request.method == "POST":
 
-        type_message = request.form.get('type')
+        
+        print ("POST")
+        data = request.get_json()  # get the data from the request
 
-        if type_message == "back":
+        type_message = data.get('type')
 
+
+        if type_message == "accept":
+
+            repo = data.get('repoName')
+            owner = data.get('owner')
+
+
+            ack = handle_invitation(repo, owner, "accept")
+            
+            if ack == 0:
+                flash("Invitation accepted", "success")
+                return jsonify({"status": "ok"})
+            elif ack == 1:
+                flash("User not found", "error")
+                return jsonify({"status": "usrError"})
+            elif ack == 2:
+                flash("Error accepting invitation", "error")
+                return jsonify({"status": "error"})
+            elif ack == 3:
+                flash("Github exception", "error")
+                return jsonify({"status": "githubError"})
+            elif ack == 4:
+                flash("An unexpected error occurred!", "error")
+                return jsonify({"status": "unexpectedError"})
+
+        
+        if type_message == "decline":
+
+            repo = data.get('repoName')
+            owner = data.get('owner')
+
+            ack = handle_invitation(repo, owner, "decline")
+
+            if ack == 0:
+                flash("Invitation declined", "success")
+                return jsonify({"status": "ok"})
+            elif ack == 1:
+                flash("User not found", "error")
+                return jsonify({"status": "usrError"})
+            elif ack == 2:
+                flash("Error declining invitation", "error")
+                return jsonify({"status": "error"})
+            elif ack == 3:
+                flash("Github exception", "error")
+                return jsonify({"status": "githubError"})
+            elif ack == 4:
+                flash("An unexpected error occurred!", "error")
+                return jsonify({"status": "unexpectedError"})
             return jsonify({"status": "ok"})
+
+

@@ -42,7 +42,7 @@ def home():
         # get the user from the database
         user_id = session.get('user_id')
         user = User.query.filter_by(id=user_id).first()
-        
+
         # get the user's repositories
         repositories = get_repos()
 
@@ -90,6 +90,9 @@ def home():
             elif ack == 4:
                 flash("Error deleting repository from the database!", category='error')
                 return jsonify({"status": "errorDB"})
+            elif ack == 5:
+                flash("You do not own the repository!", category='error')
+                return jsonify({"status": "errorRepoNotOwned"})
             else:
                 flash("An unexpected error occurred!", category='error')
                 return jsonify({"status": "unexpectedError"})
@@ -102,7 +105,6 @@ def home():
         
         elif type_message == "invitations":
 
-            print ("INVITATIONS")
             return jsonify({"status": "ok"})
 
         elif type_message =="add":

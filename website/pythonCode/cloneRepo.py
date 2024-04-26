@@ -7,15 +7,16 @@ from flask import session
 from git import Repo
 from .getHash import sign_file
 from sqlalchemy.exc import SQLAlchemyError
+import requests
 
 
 
 def clone_repo(repoName, path):
 
     user_id = session.get('user_id')
-    user = User.query.filter_by(id=user_id).first()
+    userDB = User.query.filter_by(id=user_id).first()
 
-    if not user:
+    if not userDB:
         return 1
 
     repo = Repository.query.filter_by(name=repoName).first()
@@ -45,17 +46,43 @@ def clone_repo(repoName, path):
         return 6
 
     try:
-        g = github.Github(user.githubG)
+        g = github.Github(userDB.githubG)
         user = g.get_user()
-        repo = user.get_repo(repoName)
+
+        # obtain the owner
+        repositories = user.get_repos()
+
+        for repo in repositories:
+            if repo.name == repoName:
+                owner = repo.owner.login
+                print (f"Owner: {owner}")
+                break
+
+        url = f"https://api.github.com/repos/{owner}/{repoName}"
+
+        headers = { 
+            "Authorization": f"token {userDB.githubG}",
+            "Accept": "application/vnd.github.v3+json"
+        }
+
+        response = requests.get(url, headers=headers)
+        
+        if response.status_code != 200:
+            return 7
+        
+        repo = response.json()
+
+        clone_url = repo['clone_url']
         
         # clone the repository
-        Repo.clone_from(repo.clone_url, path + repoName)
+        print (f"Cloning {repoName} to {path + repoName}")
+        Repo.clone_from(clone_url, path + repoName)
         
         # update the database adding the path and the cloned status
         repoDB = Repository.query.filter_by(name=repoName).first()
 
         repoDB.isCloned = True
+        print (f"Path: {path}")
         repoDB.FileSystemPath = path  
 
         if not add_hashes(repoName, path):
@@ -66,10 +93,12 @@ def clone_repo(repoName, path):
         return 0
 
 
-    except github.GithubException:
+    except github.GithubException as e:
+        print (f"Github exception: {e}")
         return 7
 
-    except Exception:
+    except Exception as e:
+        print (f"An unexpected error occurred: {e}")
         return 8
 
 

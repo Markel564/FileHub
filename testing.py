@@ -1,31 +1,35 @@
-import hashlib
-import os
-
-def calcular_firma_archivo(ruta_archivo):
-    """Calcula la firma (hash) SHA-256 de un archivo."""
-    sha256 = hashlib.sha256()
-    with open(ruta_archivo, 'rb') as archivo:
-        # Lee el archivo en bloques para manejar archivos grandes
-        bloque = archivo.read(4096)
-        while len(bloque) > 0:
-            sha256.update(bloque)
-            bloque = archivo.read(4096)
-    return sha256.hexdigest()
+import github
+from github import Github, Auth
+import requests
 
 
-def calcular_firma_directorio(ruta_directorio):
 
-    """Calcula la firma (hash) SHA-256 de un directorio."""
-    sha256 = hashlib.sha256()
-    for ruta, directorios, archivos in os.walk(ruta_directorio):
-        for nombre_archivo in sorted(archivos):
-            ruta_archivo = os.path.join(ruta, nombre_archivo)
-            sha256.update(calcular_firma_archivo(ruta_archivo).encode('utf-8'))
-    return sha256.hexdigest()
 
-ruta_archivo = '/mnt/c/Users/marke/Desktop/TFG/TestingClone/word1.docx'
-firma = calcular_firma_archivo(ruta_archivo)
-print("Firma SHA-256 del archivo:", firma)
-ruta_directorio = '/mnt/c/Users/marke/Desktop/TFG/TestingClone'
-firma = calcular_firma_directorio(ruta_directorio)
-print("Firma SHA-256 del directorio:", firma)
+token = "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"
+owner = "MarkelBene"
+repo = "MyFirstRepo"
+
+g = github.Github("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")
+
+user = g.get_user()
+
+url = f"https://api.github.com/repos/{owner}/{repo}/contents/"
+
+headers = {
+            "Authorization": f"token {token}",
+            "Accept": "application/vnd.github.v3+json"
+        }
+print (f"MAKING REQUEST with url {url} and headers {headers}")
+
+response = requests.get(url, headers=headers)
+print (f"RESPONSE: {response}")
+
+contents = response.json()
+
+print (f"CONTENTS: {contents}")
+for content_file in contents:
+            
+    if content_file['type'] == "file":
+        print (f"FILE: {content_file['name']}")
+    else:
+        print (f"FOLDER: {content_file['name']}")
