@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // ELIMINATION CONFIRMATION
     function PostRequestEliminate() {
 
-        fetch("/", {
+        fetch("/home", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -32,9 +32,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             }
             toggleState();
-            window.location.replace("/");
+            window.location.replace("/home");
         }else{
-            window.location.replace("/");
+            window.location.replace("/home");
         }
     })
     .catch(function (error) {
@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // CANCEL ELIMINATION
     function PostRequestCancel() {
 
-    fetch("/", {
+    fetch("/home", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

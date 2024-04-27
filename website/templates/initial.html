@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title> Initial Page</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+
+<link rel="stylesheet" href="{{url_for ('static', filename='css/style_initial.css')}}">
+<link rel="stylesheet" href="{{url_for ('static', filename='css/style_base.css')}}">
+
+
+<script src="{{ url_for('static', filename='js/initial.js') }}" defer></script>
+
+
+</head>
+<body>
+
+    
+    {% with messages = get_flashed_messages(with_categories = true) %}
+    {% if messages %}
+        <div id="flash-messages">
+        {% for category, message in messages %}
+            {% if category == 'error' %}
+            <div class = "alert alert-danger alert-dismissable fade show" role = "alert">
+                {{message}}
+                <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+            </div>
+            {% else %}
+            <div class = "alert alert-success alert-dismissable fade show" role = "alert">
+                {{message}}
+                <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+            </div>
+            {% endif %}
+        {% endfor %}
+
+        </div>
+    {% endif %}
+{% endwith %}
+
+
+
+<div class="header-container">
+    <div class="header">
+        <h1 id="headerName">Welcome to MarkHub!</h1>
+    </div>
+</div>
+
+<div class="main-container">
+    <div>
+        <h1>Enter your GitHub Token!</h1>
+        <input class="form-control mr-sm-2" type="search" id="token" placeholder="Enter your GitHub Token" aria-label="Search" data-search>
+        <button class="btn btn-submit" id="submitToken">SUBMIT</button>
+    </div>
+</div>
+
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.2/min/dropzone.min.js"></script>
+</body>
+</html>

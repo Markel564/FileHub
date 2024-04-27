@@ -48,8 +48,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             else{
                 
-                // alert("The repository is already cloned");
-                // window.location.reload();
                 window.location.href = window.location.href;
                 
             }
@@ -96,7 +94,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
                 if (data.status == "errorAlreadyCloned"){
                     alert("The repository is already cloned");
-                    // window.location.reload();
                     
                 }
             })

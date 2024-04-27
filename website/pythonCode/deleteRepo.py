@@ -12,6 +12,7 @@ import github
 import yaml
 from flask import session
 from sqlalchemy.exc import SQLAlchemyError
+import shutil
 
 
 def delete_repo():
@@ -45,12 +46,12 @@ def delete_repo():
         
         repositories = user.get_repos()
 
-        for repo in repositories:
+        for repo in repositories: # get the owner of the repo
             if repo.name == repo_name:
                 owner = repo.owner.login
                 break
         
-        if owner != user.login:
+        if owner != user.login: # if the owner is not the same, user cannot delete the repo
             session['repo_to_remove'] = None
             return 5
 
@@ -60,7 +61,17 @@ def delete_repo():
 
         # delete the repo from the database
         repo = Repository.query.filter_by(name=repo_name).first()
+
+        if repo.isCloned:
+
+            try:
+                shutil.rmtree(f"{repo.FileSystemPath}/{repo_name}")
+            except:
+                return 6
+
         db.session.delete(repo)
+        # eliminate associated files and folders of the db
+
         print (f"Repo {repo_name} deleted from the database")
         db.session.commit()
 
@@ -73,8 +84,10 @@ def delete_repo():
     except github.GithubException:
         return 3
     
-    except SQLAlchemyError:
+    except SQLAlchemyError as e:
+        print(e)
         return 4
     
-    except:
-        return 6
+    except Exception as e:
+        print(e)
+        return 7

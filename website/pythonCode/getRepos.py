@@ -51,8 +51,10 @@ def get_repos():
         repo_names = [repo.name for repo in repositories]
         return repo_names
     
-    except github.GithubException:
+    except github.GithubException as e:
+        print(e)
         return False
 
-    except Exception:
+    except Exception as e:
+        print(e)
         return False

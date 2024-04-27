@@ -23,13 +23,10 @@ def add_user():
     This function adds a user to the database
     """
 
-    # get the api token from the config file
-    with open("config.yml", 'r') as f:
-        conf = yaml.load(f, Loader=yaml.SafeLoader)
 
     try:
-        # authenticate the user
-        auth = Auth.Token(conf['api_token'])
+
+        auth = Auth.Token(session['token'])
         g = Github(auth=auth, base_url="https://api.github.com")
 
     except:
@@ -38,26 +35,32 @@ def add_user():
 
 
     try:
-    
-        # get the user's information
-        id = g.get_user().id
-        # save the user's id in the session
-        session['user_id'] = id
-        # get the user's information
-        user = g.get_user()
         
-        name = user.name
-        username = user.login
-        email = user.email
-        avatar = user.avatar_url
+        identifier = session.get('user_id')
 
-        
-        # if user is not in the database (first time loading website), we add it
-        if not User.query.filter_by(id=id).first():
+
+        if User.query.filter_by(id=identifier).first():
+
+            print("User already in session")
+            pass
+
+        else: # if the user is not in the session, we add it
+
+            # get the user's information
+            id = g.get_user().id
+            # save the user's id in the session
+            session['user_id'] = id
             
-            print (f"Creating account for {name}")
+            user = g.get_user()
+            
+            name = user.name
+            username = user.login
+            email = user.email
+            avatar = user.avatar_url
+            
             # add user to database
-            new_user = User(id=id, githubG=conf['api_token'], name=name, username=username, email=email, avatarUrl=avatar)
+            new_user = User(id=id, githubG=session['token'], name=name, username=username, email=email, avatarUrl=avatar)
+
             db.session.add(new_user)
             db.session.commit()
             # load the user's repos to the database
@@ -66,16 +69,12 @@ def add_user():
             if not repos:
                 return 3
 
-
-        print (f"Authenticated as {user.login}")
-
         g.close()
         return 0
     
     except SQLAlchemyError:
         return 2
     
-    except:
+    except Exception as e:
+        print(e)
         return 4
-
-

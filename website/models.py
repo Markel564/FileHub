@@ -29,8 +29,8 @@ class Repository(db.Model):
     lastUpdated = db.Column(db.DateTime(timezone=True), nullable=False, default=func.now())
     loadedInDB = db.Column(db.Boolean, default=False, nullable=False)
 
-    repository_files = db.relationship('File', backref='belongs_repository', lazy=True)
-    repository_folders = db.relationship('Folder', backref='belongs_repository', lazy=True) 
+    repository_files = db.relationship('File', backref='belongs_repository', lazy=True, cascade="all, delete-orphan")
+    repository_folders = db.relationship('Folder', backref='belongs_repository', lazy=True, cascade="all, delete-orphan") 
     
  
 

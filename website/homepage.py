@@ -21,7 +21,7 @@ homePage = Blueprint('homePage', __name__)
 
 
 # HOME PAGE
-@homePage.route('/', methods=['GET','POST'])
+@homePage.route('/home', methods=['GET','POST'])
 def home():
 
     if request.method == 'GET':
@@ -35,7 +35,7 @@ def home():
         elif ack == 2: # error with database
             flash("Error adding user to the database", category='error')
         elif ack == 3:
-            flash("Error loading repositories from GitHub", category='error')
+            flash("Error loading projects from GitHub", category='error')
         else:
             flash("An unexpected error occurred!", category='error')
              
@@ -76,23 +76,26 @@ def home():
             ack = delete_repo()
 
             if ack == 0:
-                flash("Repository deleted successfully", category='success')
+                flash("Project deleted successfully", category='success')
                 return jsonify({"status": "ok"})
             elif ack == 1:
                 flash("User not identified!", category='error')
                 return jsonify({"status": "errorUser"})
             elif ack == 2:
-                flash("The repository does not exist!", category='error')
+                flash("The Project does not exist!", category='error')
                 return jsonify({"status": "errorRepoDoesNotExist"})
             elif ack == 3:
                 flash("There was a Github error!", category='error')
                 return jsonify({"status": "githubError"})
             elif ack == 4:
-                flash("Error deleting repository from the database!", category='error')
+                flash("Error deleting Project!", category='error')
                 return jsonify({"status": "errorDB"})
             elif ack == 5:
-                flash("You do not own the repository!", category='error')
+                flash("You do not own the Project!", category='error')
                 return jsonify({"status": "errorRepoNotOwned"})
+            elif ack == 6:
+                flash("Unable to delete the project from the file system", category='error')
+                return jsonify({"status": "errorFileSystem"})
             else:
                 flash("An unexpected error occurred!", category='error')
                 return jsonify({"status": "unexpectedError"})

@@ -1,7 +1,7 @@
 const backButton = document.querySelector("#backButton");
 
 
-// go back to the previous folder
+// go back to home page
 backButton.addEventListener("click", () => {
 
     fetch("/add", {  // we can reuse the function we used to add a repository to go back to the home page
@@ -20,7 +20,7 @@ backButton.addEventListener("click", () => {
     })
     .then(function (data) {
         if (data.status == "ok"){
-            window.location.href = "/";
+            window.location.href = "/home";
         }
     }).catch(function (error) {
         console.error("Fetch error:", error);

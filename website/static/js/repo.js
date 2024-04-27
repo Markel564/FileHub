@@ -40,7 +40,7 @@ backButton.addEventListener("click", () => {
 
             path = path + "/";
             if (path == "/repo/"+folderName+"/"){ // if we are in the root of the repository
-                window.location.replace("/"); 
+                window.location.replace("/home"); 
             }
             // There are two cases:
             // a) The redirection takes you to the root of the repository (path = "/repo/folderName/")
@@ -54,7 +54,6 @@ backButton.addEventListener("click", () => {
                 // eliminate the final "/" from the path
                 path = path.substring(0, path.length-1);
                 window.location.replace(path);
-                // window.location.replace("/repo/"+path);
         }
     }})
     .catch(function (error) {
@@ -514,53 +513,6 @@ document.addEventListener("DOMContentLoaded", function () {
     );
 });
 
-// // function to delete a folder
-// document.addEventListener("DOMContentLoaded", function () {
-
-//     var deleteButtons = document.querySelectorAll(".delete-folder");
-
-//     deleteButtons.forEach(function (button) {
-//         button.addEventListener("click", function () {
-
-//             var folderName = this.closest('#folder').querySelector("h1").textContent;
-            
-//             let path = window.location.pathname;
-//             path = path.substring(6);
-//             path = path.substring(repoName.length);
-//             path = path.substring(1);
-//             if (path[path.length-1] != "/"){
-//                 path = path + "/";
-//             }
-
-//             fetch("/repo/"+ repoName + "/",{
-//                 method: "POST",
-//                 headers: {
-//                     "Content-Type": "application/json",
-//                 },
-//                 body: JSON.stringify({ type: "delete-folder", repoName: repoName, folderPath: path, folderName: folderName}),
-//             })
-//             .then(function (response) {
-//                 if (response.ok) {
-//                     return response.json(); 
-//                 } else {
-//                     throw new Error("Network response was not ok");
-//                 }
-//             })
-//             .then(function (data) {
-//                 if (data.status == "ok"){
-//                     window.location.reload();
-//                 }else{
-//                     window.location.reload();
-//                 }
-
-//             })
-//             .catch(function (error) {
-//                 console.error("Fetch error:", error);
-//             });
-//         });
-//     }
-//     );
-// });
 
 // Function to open window to create folder
 newFolderButton.addEventListener("click", () => {

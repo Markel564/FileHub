@@ -25,8 +25,6 @@ def view_invitations():
 
     if request.method == "POST":
 
-        
-        print ("POST")
         data = request.get_json()  # get the data from the request
 
         type_message = data.get('type')

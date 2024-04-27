@@ -23,7 +23,7 @@ backButton.addEventListener("click", () => {
     })
     .then(function (data) {
         if (data.status == "ok"){
-            window.location.replace("/");
+            window.location.replace("/home");
         }
     })
     .catch(function (error) {
@@ -70,7 +70,7 @@ createButton.addEventListener("click", (event) => {
     .then(function (data) {
         console.log(data);
         if (data.status == "ok"){
-            window.location.replace("/");
+            window.location.replace("/home");
         }
         else if (data.status == "errorDuplicate"){
             alert("Project name already exists");

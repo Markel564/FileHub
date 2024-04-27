@@ -25,7 +25,6 @@ searchInput.addEventListener("input", (e) => {
 
 
     if (numberOfVisibleRepositories === 0) {
-        console.log("No results");
         noResultsDiv.style.display = "flex";
 
     } else {
@@ -38,7 +37,7 @@ searchInput.addEventListener("input", (e) => {
 // function to add a repository
 addRepoButton.addEventListener("click", () => {
     // Create a POST request
-    fetch("/", {
+    fetch("/home", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -76,7 +75,7 @@ document.addEventListener("DOMContentLoaded", function () {
             var repoName = this.closest('.repository').getAttribute("data-repo-name");
             
             // Create a POST request
-            fetch("/", {
+            fetch("/home", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -126,7 +125,7 @@ repositories.forEach(repository => {
     repository.addEventListener("click", () => {
         // obtain the repository name
         const repositoryName = repository.textContent.trim();
-        fetch("/", {
+        fetch("/home", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -157,7 +156,7 @@ repositories.forEach(repository => {
 
 viewInvitations.addEventListener("click", () => {
 
-    fetch("/", {
+    fetch("/home", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
