@@ -304,15 +304,13 @@ document.addEventListener("DOMContentLoaded", function () {
     var synchronizeButton = document.querySelector("#cloneButton");
 
     synchronizeButton.addEventListener("click", () => {
-        let option = synchronizeButton.textContent;
-
 
         fetch("/repo/" + repoName + "/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({type: "clone-request", repoName: repoName, option: option}),
+            body: JSON.stringify({type: "clone-request", repoName: repoName}),
         })
         .then(function (response) {
             if (response.ok) {
@@ -322,27 +320,26 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         })
         .then(function (data) {
+
             if (data.status == "ok"){
-                if (option == "SYNCHRONIZE"){
-                    var errorContainer = document.getElementById("modal-content");
-                    var state = false; 
-                    function toggleState() {
+
+                var errorContainer = document.getElementById("modal-content");
+                var state = false; 
+                function toggleState() {
                             
-                        if (state){ // if state is true, then hide the modal
-                            errorContainer.classList.remove("modal-content");
-                            errorContainer.classList.add("hide")
-                        }else{
-                            errorContainer.classList.remove("hide");
-                            errorContainer.classList.add("modal-content");
-                        }
+                    if (state){ // if state is true, then hide the modal
+                        errorContainer.classList.remove("modal-content");
+                        errorContainer.classList.add("hide")
+                    }else{
+                        errorContainer.classList.remove("hide");
+                        errorContainer.classList.add("modal-content");
                     }
+                }
                         
-                    toggleState();
-                }
-                else{
-                    synchronizeButton.textContent = "SYNCHRONIZE";
-                    window.location.reload();
-                }
+                toggleState();
+            }
+            else{
+                window.location.reload();
             }
         })
         .catch(function (error) {

@@ -155,7 +155,7 @@ def load_files_and_folders(repoName, path=""):
 
                     file_last_updated_utc = file.lastUpdated.replace(tzinfo=None).strftime("%Y-%m-%d %H:%M:%S")
 
-
+                    print (f"Last commit: {last_commit_str} and last updated: {file_last_updated_utc}")
                     if file_last_updated_utc != last_commit_str: # if the file has been updated
                         file.modified = True
                         file.lastUpdated = last_commit_utc
@@ -187,9 +187,7 @@ def load_files_and_folders(repoName, path=""):
                             if file.shaHash == None:
                                 return 3
 
-                            file.modified = False # it has been updated, but we have to set modified to False
-                                                # since modified is seen from the fs perspective and used to commit changes
-
+                    
                     else: # if the file has not been updated
                         file.modified = False
 
@@ -202,7 +200,7 @@ def load_files_and_folders(repoName, path=""):
                             if file.shaHash == None:
                                 return 3
 
-
+                db.session.commit()
                 lastupdates.append(file.lastUpdated)
                 files.append(content_file['name'])
 
@@ -253,7 +251,7 @@ def load_files_and_folders(repoName, path=""):
                     else:
                         folder.modified = False
                         
-        
+                db.session.commit()
                 lastupdates.append(folder.lastUpdated)
                 folders.append(content_file['name'])
 

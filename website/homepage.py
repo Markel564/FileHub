@@ -33,7 +33,7 @@ def home():
         elif ack == 1: # user not identified
             flash("User not identified!", category='error')
         elif ack == 2: # error with database
-            flash("Error adding user to the database", category='error')
+            flash("Error identifying user!", category='error')
         elif ack == 3:
             flash("Error loading projects from GitHub", category='error')
         else:
@@ -84,17 +84,14 @@ def home():
             elif ack == 2:
                 flash("The Project does not exist!", category='error')
                 return jsonify({"status": "errorRepoDoesNotExist"})
-            elif ack == 3:
-                flash("There was a Github error!", category='error')
-                return jsonify({"status": "githubError"})
-            elif ack == 4:
+            elif ack == 3 or ack == 4:
                 flash("Error deleting Project!", category='error')
                 return jsonify({"status": "errorDB"})
             elif ack == 5:
                 flash("You do not own the Project!", category='error')
                 return jsonify({"status": "errorRepoNotOwned"})
             elif ack == 6:
-                flash("Unable to delete the project from the file system", category='error')
+                flash("Unable to delete the Project from the file system", category='error')
                 return jsonify({"status": "errorFileSystem"})
             else:
                 flash("An unexpected error occurred!", category='error')

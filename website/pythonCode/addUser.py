@@ -29,25 +29,25 @@ def add_user():
         auth = Auth.Token(session['token'])
         g = Github(auth=auth, base_url="https://api.github.com")
 
+        id = g.get_user().id
     except:
         # if the user is not authenticated, return False
         return 1
 
 
     try:
-        
-        identifier = session.get('user_id')
+        # check if the user is already in the session
 
-
-        if User.query.filter_by(id=identifier).first():
+        if User.query.filter_by(id=id).first():
 
             print("User already in session")
             pass
 
         else: # if the user is not in the session, we add it
-
+            
+            print("User not in session")
             # get the user's information
-            id = g.get_user().id
+
             # save the user's id in the session
             session['user_id'] = id
             

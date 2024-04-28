@@ -34,7 +34,7 @@ backButton.addEventListener("click", () => {
 
 
 
-// function to create a new directory
+// function to create a new repository
 createButton.addEventListener("click", (event) => {
     
     event.preventDefault();
@@ -45,9 +45,12 @@ createButton.addEventListener("click", (event) => {
         return;
     }
     const projectDescription = document.querySelector("#description").value;
-    const readme = document.querySelector("#add-readme").checked;
     const privated = document.querySelector("#make-private").checked;
+
+    const path_of_repo = document.getElementById('path-of-repo');
+    const repoPath = path_of_repo.value;
     
+    console.log(path_of_repo, repoPath);
     fetch("/add", {
         method: "POST",
         headers: {
@@ -56,8 +59,8 @@ createButton.addEventListener("click", (event) => {
         body: JSON.stringify({  type: "create", 
                                 projectName: projectName, 
                                 projectDescription: projectDescription, 
-                                readme: readme, 
-                                private: privated 
+                                private: privated,
+                                repoPath: repoPath 
                             }),
     })
     .then(function (response) {

@@ -14,9 +14,8 @@
 
 
 
-#pushButton{
+.container-buttons .btn{
   border: 2px solid black;
-  margin-left: 40%;
 }
 
  
@@ -24,14 +23,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 80%; 
-  margin-right: 30px;
-}
-
-.buttons-right {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  width: 90%; 
+  margin-top: 30px;
 }
 
 
@@ -74,13 +67,6 @@
     border: none;
   }
 
-.btn-refresh {
-  display: flex;
-  justify-content: center; 
-  align-items: center; 
-  height: 80px;
-  width: 80px;
-}
 
 
 .btn:hover {
@@ -96,8 +82,8 @@
 
 
 .img-refresh{
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
 }
 
 
@@ -121,8 +107,20 @@
   text-align: center;
 }
 
+.container-buttons{
+  display: flex;
+  justify-content: space-between;
+  width: 50%;
+  margin: 0 auto;
+}
 
-
+.btn-refresh {
+  display: flex;
+  justify-content: center; 
+  align-items: center; 
+  height: 70px;
+  width: 70px;
+}
 .grid-container{
   display: grid;
   grid-template-columns: repeat(3, 1fr); 
@@ -270,7 +268,6 @@
 .hide {
   display: none;
 }
-
 
 
 

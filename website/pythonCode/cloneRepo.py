@@ -82,7 +82,6 @@ def clone_repo(repoName, path):
         repoDB = Repository.query.filter_by(name=repoName).first()
 
         repoDB.isCloned = True
-        print (f"Path: {path}")
         repoDB.FileSystemPath = path  
 
         if not add_hashes(repoName, path):

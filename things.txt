@@ -10,3 +10,5 @@ puse mi correo publico en github
 poner que se va a hacer uso del token
 
 empecé con pygithub, pero luego no
+
+readme obligarorio

@@ -37,18 +37,32 @@
 
 
     <div class="invitations-container">
+        <div class="invitation-header">
+            <div class="column"><h1>Repository</h1></div>
+            <div class="column" id="inviter"><h1>Inviter</h1></div>
+            <div class="column"><h1>Date</h1></div>
+            <div class="column"><h1>Inviter's Avatar</h1></div>
+            <div class="column" id="buttons"><h1>Actions</h1></div>
+        </div>
+        <div class="separator"></div>
+        <br />
         {% for invitation in invitations %}
             <div class="invitation" id="invitation-{{ invitation['repository'] }}">
-
                 <div class="invitation-header">
-                    <div class="column"> <h2>{{ invitation['repository'] }}</h2></div>
-                    <div class="column" id="inviter"><h2>{{ invitation['inviter']}}</h2></div>
-                    <div class="column"><h2>{{ invitation['date']}}</h2></div>
-                    <div class="image-inviter">
-                        <img class="profile-pic-inviter" src="{{ invitation['avatar']}}">
+                    <div class="column"> <h1>{{ invitation['repository'] }}</h1></div>
+                    <div class="column" id="inviter"><h1>{{ invitation['inviter']}}</h1></div>
+                    <div class="column"><h1>{{ invitation['date']}}</h1></div>
+                    <div class="column">
+                        <div class="image-inviter">
+                            <img class="profile-pic-inviter" src="{{ invitation['avatar']}}">
+                        </div>
                     </div>
-                    <button class="btn btn-accept" id="{{invitation['repository']}}">Accept</button>
-                    <button class="btn btn-decline" id ="{{invitation['repository']}}">Decline</button>
+                    
+                    <div class="column" id="buttons">
+                        <button class="btn btn-accept" id="{{invitation['repository']}}">Accept</button>
+                        <button class="btn btn-decline" id ="{{invitation['repository']}}">Decline</button>
+                    </div>
+                    
                 </div>
             
 

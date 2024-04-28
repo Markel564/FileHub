@@ -42,15 +42,12 @@ def view_invitations():
                 flash("Invitation accepted", "success")
                 return jsonify({"status": "ok"})
             elif ack == 1:
-                flash("User not found", "error")
+                flash("User not found!", "error")
                 return jsonify({"status": "usrError"})
             elif ack == 2:
                 flash("Error accepting invitation", "error")
                 return jsonify({"status": "error"})
-            elif ack == 3:
-                flash("Github exception", "error")
-                return jsonify({"status": "githubError"})
-            elif ack == 4:
+            else:
                 flash("An unexpected error occurred!", "error")
                 return jsonify({"status": "unexpectedError"})
 
@@ -67,16 +64,9 @@ def view_invitations():
                 return jsonify({"status": "ok"})
             elif ack == 1:
                 flash("User not found", "error")
-                return jsonify({"status": "usrError"})
-            elif ack == 2:
+                return jsonify({"status": "userError"})
+            else:
                 flash("Error declining invitation", "error")
                 return jsonify({"status": "error"})
-            elif ack == 3:
-                flash("Github exception", "error")
-                return jsonify({"status": "githubError"})
-            elif ack == 4:
-                flash("An unexpected error occurred!", "error")
-                return jsonify({"status": "unexpectedError"})
-            return jsonify({"status": "ok"})
 
 

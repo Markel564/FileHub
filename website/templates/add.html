@@ -14,7 +14,7 @@
 
 <div class="new_repository">
     <div class="content">
-        <h2>NEW REPOSITORY</h2>
+        <h2>NEW PROJECT</h2>
         <form>
             <div class="form-group">
                 <input type="text" id="project-name" placeholder="Project Name">
@@ -22,9 +22,8 @@
             <div class="form-group">
                 <textarea id="description" placeholder="Description"></textarea>
             </div>
-            <div class="checkbox-group">
-                <input type="checkbox" id="add-readme">
-                <label for="add-readme">Add Descriptive file</label>
+            <div class="form-group">
+                <input type="text" id="path-of-repo" placeholder="Absolute Path (e.g. C:\Users\User\Dir)" class="form-control">
             </div>
             <div class="checkbox-group">
                 <input type="checkbox" id="make-private">
@@ -34,6 +33,7 @@
                 <button type="submit" class="create-btn" id="createButton">CREATE</button>
                 <button type="button" class="back-btn" id="backButton">BACK</button>
             </div>
+            
         </form>
     </div>
 </div>

@@ -46,19 +46,10 @@ def repo(subpath):
                     flash("User not identified!", category='error')
                     return render_template("error.html")
                 elif ack == 2:
-                    flash("The repository does not exist!", category='error')
-                    return render_template("error.html")
-                elif ack == 3:
-                    flash("There was a file error!", category='error')
-                    return render_template("error.html")
-                elif ack == 4:
-                    flash("There was a github error!", category='error')
-                    return render_template("error.html")
-                elif ack == 5:
-                    flash("There was an error with the database!", category='error')
+                    flash("The Project does not exist!", category='error')
                     return render_template("error.html")
                 else:
-                    flash("An unexpected error occurred!", category='error')
+                    flash("There was an error!", category='error')
                     return render_template("error.html")
          
                 files, folders = get_files_and_folders(repoName, subpath) # at first the path of the repository is the same as the name of the repository + '/'
@@ -88,19 +79,10 @@ def repo(subpath):
                         flash("User not identified!", category='error')
                         return render_template("error.html")
                     elif ack == 2:
-                        flash("The repository does not exist!", category='error')
-                        return render_template("error.html")
-                    elif ack == 3:
-                        flash("There was a file error!", category='error')
-                        return render_template("error.html")
-                    elif ack == 4:
-                        flash("There was a github error!", category='error')
-                        return render_template("error.html")
-                    elif ack == 5:
-                        flash("There was an error with the database!", category='error')
+                        flash("The Project does not exist!", category='error')
                         return render_template("error.html")
                     else:
-                        flash("An unexpected error occurred!", category='error')
+                        flash("There was a file error!", category='error')
                         return render_template("error.html")
 
                     
@@ -201,14 +183,9 @@ def repo(subpath):
             if repo is None:
                 return jsonify({"status": "error"})
 
-            if option == "SYNCHRONIZE": #user wants to clone repository with file system
-                return jsonify({"status": "ok"})
-            
-            # user wants to stop clonation
-            repo.isCloned = False
-            db.session.commit()
-            flash("Repository not synchronized anymore with file system", category='success')
-            return jsonify({"status": "ok", "option": "Stop"}) 
+            print("CLONE REQUEST")
+            return jsonify({"status": "ok"})
+    
 
         elif type_message == "clone-cancel":
 
@@ -225,7 +202,7 @@ def repo(subpath):
             ack = clone_repo(repoName, absolute_path)
 
             if ack == 0:
-                flash("Repository cloned successfully", category='success')
+                flash("Project cloned successfully", category='success')
                 repo = Repository.query.filter_by(name=repoName).first()
                 repo.loadedInDB = False # we will change the loaded attribute and when a GET is made, the repository will be loaded again
                 db.session.commit()
@@ -234,23 +211,17 @@ def repo(subpath):
                 flash("User not identified!", category='error')
                 return jsonify({"status": "errorUser"})
             elif ack == 2:
-                flash("The repository does not exist!", category='error')
+                flash("The Project does not exist!", category='error')
                 return jsonify({"status": "errorRepoDoesNotExist"})
             elif ack == 3:
-                flash("The repository is already cloned!", category='error')
+                flash("The Project is already cloned!", category='error')
                 return jsonify({"status": "errorRepoAlreadyCloned"})
-            elif ack == 4:
+            elif ack == 4 or ack == 5 or ack == 7:
                 flash("An error with the file occurred!", category='error')
                 return jsonify({"status": "fileError"})
-            elif ack == 5:
-                flash("There was a permission error!", category='error')
-                return jsonify({"status": "permissionError"})
             elif ack == 6:
                 flash ("The path is not a directory!", category='error')
                 return jsonify({"status": "notDirectoryError"})
-            elif ack == 7:
-                flash("There was a Github error!", category='error')
-                return jsonify({"status": "githubError"})
             else:
                 flash("An unexpected error occurred!", category='error')
                 return jsonify({"status": "unexpectedError"})
@@ -293,20 +264,12 @@ def repo(subpath):
                 flash("User not identified!", category='error')
                 return jsonify({"status": "errorUser"})
             elif ack == 2:
-                flash("The repository does not exist!", category='error')
+                flash("The Project does not exist!", category='error')
                 return jsonify({"status": "errorRepoDoesNotExist"})
-            elif ack == 3:
-                flash("There was a file error!", category='error')
-                return jsonify({"status": "errorFile"})
-            elif ack == 4:
-                flash("There was a github error!", category='error')
-                return jsonify({"status": "errorGithub"})
-            elif ack == 5:
-                flash("There was an error with the database!", category='error')
-                return jsonify({"status": "errorDB"})
             else:
                 flash("An unexpected error occurred!", category='error')
-                return jsonify({"status": "unexpectedError"})
+                return jsonify({"status": "errorFile"})
+        
 
 
             files, folders = get_files_and_folders(repoName, folderPath) # get the files and folders of the folder
@@ -333,16 +296,7 @@ def repo(subpath):
                     flash("User not identified!", category='error')
                     return jsonify({"status": "error"})
                 elif ack == 2:
-                    flash("The repository does not exist!", category='error')
-                    return jsonify({"status": "error"})
-                elif ack == 3:
-                    flash("There was a file error!", category='error')
-                    return jsonify({"status": "error"})
-                elif ack == 4:
-                    flash("There was a github error!", category='error')
-                    return jsonify({"status": "error"})
-                elif ack == 5:
-                    flash("There was an error with the database!", category='error')
+                    flash("The Project does not exist!", category='error')
                     return jsonify({"status": "error"})
                 else:
                     flash("An unexpected error occurred!", category='error')
@@ -374,7 +328,6 @@ def repo(subpath):
 
             db.session.commit()
             flash("Project updated from Github successfully", category='success') 
-            print("Project updated from Github successfully")
             return jsonify({"status": "ok"})
 
         
@@ -392,17 +345,14 @@ def repo(subpath):
                 flash("User not identified!", category='error')
                 return jsonify({"status": "errorUser"})
             elif ack == 2:
-                flash("The repository does not exist!", category='error')
+                flash("The Project does not exist!", category='error')
                 return jsonify({"status": "errorRepoDoesNotExist"})
             elif ack == 3:
-                flash("The repository is not cloned!", category='error')
+                flash("The Project is not cloned!", category='error')
                 return jsonify({"status": "errorRepoNotCloned"})
             elif ack == 4:
                 flash("An error with the file occurred!", category='error')
                 return jsonify({"status": "fileError"})
-            elif ack == 5:
-                flash("Error adding file to the database!", category='error')
-                return jsonify({"status": "errorDB"})
             else:
                 flash("An unexpected error occurred!", category='error')
                 return jsonify({"status": "unexpectedError"})
@@ -435,12 +385,12 @@ def repo(subpath):
                     insertions = True
 
             if len(files) == 0 and len(folders) == 0:
-                flash("No changes to commit", category='error')
+                flash("No changes detected!", category='error')
                 return jsonify({"status": "errorNoFiles"})
             
             # if there are no files modified or added (or deletions), do not commit
             if not modifications and not insertions and not deletions:
-                flash("No changes detected", category='error')
+                flash("No changes detected!", category='error')
                 return jsonify({"status": "errorNoFiles"})
 
             ack = commit_changes(repoName, folderPath)
@@ -452,17 +402,11 @@ def repo(subpath):
                 flash("User not identified!", category='error')
                 return jsonify({"status": "errorUser"})
             elif ack == 2:
-                flash("The repository does not exist!", category='error')
+                flash("The Project does not exist!", category='error')
                 return jsonify({"status": "errorRepoDoesNotExist"})
             elif ack == 3:
-                flash("The repository is not cloned!", category='error')
+                flash("The Project is not cloned!", category='error')
                 return jsonify({"status": "errorRepoNotCloned"})
-            elif ack == 4:
-                flash("There was an error with a file!", category='error')
-                return jsonify({"status": "fileError"})
-            elif ack == 5:
-                flash("There was a Github error!", category='error')
-                return jsonify({"status": "githubError"})
             else:
                 flash("An unexpected error occurred!", category='error')
                 return jsonify({"status": "unexpectedError"})
@@ -492,16 +436,16 @@ def repo(subpath):
                 flash("User not identified!", category='error')
                 return jsonify({"status": "errorUser"})
             elif ack == 2:
-                flash("The repository does not exist!", category='error')
+                flash("The Project does not exist!", category='error')
                 return jsonify({"status": "errorRepoDoesNotExist"})
             elif ack == 3:
-                flash("The repository is not cloned!", category='error')
+                flash("The Project is not cloned!", category='error')
                 return jsonify({"status": "errorRepoNotCloned"})
             elif ack == 4:
                 flash("File not found!", category='error')
                 return jsonify({"status": "fileError"})
             elif ack == 5:
-                flash("The file is already deleted! Commit the changes to send them!", category='error')
+                flash("The file is already deleted!", category='error')
                 return jsonify({"status": "errorFileAlreadyDeleted"})
             else:
                 flash("An unexpected error occurred!", category='error')
@@ -526,16 +470,16 @@ def repo(subpath):
                 flash("User not identified!", category='error')
                 return jsonify({"status": "errorUser"})
             elif ack == 2:
-                flash("The repository does not exist!", category='error')
+                flash("The Project does not exist!", category='error')
                 return jsonify({"status": "errorRepoDoesNotExist"})
             elif ack == 3:
-                flash("The repository is not cloned!", category='error')
+                flash("The Project is not cloned!", category='error')
                 return jsonify({"status": "errorRepoNotCloned"})
             elif ack == 4:
                 flash("Folder not found!", category='error')
                 return jsonify({"status": "folderError"})
             elif ack == 5:
-                flash("The folder is already deleted! Commit the changes to send them!", category='error')
+                flash("The folder is already deleted!", category='error')
                 return jsonify({"status": "errorFolderAlreadyDeleted"})
             else:
                 flash("An unexpected error occurred!", category='error')
@@ -545,40 +489,6 @@ def repo(subpath):
         elif type_message == "open-file":
 
             return jsonify({"status": "ok"})
-
-            # repoName, folderPath, fileName = data.get('repoName'), data.get('folderPath'), data.get('fileName')
-
-            # if folderPath == "/":  # if we are in the root of the repository
-            #     path = repoName+"/"+fileName
-            # else:
-            #     path = repoName+"/"+folderPath+fileName
-
-            # ack = open_file(repoName, path)
-
-            # if ack == 0:
-            #     return jsonify({"status": "ok"})
-            # elif ack == 1:
-            #     flash("User not identified!", category='error')
-            #     return jsonify({"status": "errorUser"})
-            # elif ack == 2:
-            #     flash("The repository does not exist!", category='error')
-            #     return jsonify({"status": "errorRepoDoesNotExist"})
-            # elif ack == 3:
-            #     flash("The repository is not cloned!", category='error')
-            #     return jsonify({"status": "errorRepoNotCloned"})
-            # elif ack == 4:
-            #     flash("File not found!", category='error')
-            #     return jsonify({"status": "fileError"})
-            # elif ack == 5:
-            #     flash("Error opening the file!", category='error')
-            #     return jsonify({"status": "fileError"})
-            # elif ack == 6:
-            #     flash("The operating system is not supported!", category='error')
-            #     return jsonify({"status": "errorOS"})
-            # else:
-            #     flash("An unexpected error occurred!", category='error')
-            #     return jsonify({"status": "unexpectedError"})
-
 
         elif type_message == "new-folder-request":
 
@@ -602,10 +512,10 @@ def repo(subpath):
                 flash("User not identified!", category='error')
                 return jsonify({"status": "errorUser"})
             elif ack == 2:
-                flash("The repository does not exist!", category='error')
+                flash("The Project does not exist!", category='error')
                 return jsonify({"status": "errorRepoDoesNotExist"})
             elif ack == 3:
-                flash("The repository is not cloned!", category='error')
+                flash("The Project is not cloned!", category='error')
                 return jsonify({"status": "errorRepoNotCloned"})
             elif ack == 4:
                 flash("Folder already exists!", category='error')
@@ -613,9 +523,6 @@ def repo(subpath):
             elif ack == 5:
                 flash("Error creating the folder in the file system!", category='error')
                 return jsonify({"status": "errorFolder"})
-            elif ack == 6:
-                flash("Error adding the folder to the database!", category='error')
-                return jsonify({"status": "errorDB"})
             else:
                 flash("An unexpected error occurred!", category='error')
                 return jsonify({"status": "unexpectedError"})

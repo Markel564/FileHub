@@ -28,19 +28,9 @@
         </button>
         <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" data-search>
         <button class="btn btn-add-people" id="addPeopleButton">ADD PEOPLE</button>
-        <button class="btn btn-clone" id="cloneButton">SYNCHRONIZE</button>
-        <!-- <button class="btn btn-update-ghub" id="updateGhubButton">UPDATE FROM GITHUB</button>
-        <button class="btn btn-update-fs" id="updateFSButton">UPDATE FROM LOCAL SYSTEM</button> -->
+        <button class="btn btn-clone" id="cloneButton">DOWNLOAD</button>
     </div>
     
-    <div class="buttons-right">
-        <button class="btn btn-refresh" id="refresh-github">
-            <img src="{{ url_for('static', filename='images/ghubrefresh.svg')}}" alt="refresh" class="img-refresh">
-        </button>
-        <button class="btn btn-refresh" id="refresh-filesystem">
-            <img src="{{ url_for('static', filename='images/filerefresh.svg')}}" alt="refresh" class="img-refresh">
-        </button>
-    </div>
     
 </div>
 
@@ -50,7 +40,17 @@
     <h1>{{whole_path}}</h1>
     <h1>Last Updated: {{last_updated}}</h1>
     <br />
-    <button class="btn btn-push" id="pushButton">Send Changes</button>
+    <div class="container-buttons">
+        <button class="btn btn-refresh" id="refresh-github">
+            <img src="{{ url_for('static', filename='images/ghubrefresh.svg')}}" alt="refresh" class="img-refresh">
+        </button>
+        <button class="btn btn-push" id="pushButton">Upload to GitHub</button>
+        
+        <button class="btn btn-refresh" id="refresh-filesystem">
+            <img src="{{ url_for('static', filename='images/filerefresh.svg')}}" alt="refresh" class="img-refresh">
+        </button>
+    </div>
+    
     <div class="grid-container"> 
         {% if folders %}
         {% for folder in folders %}
@@ -111,13 +111,13 @@
 <!-- to 'clone' the repository -->
 <div id="modal-content" class="hide">
     <div class="modal-row">
-        <h2>SYNCHRONIZE</h2>
+        <h2>DOWNLOAD</h2>
     </div>
     <div class="modal-row">
-        <p>This repository will be synchronized with your local system</p>
+        <p>This Project will be downloaded in your local filesystem</p>
     </div>
     <div class="modal-row">
-        <p>This means the changes done in the repository at your file system will be shown here</p>
+        <p>This means the changes done in the Project from your filesystem will be shown here</p>
     </div>
     <div class="absolutePath">
         <input type="text" id="path" placeholder="Absolute Path (e.g. C:\Users\User\Dir)" class="form-control">
@@ -150,7 +150,6 @@
         </div>
     </div>
 </div>
-
 
 
 {% endblock %}

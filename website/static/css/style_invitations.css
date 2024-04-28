@@ -71,7 +71,8 @@
 
 
 .invitation-header {
-    display: flex;
+    display: grid;
+    grid-template-columns: 150px 150px 150px 150px 1fr;
     justify-content: space-between;
     align-items: center;
     margin-left: 20px;
@@ -85,11 +86,16 @@
     color: white;
 }
 
-
-.column{
-    flex: 1; 
-    margin-right: 10px;
+.invitation-header h1{
+    font-size: 1rem;
+    font-weight: bold;
+    color: white;
 }
+
+#buttons{
+    margin: 0 auto; 
+}
+
 
 .separator{
     margin-top: 20px;
@@ -99,8 +105,7 @@
 
 
 .image-inviter{
-    margin-top: 20px;
-    margin-right: 40px;
+    margin: 0 auto;
     height: 100px;
     width: 100px; 
     border-radius: 20%;
@@ -117,14 +122,6 @@
 
 
 
-.column:last-child {
-    margin-right: 0; 
-}
-
-.btn {
-    margin-left: 5px;
-}
-
 
 .btn {
     padding: 10px 20px; 
@@ -139,7 +136,12 @@
     color: white;
     border: none;
     margin-left: 30px;
+
   }
+  
+#backButton{
+    
+}
 
   .btn:hover {
     background-color: #a50b50; 

@@ -14,12 +14,11 @@ from sqlalchemy.exc import SQLAlchemyError
 
 
 
-def add_repo(project_name, project_description, readme, isPrivate=False):
+def add_repo(project_name, project_description, isPrivate=False):
     """
     input: 
         - project_name (string): name of the project/repository
         - project_description (string): description of the project
-        - readme (boolean): True if the user wants to create a readme file, False if not
         - isPrivate (boolean): True if the user wants to create a private repo, False if not (default is False)
         
     output: 
@@ -57,8 +56,7 @@ def add_repo(project_name, project_description, readme, isPrivate=False):
         db.session.commit()
 
         # create the readme file with default text
-        if readme:
-            repo.create_file("README.md", "Initial commit", "New Repository Created!", branch="main")
+        repo.create_file("DescriptiveFile.txt", "Initial file!", "New Project Created!", branch="main")
         
         g.close()
         return 0

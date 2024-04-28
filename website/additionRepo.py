@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, flash, request, jsonify, session
 from . import db
 from .models import User
-from .pythonCode import add_repo
+from .pythonCode import add_repo, clone_repo
 
 
 additionRepo = Blueprint('additionRepo', __name__)
@@ -37,28 +37,35 @@ def add():
             # get the data from the POST request
             project_name = data.get('projectName')
             project_description = data.get('projectDescription')
-            readme = data.get('readme')
             isPrivate = data.get('private')
+            pathOfRepo = data.get('repoPath')
 
-            
+            print(project_name, project_description, isPrivate, pathOfRepo)
             # create the repo
-            ack = add_repo(project_name, project_description, readme, isPrivate)
+            ack = add_repo(project_name, project_description, isPrivate)
             
             if ack == 0:
-                flash("Repository created successfully", category='success')
-                return jsonify({"status": "ok"})
+                
+                if pathOfRepo != None:
+                    ack = clone_repo(project_name, pathOfRepo)
+                    
+                    print("ACK: ", ack)
+                    if ack == 0:
+                        flash("Project created successfully", category='success')
+                        return jsonify({"status": "ok"})
+                    else:
+                        flash("Project created successfully, but unable to download the Project", category='error')
+                        return jsonify({"status": "errorClone"})
+                else:
+                    flash("Project created successfully", category='success')
+                    return jsonify({"status": "ok"})
             elif ack == 1:
                 flash("User not identified!", category='error')
                 return jsonify({"status": "errorUser"})
             elif ack == 2:
-                flash("There is already a repository with the same name!", category='error')
+                flash("There is already a project with the same name!", category='error')
                 return jsonify({"status": "errorRepoAlreadyExists"})
-            elif ack == 3:
-                flash("There was a Github error!", category='error')
-                return jsonify({"status": "githubError"})
-            elif ack == 4:
-                flash("Error adding repository to the database!", category='error')
-                return jsonify({"status": "errorDB"})
             else:
-                flash("An unexpected error occurred!", category='error')
+                flash("Unable to create project", category='error')
                 return jsonify({"status": "unexpectedError"})
+    
