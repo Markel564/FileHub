@@ -113,7 +113,7 @@ def home():
             return jsonify({"status": "ok"})
 
         elif type_message == "repo":
-                        
+          
             repoName = data.get('repo_name')
             repo_to_check = Repository.query.filter_by(name=repoName).first()
 

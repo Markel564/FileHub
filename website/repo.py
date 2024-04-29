@@ -31,7 +31,6 @@ def repo(subpath):
         if directory == '': # we are in a folder, if not, we are in the repository main page
             root_of_project = True
         
-            
         if root_of_project:
             
             repo = Repository.query.filter_by(name=repoName).first()
@@ -183,7 +182,6 @@ def repo(subpath):
             if repo is None:
                 return jsonify({"status": "error"})
 
-            print("CLONE REQUEST")
             return jsonify({"status": "ok"})
     
 
@@ -202,7 +200,7 @@ def repo(subpath):
             ack = clone_repo(repoName, absolute_path)
 
             if ack == 0:
-                flash("Project cloned successfully", category='success')
+                flash("Project downloaded successfully", category='success')
                 repo = Repository.query.filter_by(name=repoName).first()
                 repo.loadedInDB = False # we will change the loaded attribute and when a GET is made, the repository will be loaded again
                 db.session.commit()
@@ -214,7 +212,7 @@ def repo(subpath):
                 flash("The Project does not exist!", category='error')
                 return jsonify({"status": "errorRepoDoesNotExist"})
             elif ack == 3:
-                flash("The Project is already cloned!", category='error')
+                flash("The Project is already downloaded!", category='error')
                 return jsonify({"status": "errorRepoAlreadyCloned"})
             elif ack == 4 or ack == 5 or ack == 7:
                 flash("An error with the file occurred!", category='error')
@@ -230,7 +228,6 @@ def repo(subpath):
         
         elif type_message == "refresh-github": #to refresh the data based on the one in github (like a pull)
             
-            print("refresh-github")
             repoName, folderPath = data.get('repoName'), data.get('folderPath')
 
             repo = Repository.query.filter_by(name=repoName).first()
@@ -348,7 +345,7 @@ def repo(subpath):
                 flash("The Project does not exist!", category='error')
                 return jsonify({"status": "errorRepoDoesNotExist"})
             elif ack == 3:
-                flash("The Project is not cloned!", category='error')
+                flash("The Project is not downloaded!", category='error')
                 return jsonify({"status": "errorRepoNotCloned"})
             elif ack == 4:
                 flash("An error with the file occurred!", category='error')
@@ -405,7 +402,7 @@ def repo(subpath):
                 flash("The Project does not exist!", category='error')
                 return jsonify({"status": "errorRepoDoesNotExist"})
             elif ack == 3:
-                flash("The Project is not cloned!", category='error')
+                flash("The Project is not downloaded!", category='error')
                 return jsonify({"status": "errorRepoNotCloned"})
             else:
                 flash("An unexpected error occurred!", category='error')
@@ -439,7 +436,7 @@ def repo(subpath):
                 flash("The Project does not exist!", category='error')
                 return jsonify({"status": "errorRepoDoesNotExist"})
             elif ack == 3:
-                flash("The Project is not cloned!", category='error')
+                flash("The Project is not downloaded!", category='error')
                 return jsonify({"status": "errorRepoNotCloned"})
             elif ack == 4:
                 flash("File not found!", category='error')
@@ -473,7 +470,7 @@ def repo(subpath):
                 flash("The Project does not exist!", category='error')
                 return jsonify({"status": "errorRepoDoesNotExist"})
             elif ack == 3:
-                flash("The Project is not cloned!", category='error')
+                flash("The Project is not downloaded!", category='error')
                 return jsonify({"status": "errorRepoNotCloned"})
             elif ack == 4:
                 flash("Folder not found!", category='error')
@@ -515,7 +512,7 @@ def repo(subpath):
                 flash("The Project does not exist!", category='error')
                 return jsonify({"status": "errorRepoDoesNotExist"})
             elif ack == 3:
-                flash("The Project is not cloned!", category='error')
+                flash("The Project is not downloaded!", category='error')
                 return jsonify({"status": "errorRepoNotCloned"})
             elif ack == 4:
                 flash("Folder already exists!", category='error')

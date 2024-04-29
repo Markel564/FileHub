@@ -40,10 +40,6 @@ document.addEventListener("DOMContentLoaded", function () {
             toggleState();
 
             if (data.status == "ok"  || data.status == "error"){
-                var synchronizeButton = document.querySelector("#cloneButton");
-                if (data.status == "ok"){
-                    synchronizeButton.textContent = "STOP SYNCHRO";
-                }
                 window.location.href = window.location.href;
             }
             else{

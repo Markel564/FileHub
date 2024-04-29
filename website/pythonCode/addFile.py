@@ -82,7 +82,6 @@ def add_file(repoName, file_name, file_path):
         if repo.isCloned:
             file.FileSystemPath = repo.FileSystemPath + path
   
-            print (f"About to hash {file.FileSystemPath}")
             file.shaHash = sign_file(file.FileSystemPath)
 
             if not file.shaHash:

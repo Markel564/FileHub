@@ -99,7 +99,7 @@ def load_files_and_folders(repoName, path=""):
                     last_modified = get_last_modified(content_file['path'], repoName, owner, userDB.githubG)
                     
                     # the folder path is the path of the file without the file name
-                    folder_path = repoName + '/' + content_file['path'].split(content_file['name'])[0]
+                    folder_path = repoName + '/' + content_file['path'].split(content_file['name'])[0] 
 
                     file = File(name=content_file['name'], repository_name=repoName, lastUpdated=last_modified, 
                     modified=False, path=str(repoName+'/'+content_file['path']), folderPath=folder_path)
@@ -325,7 +325,8 @@ def load_files_and_folders(repoName, path=""):
         print (e)
         return 4
     
-    except SQLAlchemyError:
+    except SQLAlchemyError as e:
+        print (e)
         return 5
     
     except Exception as e:

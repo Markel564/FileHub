@@ -66,6 +66,7 @@ def check_file_system(repo):
                         # we have to update the date of the folder where the file is located and the repository
                         father_dir = folderPath
 
+
                         while father_dir != repo.name + "/":
                             folder = Folder.query.filter_by(path=father_dir[:-1], repository_name=repo.name).first()
                             # there is a chance that the user created the directory manually, so we have to add it to the database

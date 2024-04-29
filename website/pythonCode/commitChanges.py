@@ -149,6 +149,7 @@ def commit_changes(repoName, folderpath):
         return 0
 
     except FileNotFoundError as e:
+        print(e)
         return 4
 
     except github.GithubException as e:
