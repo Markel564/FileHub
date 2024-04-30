@@ -135,14 +135,14 @@ def commit_changes(repoName, folderpath):
         # also, we will delete the folders that the user deleted
         # it is not necessary to 'commit' the folder
 
-        for folder in repoDB.repository_folders:
+        # for folder in repoDB.repository_folders:
 
-            if folder.deleted:
-                db.session.delete(folder)
+        #     if folder.deleted:
+        #         db.session.delete(folder)
             
-            if not folder.deleted:
-                folder.addedFirstTime = False
-                folder.modified = False
+        #     if not folder.deleted:
+        #         folder.addedFirstTime = False
+        #         folder.modified = False
 
 
         db.session.commit()

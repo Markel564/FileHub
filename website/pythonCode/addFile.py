@@ -31,8 +31,6 @@ def add_file(repoName, file_name, file_path):
         path = str(repo.name + file_path + file_name)
         folder_path = str(repo.name + file_path)
 
-        print (f"Path: {path}")
-        print (f"Folder path: {folder_path}")
 
         with open("./uploads/"+file_name, 'rb') as file:
             content = file.read()
@@ -52,13 +50,22 @@ def add_file(repoName, file_name, file_path):
         repo = Repository.query.filter_by(name=repoName).first()
 
         
-        
-        if file_name in [f.name for f in repo.repository_files]:
-            return 7
-
-
         file = File(name=file_name, path = path, repository_name=repo.name, 
         lastUpdated=datetime.now(), modified = True ,folderPath = folder_path, addedFirstTime = True)
+
+
+        if path in [f.path for f in repo.repository_files]: # if the file is already in the repository (same place)
+            
+            f = File.query.filter_by(path=path).first()
+            print (f" File {file.name} is already in the repository, with deleted = {f.deleted}")
+            if f.deleted: # if the file was deleted, we will delete the file from the database and add the new one
+                db.session.delete(f)
+                db.session.commit()
+            else:
+                return 7 # the file is already in the repository, and in the same location (plus, not deleted)
+
+
+        
         db.session.add(file)
 
         repo.lastUpdated = datetime.now() # update the last updated date of the repository

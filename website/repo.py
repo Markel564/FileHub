@@ -3,12 +3,15 @@ from . import db
 from .models import User, Repository, Folder, File
 import os
 from .pythonCode import *
+from flask_login import login_required
+
 
 
 repository = Blueprint('repository', __name__)
 
 
 # REPO page
+@login_required
 @repository.route('/<path:subpath>', methods=['GET','POST'])
 def repo(subpath):
 
@@ -113,7 +116,7 @@ def repo(subpath):
             
             files, folders = get_files_and_folders(repoName, subpath +'/')
 
-            
+            print ("SUBPATH: ", subpath)
             folder = Folder.query.filter_by(repository_name=repoName, path=subpath).first()
             last_updated = folder.lastUpdated
 
@@ -215,7 +218,7 @@ def repo(subpath):
                 flash("The Project is already downloaded!", category='error')
                 return jsonify({"status": "errorRepoAlreadyCloned"})
             elif ack == 4 or ack == 5 or ack == 7:
-                flash("An error with the file occurred!", category='error')
+                flash("Couldn't download the project", category='error')
                 return jsonify({"status": "fileError"})
             elif ack == 6:
                 flash ("The path is not a directory!", category='error')

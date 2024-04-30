@@ -14,6 +14,7 @@ from flask import Blueprint, render_template, flash, request, jsonify, session
 from . import db
 from .models import User, Repository
 from .pythonCode import add_user, get_repos, delete_repo
+from flask_login import login_required, logout_user
 
 
 homePage = Blueprint('homePage', __name__)
@@ -21,6 +22,7 @@ homePage = Blueprint('homePage', __name__)
 
 
 # HOME PAGE
+@login_required
 @homePage.route('/home', methods=['GET','POST'])
 def home():
 
@@ -30,6 +32,7 @@ def home():
 
         if ack == 0: # user added successfully
             pass
+            
         elif ack == 1: # user not identified
             flash("User not identified!", category='error')
         elif ack == 2: # error with database
@@ -122,8 +125,17 @@ def home():
             
             return jsonify({"status": "ok", "repoName": repoName + "/"})
 
-        return jsonify({"status": "error"})
+        elif type_message == "logout":
 
+            session.pop('user_id', None)
+            session.pop('repo_to_remove', None)
+            session.pop('token', None)
+
+            db.session.commit()
+            logout_user()
+
+            
+            return jsonify({"status": "ok"})
 
 
             

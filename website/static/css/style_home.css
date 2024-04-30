@@ -5,7 +5,7 @@
     justify-content: space-between;
     padding: 10px; 
     background-color: #1a1a1d;
-    width: 50vw; 
+    width: 58vw; 
     margin: 20px auto;
 }
 
@@ -21,19 +21,13 @@
   cursor: pointer; 
   }
 
-/* BUTTON to add repositories */
-.btn-add-repo {
+/* BUTTONs */
+.btn-add-repo, .btn-view-invites, .btn-logout {
     background-color: #950740;
     color: white;
     border: none;
 }
 
-/* BUTTON to see invitations to other repositories */
-.btn-view-invites {
-    background-color: #950740;
-    color: white;
-    border: none;
-}
 
 
 .btn:hover {

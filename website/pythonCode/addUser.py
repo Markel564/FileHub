@@ -39,8 +39,9 @@ def add_user():
         # check if the user is already in the session
 
         if User.query.filter_by(id=id).first():
-
-            print("User already in session")
+            
+            user = User.query.filter_by(id=id).first()
+            session['user_id'] = id
             pass
 
         else: # if the user is not in the session, we add it

@@ -16,10 +16,6 @@ def delete_file(repo, path, name):
     user_id = session.get('user_id')
     user = User.query.filter_by(id=user_id).first()
 
-    print (f"Dentro de delete_file")
-
-    print (f"Arguments: {repo}, {path}, {name}")
-    print (f"Types: {type(repo)}, {type(path)}, {type(name)}")
     if not user:
         return 1
     
@@ -39,7 +35,6 @@ def delete_file(repo, path, name):
 
         file = File.query.filter_by(path=path, name=name).first()
 
-        print (f"File: {file}")
         if not file:
             return 4
 
@@ -66,8 +61,11 @@ def delete_file(repo, path, name):
         # commits the deletion). It will be deleted from the database when the user commits the message
         if file.deleted: # if the file is already deleted, the user will not be able to delete it again
             return 5
-        file.deleted = True
 
+        
+        file.deleted = True
+        file.modified = False # the file is not modified anymore
+        print (f"File deleted set to: {file.deleted}")
         # also, the repositories lastUpdated field is updated
         repoDB.lastUpdated = datetime.now()
 
@@ -75,7 +73,6 @@ def delete_file(repo, path, name):
 
         folder_path = file.folderPath[:-1] # remove the last character
 
-        print (f"Folder path: {folder_path}")
         while folder_path != repoDB.name:
                 
                 # open all the folders that have that folder_path as their path
@@ -86,14 +83,14 @@ def delete_file(repo, path, name):
                 # remove until the last slash
                 folder_path = folder_path[:folder_path.rfind("/")]
         
-        print (f"Time to remove the file from the database")
-        print (f"File path: {file.FileSystemPath}")
+
         # since the file is in the file system, we have to delete it
         if os.path.exists(file.FileSystemPath):
             os.remove(file.FileSystemPath)
+
+        print (f"File deleted set to: {file.deleted}")
         db.session.commit()
 
-        print (f"File deleted from the database")
         return 0
 
         
@@ -136,6 +133,18 @@ def delete_folder(repo, path, name):
         if folder.addedFirstTime:
             print ("Folder added for the first time")
             db.session.delete(folder)
+
+            subfolders = Folder.query.filter_by(folderPath=folder.path+"/%").all()
+            files = File.query.filter(File.folderPath.like(folder.path + "/%")).all()
+
+            print (f"Subfolders: {subfolders}")
+            print (f"Files: {files}")
+
+            for f in files:
+                print (f"File: {f}")
+                f.deleted = True # set the file as deleted, and not deleted from the database until the user commits the changes
+                f.modified = False # the file is not modified anymore
+
             db.session.commit()
 
             # since the folder is in the file system, we have to delete it
@@ -147,8 +156,8 @@ def delete_folder(repo, path, name):
         if folder.deleted:
             return 5
 
-        folder.deleted = True # set the folder as deleted
-
+        # folder.deleted = True # set the folder as deleted
+        
         # update the dates
 
         repoDB.lastUpdated = datetime.now()
@@ -169,34 +178,22 @@ def delete_folder(repo, path, name):
 
         # moreover, we will put as deleted all the files and folders that are inside the folder
 
-        subfolders = Folder.query.filter_by(folderPath=folder.path+"/").all()
-        files = File.query.filter_by(folderPath=folder.path+"/").all()
+        subfolders = Folder.query.filter_by(folderPath=folder.path+"/%").all()
+        files = File.query.filter(File.folderPath.like(folder.path + "/%")).all()
 
+        print (f"Subfolders: {subfolders}")
 
         for f in files:
-            f.deleted = True
+            print (f"File: {f}")
+            f.deleted = True # set the file as deleted, and not deleted from the database until the user commits the changes
+            f.modified = False # the file is not modified anymore
 
-        print ("Path of the folder: ", folder.path)
 
         for f in subfolders:
-            print (f.name)
-            print (f.folderPath, f.path)
-
-        while subfolders:
-            
-            print (subfolders[0].name)
-            files = File.query.filter_by(folderPath=subfolders[0].path+"/").all()
-
-            for f in files:
-                f.deleted = True
-            folders = Folder.query.filter_by(folderPath=subfolders[0].path+"/").all()
-
-            if folders:
-                subfolders.append(folders)
-
-            subfolders.pop(0)
+            db.session.delete(f) # delete the folder from the database
 
 
+        db.session.delete(folder)
         db.session.commit()    
         # delete from file system
         if os.path.exists(folder.FileSystemPath):

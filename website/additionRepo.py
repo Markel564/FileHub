@@ -2,13 +2,14 @@ from flask import Blueprint, render_template, flash, request, jsonify, session
 from . import db
 from .models import User
 from .pythonCode import add_repo, clone_repo
-
+from flask_login import login_required
 
 additionRepo = Blueprint('additionRepo', __name__)
 
 
 
 # ADD page
+@login_required
 @additionRepo.route('/add', methods=['GET','POST'])
 def add():
 
@@ -23,7 +24,8 @@ def add():
         data = request.get_json()  
 
         if data is None:
-            return render_template("generic_error.html")
+            flash("An unexpected error occurred!", category='error')
+            return jsonify({"status": "error"})
         
         type_message = data.get('type')
 

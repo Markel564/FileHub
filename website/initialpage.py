@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, flash, request, jsonify, session
 from . import db
-from .pythonCode import validate_token
+from .pythonCode import validate_token, add_user
+from flask_login import login_user
+from .models import User
 
 initialPage = Blueprint('initialPage', __name__)
 
@@ -12,6 +14,9 @@ def create_token():
 
     if request.method == 'GET':
         
+        user = User.query.filter_by(id=session.get('user_id')).first()
+        if user:
+            print(f"User {user.username} already logged in!")
         return render_template("initial.html")
 
     elif request.method == 'POST':
@@ -28,6 +33,15 @@ def create_token():
 
             if valid:
                 session['token'] = token
+
+                ack = add_user()
+
+                if ack != 0:
+                    return jsonify({"status": "error"})
+                
+                user_id = session.get('user_id')
+                user = User.query.filter_by(id=user_id).first()
+                login_user(user) # login the user
                 return jsonify({"status": "ok"})
             else:
                 flash("User not identified!", category='error')

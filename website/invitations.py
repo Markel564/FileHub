@@ -2,11 +2,12 @@ from flask import Blueprint, render_template, flash, request, jsonify, session
 from . import db
 from .models import User, Repository
 from .pythonCode import get_invitations, handle_invitation
+from flask_login import login_required
 
 
 invitations = Blueprint('invitations', __name__)
 
-
+@login_required
 @invitations.route('/invitations', methods=['GET','POST'])
 def view_invitations():
 

@@ -3,6 +3,7 @@ const repositoryElements = document.querySelectorAll(".repository");
 const addRepoButton = document.querySelector("#addRepo");
 const repositories = document.querySelectorAll('.repository-name');
 const viewInvitations = document.querySelector("#viewInvitations");
+const logoutButton = document.querySelector("#logout");
 
 // function to search for a repository
 searchInput.addEventListener("input", (e) => {
@@ -172,6 +173,33 @@ viewInvitations.addEventListener("click", () => {
     }).then(function (data) {
         if (data.status == "ok"){
             window.location.replace("/invitations");
+        }
+        else{
+            console.log("Error");
+        }
+    })
+});
+
+
+// function to log out
+logoutButton.addEventListener("click", () => {
+
+    fetch("/home", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({type: "logout"}),
+    })
+    .then(function (response) {
+        if (response.ok) {
+            return response.json(); 
+        } else {
+            throw new Error("Network response was not ok");
+        }
+    }).then(function (data) {
+        if (data.status == "ok"){
+            window.location.replace("/");
         }
         else{
             console.log("Error");

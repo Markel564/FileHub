@@ -26,7 +26,6 @@ def get_repos():
     # obtain the user from the database
     user_id = session.get('user_id')
     user = User.query.filter_by(id=user_id).first()
-
     try:
 
         # authenticate the user
