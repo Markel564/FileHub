@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Collaborators{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_invitations.css') }}">
+<!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/style_collaborators.css') }}"> -->
+
+{% endblock %}
+
+{% block js %}
+<script src="{{ url_for('static', filename='js/collaborations.js') }}" defer></script>
+{% endblock %}
+
+{% block content %}
+
+<div class = "container">
+
+    <div class="content-header">
+        <button class="btn btn-back" id="backButton">
+            <span>
+                <img src="{{ url_for('static', filename='images/arrow-left2.svg')}}" alt="back-arrow" class="img-back">
+                BACK
+            </span>
+        </button>
+        <h1>Collaborators</h1>
+    </div>
+
+    <br/>
+    {% if not collaborations %}
+
+    <div class="no-results">
+        <h1>No Collaborators</h1>
+        <!-- <img src="../static/images/sad-face.svg" alt="No results found" class="img-no-results"> -->
+    </div>
+    
+    {% else %}
+
+
+    <div class="collaborations-container">
+        <div class="collaborations-header">
+            <div class="column"><h1>Collaborator</h1></div>
+            <div class="column"><h1>Avatar</h1></div>
+            <div class="column" id="buttons"><h1>Role</h1></div>
+            <div class="column" id="buttons"><h1>Remove</h1></div>
+        </div>
+        <div class="separator"></div>
+        <br />
+        {% for collab in collaborations %}
+            <div class="collaboration" id="{{ collab['username'] }}">
+                <div class="collaborations-header">
+                    <div class="column"> <h1>{{ collab['username'] }}</h1></div>
+                    <div class="column">
+                        <div class="image-collaboratorr">
+                            <img class="profile-pic-collaborator" src="{{ collab['avatar']}}">
+                        </div>
+                    </div>
+                    <div class="column"><h1>{{ collab['permissions']}}</h1></div>
+                    
+                    <div class="column" id="buttons">
+                        <img src="{{ url_for('static', filename='images/trash-bin.svg')}}" alt="removeCollaborator" class="remove-collaborator"> 
+                    </div>
+                </div>
+                <div class="separator"></div>
+            </div>
+
+            
+        {% endfor %}
+
+    
+
+    {% endif %}
+</div>
+
+{% endblock %}

@@ -182,7 +182,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         })
         .then(function (data) {
-            console.log(data);
             folderWindow = document.getElementById("modal-folder");
 
             var state = false;

@@ -1,35 +1,28 @@
-import github
-from github import Github, Auth
 import requests
 
+# Define the repository details and token
+owner = "Markel564"
+repo = "TestingClone"
+token = "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"
+
+# URL for the list of collaborators in the repository
+url = f"https://api.github.com/repos/{owner}/{repo}/collaborators"
 
 
-
-token = "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"
-owner = "MarkelBene"
-repo = "MyFirstRepo"
-
-g = github.Github("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")
-
-user = g.get_user()
-
-url = f"https://api.github.com/repos/{owner}/{repo}/contents/"
-
+# Headers with the authorization token
 headers = {
-            "Authorization": f"token {token}",
-            "Accept": "application/vnd.github.v3+json"
-        }
-print (f"MAKING REQUEST with url {url} and headers {headers}")
+    "Authorization": f"token {token}",
+    "Accept": "application/vnd.github.v3+json"
+}
 
+print(f"URL is {url} with headers {headers}")
+# Make the request to the GitHub API
 response = requests.get(url, headers=headers)
-print (f"RESPONSE: {response}")
 
-contents = response.json()
+print(f"Response is {response}")
+collaborators = response.json()
 
-print (f"CONTENTS: {contents}")
-for content_file in contents:
-            
-    if content_file['type'] == "file":
-        print (f"FILE: {content_file['name']}")
-    else:
-        print (f"FOLDER: {content_file['name']}")
+for collaborator in collaborators:
+    print(collaborator)
+    print ("\n")
+    

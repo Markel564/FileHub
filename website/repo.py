@@ -1,9 +1,10 @@
-from flask import Blueprint, render_template, flash, request, jsonify, session
+from flask import Blueprint, render_template, flash, request, jsonify, session, redirect, url_for
 from . import db
 from .models import User, Repository, Folder, File
 import os
 from .pythonCode import *
 from flask_login import login_required
+
 
 
 
@@ -529,6 +530,16 @@ def repo(subpath):
 
             return jsonify({"status": "ok"})
 
-        elif type_message == "cancel-folder":
+        elif type_message == "cancel-folder": 
 
             return jsonify({"status": "ok"})
+
+        elif type_message == "add-people":
+            
+
+            repoName = data.get('repoName')
+            return jsonify({"status": "ok", "url": url_for('collabPage.collaboration', repoName=repoName)})
+
+            
+
+

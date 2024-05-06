@@ -80,13 +80,23 @@
     width: 1000px;
 }
 
-.invitation-header h2{
+
+.collaborations-header{
+    display: grid;
+    grid-template-columns: 150px 150px 150px 150px;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 auto;
+    width: 800px;
+}
+
+.invitation-header h2, .collaborations-header h2{
     font-size: 1rem;
     font-weight: bold;
     color: white;
 }
 
-.invitation-header h1{
+.invitation-header h1, .collaborations-header h1{
     font-size: 1rem;
     font-weight: bold;
     color: white;
@@ -104,7 +114,7 @@
 }
 
 
-.image-inviter{
+.image-inviter, .image-collaborator{
     margin: 0 auto;
     height: 100px;
     width: 100px; 
@@ -113,7 +123,7 @@
     border: 5px solid #950740;
 }
 
-.profile-pic-inviter {
+.profile-pic-inviter, .profile-pic-collaborator {
     width: 100%;
     height: 100%;
     object-fit: cover;  
@@ -139,17 +149,21 @@
 
   }
   
-#backButton{
-    
-}
 
-  .btn:hover {
+
+.btn:hover {
     background-color: #a50b50; 
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); 
 }
 
 
-.profile-pic-inviter:hover {
+.profile-pic-inviter:hover , .remove-collaborator:hover{
     cursor: pointer;
     opacity: 0.8;
 }
+
+
+.remove-collaborator{
+    height: 25px;
+    width: auto;
+  }

@@ -5,7 +5,6 @@ import github
 import yaml
 from flask import session
 import os
-from sqlalchemy.exc import SQLAlchemyError
 from .reformatDate import change_format_date
 
 

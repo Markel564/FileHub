@@ -42,6 +42,7 @@ def create_token():
                 user_id = session.get('user_id')
                 user = User.query.filter_by(id=user_id).first()
                 login_user(user) # login the user
+                print(f"User {user.username} logged in!")
                 return jsonify({"status": "ok"})
             else:
                 flash("User not identified!", category='error')

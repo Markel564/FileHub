@@ -9,8 +9,7 @@ const refreshGitHubButton = document.querySelector("#refresh-github");
 const refreshFileSystemButton = document.querySelector("#refresh-filesystem");
 const commitButton = document.querySelector("#pushButton");
 const newFolderButton = document.querySelector("#new-folder");
-
-
+const addPeopleButton = document.querySelector("#addPeopleButton");
 
 // function to go back to one page before
 backButton.addEventListener("click", () => {
@@ -599,6 +598,38 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+// button to add people to the repository
+addPeopleButton.addEventListener("click", () => {
+
+    fetch("/repo/"+repoName + "/",{
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ type: "add-people", repoName: repoName}),
+    })
+    .then(function (response) {
+        if (response.ok) {
+            return response.json(); 
+        } else {
+            throw new Error("Network response was not ok");
+        }
+    })
+    .then(function (data) {
+    
+        if (data.status == "ok"){
+            
+            // send the user to the url in data.url
+            console.log(data.url);
+            window.location.replace(data.url);
+        }else{
+            window.location.reload();
+        }
+    })
+    .catch(function (error) {
+   
+    });
+});
 
 
 

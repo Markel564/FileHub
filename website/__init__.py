@@ -17,6 +17,8 @@ def create_app():
     from .additionRepo import additionRepo
     from .repo import repository
     from .invitations import invitations
+    from .collaborators import collabPage
+
     
     app.register_blueprint(initialPage, url_prefix='/')
     app.register_blueprint(homePage, url_prefix='/')
@@ -24,7 +26,7 @@ def create_app():
     app.register_blueprint(additionRepo, url_prefix='/')
     app.register_blueprint(repository, url_prefix='/repo')
     app.register_blueprint(invitations, url_prefix='/')
-
+    app.register_blueprint(collabPage, url_prefix='/repo')
 
     return app
 

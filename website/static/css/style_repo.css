@@ -5,9 +5,8 @@
     align-items: center;
     justify-content: space-between;
     background-color: #1a1a1d;
-    width: 85vw; 
+    width: 70vw; 
     margin: 20px auto;
-    margin-left: 8vw;
     flex-wrap: wrap;
 }
 
