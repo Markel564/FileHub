@@ -14,3 +14,7 @@ empecé con pygithub, pero luego no
 readme obligarorio
 
 dropzone solo me deja algunos documentos
+
+hay problema si repo esta vacio
+
+shaHash puede ser no unico porque puedes el mismo archivos en distintas carpetas

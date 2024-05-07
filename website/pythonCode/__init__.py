@@ -26,3 +26,4 @@ from .handleInvitations import handle_invitation
 from .validateToken import validate_token
 from .getCollaborators import get_collaborators
 from .eliminateCollaborators import eliminate_collaborator
+from .addCollaborator import add_collaborator

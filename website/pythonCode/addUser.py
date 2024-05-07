@@ -31,7 +31,7 @@ def add_user():
         g = Github(auth=auth, base_url="https://api.github.com")
 
         id = g.get_user().id
-        print(f"Token is {session['token']} and id is {id}")
+
     
     except:
         # if the user is not authenticated, return False

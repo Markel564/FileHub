@@ -51,23 +51,18 @@ def add():
                 if pathOfRepo != None:
                     ack = clone_repo(project_name, pathOfRepo)
                     
-                    print("ACK: ", ack)
                     if ack == 0:
                         flash("Project created successfully", category='success')
-                        return jsonify({"status": "ok"})
                     else:
                         flash("Project created successfully, but unable to download the Project", category='error')
-                        return jsonify({"status": "errorClone"})
                 else:
                     flash("Project created successfully", category='success')
-                    return jsonify({"status": "ok"})
             elif ack == 1:
                 flash("User not identified!", category='error')
-                return jsonify({"status": "errorUser"})
             elif ack == 2:
                 flash("There is already a project with the same name!", category='error')
-                return jsonify({"status": "errorRepoAlreadyExists"})
             else:
                 flash("Unable to create project", category='error')
-                return jsonify({"status": "unexpectedError"})
+
+            return jsonify({"status": "ok"})
     

@@ -41,17 +41,14 @@ def view_invitations():
             
             if ack == 0:
                 flash("Invitation accepted", "success")
-                return jsonify({"status": "ok"})
             elif ack == 1:
                 flash("User not found!", "error")
-                return jsonify({"status": "usrError"})
             elif ack == 2:
                 flash("Error accepting invitation", "error")
-                return jsonify({"status": "error"})
             else:
                 flash("An unexpected error occurred!", "error")
-                return jsonify({"status": "unexpectedError"})
 
+            return jsonify({"status": "ok"})
         
         if type_message == "decline":
 
@@ -61,13 +58,12 @@ def view_invitations():
             ack = handle_invitation(repo, owner, "decline")
 
             if ack == 0:
-                flash("Invitation declined", "success")
-                return jsonify({"status": "ok"})
+                flash("Invitation declined", "success")              
             elif ack == 1:
                 flash("User not found", "error")
-                return jsonify({"status": "userError"})
             else:
                 flash("Error declining invitation", "error")
-                return jsonify({"status": "error"})
+
+            return jsonify({"status": "ok"})
 
 

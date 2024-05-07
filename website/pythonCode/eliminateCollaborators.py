@@ -27,6 +27,9 @@ def eliminate_collaborator(repo, collaborator):
             if repository.name == repo:
                 owner = repository.owner.login
                 break
+        
+        if owner == collaborator:
+            return 2
 
         url = f"https://api.github.com/repos/{owner}/{repo}/collaborators/{collaborator}"
 
@@ -46,6 +49,6 @@ def eliminate_collaborator(repo, collaborator):
     except Exception as e:
         
         print(e)
-        return 2
+        return 3
 
 

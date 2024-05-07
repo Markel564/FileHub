@@ -9,6 +9,7 @@ uploading = Blueprint('uploading', __name__)
 @login_required
 @uploading.route('/upload-file', methods=['GET','POST'])
 def upload_file():
+
     if 'file' in request.files:
 
         file = request.files['file']
@@ -21,32 +22,27 @@ def upload_file():
 
         ack = add_file(repoName, file.filename, path) 
 
+        print ("REceived ack: ", ack)
         if ack == 0:
             flash ("File uploaded successfully", category='success')
-            return jsonify({'status': 'ok'})
-        if ack == 1:
+        elif ack == 1:
             flash ("User not identified!", category='error')
-            return jsonify({'status': 'errorUser'})
         elif ack == 2:
             flash ("The Project does not exist!", category='error')
-            return jsonify({'status': 'errorRepoDoesNotExist'})
         elif ack == 3:
             flash ("The Project is not downloaded!", category='error') 
-            return jsonify({'status': 'errorRepoNotCloned'})
         elif ack == 4:
             flash ("Error finding file!", category='error')
-            return jsonify({'status': 'fileError'})
         elif ack == 5:
             flash ("No permissions to add file!", category='error')
-            return jsonify({'status': 'permissionError'})
         elif ack == 7:
             flash ("That file already exists in the project!", category='error')
-            return jsonify({'status': 'errorFileAlreadyExists'})
         else:
             flash ("An unexpected error occurred!", category='error')
-            return jsonify({'status': 'unexpectedError'})
-            
+        
+        return jsonify({'status': 'ok'})
 
     else:
+
         flash ("An unexpected error occurred!", category='error')
-        return jsonify({'error', 'An unexpected error occurred!'})
+        return jsonify({'status': 'ok'})

@@ -56,7 +56,7 @@ class File(db.Model):
     path = db.Column(db.String(255), nullable=False, unique=True)
     lastUpdated = db.Column(db.DateTime(timezone=True), default=func.now())
     modified = db.Column(db.Boolean, default=True, nullable=False)
-    shaHash = db.Column(db.String(64), nullable=True, unique=True)   
+    shaHash = db.Column(db.String(64), nullable=True, unique=False)   
     repository_name = db.Column(db.String(100), db.ForeignKey('repository.name'), nullable=False)
     folderPath = db.Column(db.String(255), nullable=False, unique=False) #represents the path of his father folder
     FileSystemPath = db.Column(db.String(255), nullable=True, unique=True)

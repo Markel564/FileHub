@@ -45,39 +45,22 @@ document.addEventListener("DOMContentLoaded", function () {
     // CANCEL ELIMINATION
     function PostRequestCancel() {
 
-    fetch("/home", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({type: "eliminate-cancel" }),
-    })
-    .then(function (response) {
-        if (response.ok) {
-            return response.json(); 
-        } else {
-            throw new Error("Network response was not ok");
-        }
-    })
-    .then(function (data) {
-        var errorContainer = document.getElementById("modal-content");
+
+    var errorContainer = document.getElementById("modal-content");
             
-            var state = false;
-            function toggleState() {
-                if (!state){ 
-                    errorContainer.classList.remove("modal-content");
-                    errorContainer.classList.add("hide")
-                }else{
-                    errorContainer.classList.remove("hide");
-                    errorContainer.classList.add("modal-content");
-                }
-            }
-            toggleState();
-    })
-    .catch(function (error) {
-        console.error("Fetch error", error);
-    });
+    var state = false;
+    function toggleState() {
+    if (!state){ 
+        errorContainer.classList.remove("modal-content");
+        errorContainer.classList.add("hide")
+        }
+    else{
+        errorContainer.classList.remove("hide");
+        errorContainer.classList.add("modal-content");
+        }
     }
+    toggleState();
+}
 
 
     var removeButton = document.querySelector("#remove");

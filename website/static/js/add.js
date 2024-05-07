@@ -71,14 +71,10 @@ createButton.addEventListener("click", (event) => {
         }
     })
     .then(function (data) {
-        console.log(data);
         if (data.status == "ok"){
             window.location.replace("/home");
         }
-        else if (data.status == "errorDuplicate"){
-            alert("Project name already exists");
-        }
-        else if (data.status == "errorCreation"){
+        else {
             window.location.replace("/error");
         }
     })

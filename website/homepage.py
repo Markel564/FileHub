@@ -80,50 +80,22 @@ def home():
 
             if ack == 0:
                 flash("Project deleted successfully", category='success')
-                return jsonify({"status": "ok"})
+                
             elif ack == 1:
                 flash("User not identified!", category='error')
-                return jsonify({"status": "errorUser"})
             elif ack == 2:
                 flash("The Project does not exist!", category='error')
-                return jsonify({"status": "errorRepoDoesNotExist"})
             elif ack == 3 or ack == 4:
                 flash("Error deleting Project!", category='error')
-                return jsonify({"status": "errorDB"})
             elif ack == 5:
                 flash("You do not own the Project!", category='error')
-                return jsonify({"status": "errorRepoNotOwned"})
             elif ack == 6:
                 flash("Unable to delete the Project from the file system", category='error')
-                return jsonify({"status": "errorFileSystem"})
             else:
                 flash("An unexpected error occurred!", category='error')
-                return jsonify({"status": "unexpectedError"})
-
-
-        elif type_message == "eliminate-cancel":
-            
-            # js handles cancelation (just eliminates the pop screen)
-            return jsonify({"status": "ok"})
-        
-        elif type_message == "invitations":
 
             return jsonify({"status": "ok"})
 
-        elif type_message =="add":
-
-            # js handles the redirection to /add
-            return jsonify({"status": "ok"})
-
-        elif type_message == "repo":
-          
-            repoName = data.get('repo_name')
-            repo_to_check = Repository.query.filter_by(name=repoName).first()
-
-            if repo_to_check is None:
-                return jsonify({"status": "errorNoRepo"})
-            
-            return jsonify({"status": "ok", "repoName": repoName + "/"})
 
         elif type_message == "logout":
 
@@ -134,7 +106,6 @@ def home():
             db.session.commit()
             logout_user()
 
-            
             return jsonify({"status": "ok"})
 
 

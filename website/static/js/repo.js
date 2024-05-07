@@ -14,53 +14,31 @@ const addPeopleButton = document.querySelector("#addPeopleButton");
 // function to go back to one page before
 backButton.addEventListener("click", () => {
 
-    fetch("/repo/"+folderName, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ type: "back" }),
-    })
-    .then(function (response) {
-        if (response.ok) {
-            return response.json(); 
-        } else {
-            throw new Error("Network response was not ok");
-        }
-    })
-    .then(function (data) {
-        if (data.status == "ok"){
-            // eliminate the last folder from the path
-            var path = window.location.pathname.split("/");
-            path.pop();
-            path = path.join("/");
-            // we add the final "/" to the path
-            var count = (path.match(/\//g) || []).length;
+    var path = window.location.pathname.split("/");
+    path.pop();
+    path = path.join("/");
+    // we add the final "/" to the path
+    var count = (path.match(/\//g) || []).length;
 
-            path = path + "/";
-            if (path == "/repo/"+folderName+"/"){ // if we are in the root of the repository
-                window.location.replace("/home"); 
-            }
-            // There are two cases:
-            // a) The redirection takes you to the root of the repository (path = "/repo/folderName/")
-            // b) The redirection takes you to a folder (path = "/repo/folderName/folder")
-            // The difference is that in the first case, the path has a final "/", and in the second case, it does not have it
-            // count the number of "/" in the path
-            else if (count == 2){ // option a
-                window.location.replace(path)
-            }
-            else { // option b
-                // eliminate the final "/" from the path
-                path = path.substring(0, path.length-1);
-                window.location.replace(path);
+    path = path + "/";
+    if (path == "/repo/"+folderName+"/"){ // if we are in the root of the repository
+        window.location.replace("/home"); 
+    }
+    // There are two cases:
+    // a) The redirection takes you to the root of the repository (path = "/repo/folderName/")
+    // b) The redirection takes you to a folder (path = "/repo/folderName/folder")
+    // The difference is that in the first case, the path has a final "/", and in the second case, it does not have it
+    // count the number of "/" in the path
+    else if (count == 2){ // option a
+        window.location.replace(path)
         }
-    }})
-    .catch(function (error) {
-        console.error("Fetch error:", error);
-    });
+    else { // option b
+        // eliminate the final "/" from the path
+        path = path.substring(0, path.length-1);
+        window.location.replace(path);
+    }
 
 })
-
 
 
 // function to search for a folder or file
@@ -280,7 +258,6 @@ document.getElementById('file-input').addEventListener('change', function(e) {
             }
         })
         .then(function (data) {
-            console.log("DATA", data)
             if (data.status == "ok"){
                 window.location.reload();
             }
@@ -304,49 +281,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
     synchronizeButton.addEventListener("click", () => {
 
-        fetch("/repo/" + repoName + "/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({type: "clone-request", repoName: repoName}),
-        })
-        .then(function (response) {
-            if (response.ok) {
-                return response.json(); 
-            } else {
-                throw new Error("Network response was not ok");
-            }
-        })
-        .then(function (data) {
-
-            if (data.status == "ok"){
-
-                var errorContainer = document.getElementById("modal-content");
+        var CloneContainertainer = document.getElementById("modal-content");
                 var state = false; 
                 function toggleState() {
                             
                     if (state){ // if state is true, then hide the modal
-                        errorContainer.classList.remove("modal-content");
-                        errorContainer.classList.add("hide")
+                        CloneContainertainer.classList.remove("modal-content");
+                        CloneContainertainer.classList.add("hide")
                     }else{
-                        errorContainer.classList.remove("hide");
-                        errorContainer.classList.add("modal-content");
+                        CloneContainertainer.classList.remove("hide");
+                        CloneContainertainer.classList.add("modal-content");
                     }
-                }
-                        
+                }                     
                 toggleState();
-            }
-            else{
-                window.location.reload();
-            }
-        })
-        .catch(function (error) {
-            console.error("Fetch error:", error);
-        });
-
     });
-
 });
 
 
@@ -381,6 +329,8 @@ refreshGitHubButton.addEventListener("click", () => {
     .then(function (data) {
         if (data.status == "ok"){
             window.location.reload();
+        } else{
+            window.location.reload();
         }
 
     })
@@ -414,7 +364,6 @@ refreshFileSystemButton.addEventListener("click", () => {
         }else{
             window.location.reload();
         }
-
     })
     .catch(function (error) {
         console.error("Fetch error:", error);
@@ -513,88 +462,11 @@ document.addEventListener("DOMContentLoaded", function () {
 // Function to open window to create folder
 newFolderButton.addEventListener("click", () => {
 
-    let path = window.location.pathname;
-    path = path.substring(6);
-    path = path.substring(repoName.length);
-    path = path.substring(1);
-    if (path[path.length-1] != "/"){
-        path = path + "/";
-    }
+    var folderWindow = document.getElementById("modal-folder");
 
-    fetch("/repo/"+ repoName + "/",{
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ type: "new-folder-request", repoName: repoName, folderPath: path}),
-    })
-    .then(function (response) {
-        if (response.ok) {
-            return response.json(); 
-        } else {
-            throw new Error("Network response was not ok");
-        }
-    })
-    .then(function (data) {
-        
-        var folderWindow = document.getElementById("modal-folder");
+    folderWindow.classList.remove("hide");
+    folderWindow.classList.add("modal-folder");
 
-        if (data.status == "ok"){
-            folderWindow.classList.remove("hide");
-            folderWindow.classList.add("modal-folder");
-        }
-    })
-    .catch(function (error) {
-        console.error("Fetch error:", error);
-    });
-});
-
-
-// Function to open a file by clicking it
-document.addEventListener("DOMContentLoaded", function () {
-
-    var files = document.querySelectorAll("#file");
-
-    files.forEach(function (file) {
-
-        file.addEventListener("click", function () {
-
-            
-            var fileName = this.getAttribute("name");
-            let path = window.location.pathname;
-            path = path.substring(6);
-            path = path.substring(repoName.length);
-            path = path.substring(1);
-            if (path[path.length-1] != "/"){
-                path = path + "/";
-            }
-
-            fetch("/repo/"+ repoName + "/",{
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ type: "open-file", repoName: repoName, folderPath: path, fileName: fileName}),
-            })
-            .then(function (response) {
-                if (response.ok) {
-                    return response.json(); 
-                } else {
-                    throw new Error("Network response was not ok");
-                }
-            })
-            .then(function (data) {
-                if (data.status == "ok"){
-                    window.location.reload();
-                }else{
-                    window.location.reload();
-                }
-            })
-            .catch(function (error) {
-                console.error("Fetch error:", error);
-            });
-        });
-    });
 });
 
 
@@ -619,8 +491,6 @@ addPeopleButton.addEventListener("click", () => {
     
         if (data.status == "ok"){
             
-            // send the user to the url in data.url
-            console.log(data.url);
             window.location.replace(data.url);
         }else{
             window.location.reload();

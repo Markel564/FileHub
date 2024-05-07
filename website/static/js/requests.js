@@ -39,15 +39,12 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             toggleState();
 
-            if (data.status == "ok"  || data.status == "error"){
-                window.location.href = window.location.href;
-            }
-            else{
-                
-                window.location.href = window.location.href;
-                
-            }
-            
+            if (data.status == "ok"){
+                window.location.reload();
+            }  
+            else{ 
+                window.location.reload();       
+            }       
         })
         .catch(function (error) {
             console.error("Fetch error for clonation:", error);
@@ -56,48 +53,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // CANCEL CLONATION
     function PostRequestCancel() {
-            fetch("/repo/" + repoName + "/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({type: "clone-cancel"}),
-            })
-            .then(function (response) {
-                if (response.ok) {
-                    return response.json(); 
-                } else {
-                    throw new Error("Network response was not ok");
+        var errorContainer = document.getElementById("modal-content");
+            
+            var state = false;
+            function toggleState() {
+                if (!state){ 
+                    errorContainer.classList.remove("modal-content");
+                    errorContainer.classList.add("hide")
+                }else{
+                    errorContainer.classList.remove("hide");
+                    errorContainer.classList.add("modal-content");
                 }
-            })
-            .then(function (data) {
-                console.log(data);
-                var errorContainer = document.getElementById("modal-content");
-                    
-                    var state = false;
-                    function toggleState() {
-                        if (!state){ 
-                            errorContainer.classList.remove("modal-content");
-                            errorContainer.classList.add("hide")
-                        }else{
-                            errorContainer.classList.remove("hide");
-                            errorContainer.classList.add("modal-content");
-                        }
-                    }
-                toggleState();
-                if (data.status == "ok"){
-                    
-                }
-                if (data.status == "errorAlreadyCloned"){
-                    alert("The repository is already cloned");
-                    
-                }
-            })
-            .catch(function (error) {
-                console.error("Fetch error for clonation:", error);
-            });
-        }
-
+            }
+        toggleState();
+    }
     var acceptButton = document.getElementById("ok-clone");
     var backButton = document.getElementById("back-clone");
 
@@ -167,39 +136,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function PostRequestCancelFolder() {
 
-        fetch("/repo/" + repoName + "/", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({type: "cancel-folder"}),
-        })
-        .then(function (response) {
-            if (response.ok) {
-                return response.json(); 
-            } else {
-                throw new Error("Network response was not ok");
-            }
-        })
-        .then(function (data) {
-            folderWindow = document.getElementById("modal-folder");
+        folderWindow = document.getElementById("modal-folder");
 
-            var state = false;
-            function toggleState() {
-                if (!state){ 
-                    folderWindow.classList.remove("modal-folder");
-                    folderWindow.classList.add("hide")
-                }else{
-                    folderWindow.classList.remove("hide");
-                    folderWindow.classList.add("modal-folder");
-                }
+        var state = false;
+        function toggleState() {
+            if (!state){ 
+                folderWindow.classList.remove("modal-folder");
+                folderWindow.classList.add("hide")
+            }else{
+                folderWindow.classList.remove("hide");
+                folderWindow.classList.add("modal-folder");
             }
-            toggleState();
-        })
-        .catch(function (error) {
-            console.error("Fetch error for creating a folder:", error);
-        });
+        }
+        toggleState();
     }
+        
 
     var acceptButton = document.getElementById("ok-folder");
     var backButton = document.getElementById("back-folder");

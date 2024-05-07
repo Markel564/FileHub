@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, flash, request, jsonify, session
 from . import db
 from .models import User, Repository
-from .pythonCode import get_collaborators, eliminate_collaborator
+from .pythonCode import get_collaborators, eliminate_collaborator, add_collaborator
 from flask_login import login_required
 
 
@@ -27,7 +27,6 @@ def collaboration(repoName):
 
         else:
             
-            print ("POST")
             data = request.get_json()  
         
             if data is None: # if no data was sent
@@ -51,7 +50,35 @@ def collaboration(repoName):
 
                 if ack == 0:
                     flash("Collaborator removed", "success")
+                elif ack == 1:
+                    flash("User not found", "error")
+                elif ack == 2:
+                    flash("You can't remove the owner of the repository", "error")
                 else:
                     flash("Error removing collaborator", "error")
 
                 return jsonify({"status": "ok"})
+            
+            elif type_message == "add":
+
+                repoName, collaboration, isAdmin, isWriter, isReader = data.get('repoName'), data.get('collaboratorName'), data.get('admin'), data.get('writer'), data.get('reader')
+                
+                ack = add_collaborator(repoName, collaboration, isAdmin, isWriter, isReader)
+
+                if ack == 0:
+                    flash ("Collaborator invited", "success")
+                elif ack == 1:
+                    flash ("User not found", "error")
+                elif ack == 2:
+                    flash ("No role was selected", "error")
+                elif ack == 3:
+                    flash ("You can't add yourself as a collaborator", "error")
+                elif ack == 4:
+                    flash ("Please select only 1 role", "error")
+                elif ack == 5:
+                    flash ("Collaborator already exists", "error")
+                else:
+                    flash ("Error inviting collaborator", "error")
+                
+                return jsonify({"status": "ok"})
+                

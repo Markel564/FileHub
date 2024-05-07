@@ -37,29 +37,7 @@ searchInput.addEventListener("input", (e) => {
 
 // function to add a repository
 addRepoButton.addEventListener("click", () => {
-    // Create a POST request
-    fetch("/home", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ type: "add" }),
-    })
-    .then(function (response) {
-        if (response.ok) {
-            return response.json(); 
-        } else {
-            throw new Error("Network response was not ok");
-        }
-    })
-    .then(function (data) {
-        if (data.status == "ok"){
-            window.location.replace("/add");
-        }
-    })
-    .catch(function (error) {
-        console.error("Fetch error:", error);
-    });
+    window.location.replace("/add");
 });
 
 
@@ -126,29 +104,7 @@ repositories.forEach(repository => {
     repository.addEventListener("click", () => {
         // obtain the repository name
         const repositoryName = repository.textContent.trim();
-        fetch("/home", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({type: "repo", repo_name: repositoryName }),
-        })
-        .then(function (response) {
-            if (response.ok) {
-                return response.json(); 
-            } else {
-                throw new Error("Network response was not ok");
-            }
-        }).then(function (data) {
-            repoName = data.repoName;
-            if (data.status == "ok"){
-                console.log("Success");
-                window.location.replace("/repo/"+repoName);
-            }
-            else{
-                console.log("Error");
-            }
-        })
+        window.location.replace("/repo/"+repositoryName+"/");
     });
 });
 
@@ -157,27 +113,7 @@ repositories.forEach(repository => {
 
 viewInvitations.addEventListener("click", () => {
 
-    fetch("/home", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({type: "invitations"}),
-    })
-    .then(function (response) {
-        if (response.ok) {
-            return response.json(); 
-        } else {
-            throw new Error("Network response was not ok");
-        }
-    }).then(function (data) {
-        if (data.status == "ok"){
-            window.location.replace("/invitations");
-        }
-        else{
-            console.log("Error");
-        }
-    })
+    window.location.replace("/invitations");
 });
 
 
@@ -202,7 +138,7 @@ logoutButton.addEventListener("click", () => {
             window.location.replace("/");
         }
         else{
-            console.log("Error");
+            window.location.reload();
         }
     })
 });
