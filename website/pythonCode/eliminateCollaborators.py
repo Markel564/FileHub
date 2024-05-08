@@ -43,12 +43,10 @@ def eliminate_collaborator(repo, collaborator):
         if response.status_code != 204:
             return 2
         
-        print("Collaborator removed")
         return 0
         
     except Exception as e:
         
-        print(e)
         return 3
 
 

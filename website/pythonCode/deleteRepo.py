@@ -72,7 +72,6 @@ def delete_repo():
         db.session.delete(repo)
         # eliminate associated files and folders of the db
 
-        print (f"Repo {repo_name} deleted from the database")
         db.session.commit()
 
         # remove the repo to be deleted from the session
@@ -85,9 +84,7 @@ def delete_repo():
         return 3
     
     except SQLAlchemyError as e:
-        print(e)
         return 4
     
     except Exception as e:
-        print(e)
         return 7

@@ -75,7 +75,6 @@ def clone_repo(repoName, path):
         clone_url = repo['clone_url']
         
         # clone the repository
-        print (f"Cloning {repoName} to {path + repoName}")
         Repo.clone_from(clone_url, path + repoName)
         
         # update the database adding the path and the cloned status
@@ -93,11 +92,9 @@ def clone_repo(repoName, path):
 
 
     except github.GithubException as e:
-        print (f"Github exception: {e}")
         return 7
 
     except Exception as e:
-        print (f"An unexpected error occurred: {e}")
         return 8
 
 
@@ -164,18 +161,14 @@ def doesPathExist(path):
 
 def permissions(path):
     if not os.access(path, os.R_OK):
-        print ("Not readable")
         return False
     if not os.access(path, os.W_OK):
-        print ("Not writable")
         return False
     if not os.access(path, os.X_OK):
-        print ("Not executable")
         return False
     return True
 
 def isDirectory(path):
     if not os.path.isdir(path):
-        print ("Not a directory")
         return False
     return True

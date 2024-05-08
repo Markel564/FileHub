@@ -36,7 +36,7 @@ def load_files_and_folders(repoName, path=""):
     """
     user_id = session.get('user_id')
     userDB = User.query.filter_by(id=user_id).first()
-
+    
     # if the user is not in the database, return False
     if not userDB:
         return 1
@@ -95,7 +95,6 @@ def load_files_and_folders(repoName, path=""):
                     # given that there is an issue with last_modified attribute (see https://github.com/PyGithub/PyGithub/issues/629)
                     # we will see the most recent commit of the file and get the last modified date from there
 
-                    print (f"File {content_file['name']} not in db")
                     last_modified = get_last_modified(content_file['path'], repoName, owner, userDB.githubG)
                     
                     # the folder path is the path of the file without the file name
@@ -104,15 +103,12 @@ def load_files_and_folders(repoName, path=""):
                     file = File(name=content_file['name'], repository_name=repoName, lastUpdated=last_modified, 
                     modified=False, path=str(repoName+'/'+content_file['path']), folderPath=folder_path)
 
-                    print (f"Created file with file.path: {file.path} and file.folderPath: {file.folderPath} with last updated date {file.lastUpdated}")
-
                     db.session.add(file)
 
 
                     # also, if the repository is cloned, we have to add the file to the file system
 
                     if repository.isCloned:
-                        print ("REPO CLONED")
                         # there is a chance that the new file belongs to a folder which we did not have in the database
                         directory_path = str(repository.FileSystemPath + repoName + "/" + content_file['path'])
                         directory = os.path.dirname(directory_path)
@@ -149,13 +145,11 @@ def load_files_and_folders(repoName, path=""):
                     
                 else: # if the file is already in db, check if it has been updated and change modified to True if it has
                     
-                    print (f"File {content_file['name']} in db")
                     last_commit_utc = get_last_modified(content_file['path'], repoName, owner, userDB.githubG)
                     last_commit_str = last_commit_utc.strftime("%Y-%m-%d %H:%M:%S")
 
                     file_last_updated_utc = file.lastUpdated.replace(tzinfo=None).strftime("%Y-%m-%d %H:%M:%S")
 
-                    print (f"Last commit: {last_commit_str} and last updated: {file_last_updated_utc}")
                     if file_last_updated_utc != last_commit_str: # if the file has been updated
                         file.modified = True
                         file.lastUpdated = last_commit_utc
@@ -229,7 +223,6 @@ def load_files_and_folders(repoName, path=""):
                     folder = Folder(name=content_file['name'], repository_name=repoName, 
                     lastUpdated=last_modified, modified=False, path=str(repoName+'/'+ content_file['path']), folderPath=folder_path) 
 
-                    print (f"Created folder with folder.path: {folder.path} and folder.folderPath: {folder.folderPath}")
                     db.session.add(folder)
                     # the last updated date of the repository will be the last updated date of the file
                 
@@ -322,15 +315,12 @@ def load_files_and_folders(repoName, path=""):
         return 0
         
     except github.GithubException as e: 
-        print (e)
         return 4
     
     except SQLAlchemyError as e:
-        print (e)
         return 5
     
     except Exception as e:
-        print (e)
         return 6
 
 
@@ -405,7 +395,6 @@ def get_last_modified(path, repoName, owner, token):
 
 
     except Exception as e:
-        print (e)
         return None
 
 

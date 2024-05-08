@@ -131,33 +131,15 @@ def commit_changes(repoName, folderpath):
                 
                 db.session.commit()
 
-
-        # also, we will delete the folders that the user deleted
-        # it is not necessary to 'commit' the folder
-
-        # for folder in repoDB.repository_folders:
-
-        #     if folder.deleted:
-        #         db.session.delete(folder)
-            
-        #     if not folder.deleted:
-        #         folder.addedFirstTime = False
-        #         folder.modified = False
-
-
         db.session.commit()
         return 0
 
     except FileNotFoundError as e:
-        print(e)
         return 4
 
     except github.GithubException as e:
-        print(e)
-        
         return 5
         
     except Exception as e:
-        print(e)
         return 6
     

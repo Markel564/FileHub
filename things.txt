@@ -18,3 +18,5 @@ dropzone solo me deja algunos documentos
 hay problema si repo esta vacio
 
 shaHash puede ser no unico porque puedes el mismo archivos en distintas carpetas
+
+un usuario que modifique un repo, se verá reflejado en el otro

@@ -51,9 +51,7 @@ def get_repos():
         return repo_names
     
     except github.GithubException as e:
-        print(e)
         return False
 
     except Exception as e:
-        print(e)
         return False

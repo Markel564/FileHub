@@ -92,7 +92,6 @@ def check_file_system(repo):
         
         # second, we have to check for modifications in the files that are already in the database
         for file_repo in repo.repository_files:
-            print (f"File path: {file_repo.FileSystemPath} for file {file_repo.name}")
             file = File.query.filter_by(path=file_repo.path).first()
         
             hash_of_file = sign_file(file.FileSystemPath)   
@@ -134,14 +133,12 @@ def check_file_system(repo):
         for folder in Folder.query.filter_by(repository_name=repo.name).all():
 
             # check if the folder's path exists in the file system
-            print (f"Folder path: {folder.FileSystemPath} for folder {folder.name}")
 
             if not os.path.exists(folder.FileSystemPath):
 
                 # if the folder is no longer in the file system, it means we must eliminate it from the database
                 # regardless of whether it is renamed or deleted completely, we will delete it by putting
                 # the attribute deleted to True, and later when the user commits the changes, we will delete it from the database
-                print (f"Folder {folder.name} has been deleted")
                 folder.deleted = True
 
                 # we will put these files as deleted as well
@@ -160,14 +157,12 @@ def check_file_system(repo):
                 update_dates(father_dir, repo.name)
                 db.session.commit()
             
-
         return 0
 
     except SQLAlchemyError as e:
-        print(e)
         return 5
+
     except Exception as e:
-        print(e)
         return 6
 
 
@@ -177,7 +172,6 @@ def update_dates(father_dir, repo_name):
 
     
     while father_dir != repo.name + "/":
-        print(f"Father dir: {father_dir} and repo name: {repo.name}")
         folder = Folder.query.filter_by(path=father_dir[:-1], repository_name=repo.name).first()
         folder.lastUpdated = datetime.now()
         father_dir = father_dir.rsplit("/",2)[0] + "/"

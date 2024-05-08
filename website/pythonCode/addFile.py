@@ -23,15 +23,16 @@ def add_file(repoName, file_name, file_path):
 
     if not repo.isCloned:
         return 3
-    try:
 
-        if file_path[0] != "/":
+
+    if file_path[0] != "/":
             file_path = "/" + file_path
 
-        path = str(repo.name + file_path + file_name)
-        folder_path = str(repo.name + file_path)
+    path = str(repo.name + file_path + file_name)
+    folder_path = str(repo.name + file_path)
 
-
+    try:
+    
         with open("./uploads/"+file_name, 'rb') as file:
             content = file.read()
 
@@ -57,13 +58,11 @@ def add_file(repoName, file_name, file_path):
         if path in [f.path for f in repo.repository_files]: # if the file is already in the repository (same place)
             
             f = File.query.filter_by(path=path).first()
-            print (f" File {file.name} is already in the repository, with deleted = {f.deleted}")
             if f.deleted: # if the file was deleted, we will delete the file from the database and add the new one
                 db.session.delete(f)
                 db.session.commit()
             else:
                 return 7 # the file is already in the repository, and in the same location (plus, not deleted)
-
 
         
         db.session.add(file)
@@ -95,7 +94,7 @@ def add_file(repoName, file_name, file_path):
                 return 4
         db.session.commit()
 
-            
+   
         return 0
 
     except FileNotFoundError as e:

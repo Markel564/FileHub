@@ -27,15 +27,15 @@ def create_folder(repoName,folder_name, path):
 
     if folder is not None:
         return 4
-    
+
+    # for folder path, we select the part of the path that is not the folder name itself
+    folderPath = path[:-len(folder_name)] 
+
     try:
-        
-        # for folder path, we select the part of the path that is not the folder name itself
-        folderPath = path[:-len(folder_name)] 
+          
         folder = Folder(name=folder_name, repository_name=repo.name,  path = path, lastUpdated = datetime.now(), modified = True,
         folderPath=folderPath, FileSystemPath=repo.FileSystemPath + path, addedFirstTime=True)
 
-        print (f"Folder with path {path} and folderpath: {folderPath}")
         repo.lastUpdated = datetime.now() # update the last updated date of the repository
         # we also have to update the dates of the folders where the folder is located
 
@@ -43,7 +43,6 @@ def create_folder(repoName,folder_name, path):
 
         while folderPath != repo.name+"/":
             
-            print (f"Folders: {folderPath} updated")
             # open all the folders that have that folder_path as their path
             fatherFolder = Folder.query.filter_by(path=folderPath[:-1], repository_name=repo.name).first()
 
@@ -71,7 +70,6 @@ def create_folder(repoName,folder_name, path):
         return 6
 
     except Exception as e:
-        print (e)
         return 7
 
 

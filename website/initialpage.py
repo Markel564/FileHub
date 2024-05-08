@@ -35,7 +35,6 @@ def create_token():
                     flash("An unexpected error occurred!", category='error')
                 
                 else:
-                    flash("User identified successfully", category='success')
                     user_id = session.get('user_id')
                     user = User.query.filter_by(id=user_id).first()
                     login_user(user) # login the user     

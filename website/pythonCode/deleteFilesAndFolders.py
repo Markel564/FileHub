@@ -46,7 +46,6 @@ def delete_file(repo, path, name):
         # as if not, it will stay there, and will be recognized as a deleted file when the user commits the changes
         # when it does not in fact exist in the file system
 
-        print (f"File added for the first time: {file.addedFirstTime}")
         if file.addedFirstTime:
             db.session.delete(file)
             db.session.commit()
@@ -65,7 +64,6 @@ def delete_file(repo, path, name):
         
         file.deleted = True
         file.modified = False # the file is not modified anymore
-        print (f"File deleted set to: {file.deleted}")
         # also, the repositories lastUpdated field is updated
         repoDB.lastUpdated = datetime.now()
 
@@ -88,14 +86,12 @@ def delete_file(repo, path, name):
         if os.path.exists(file.FileSystemPath):
             os.remove(file.FileSystemPath)
 
-        print (f"File deleted set to: {file.deleted}")
         db.session.commit()
 
         return 0
 
         
     except Exception as e:
-        print (e)
         return 6
 
 
@@ -131,17 +127,12 @@ def delete_folder(repo, path, name):
 
         # if the folder was added for the first time (it is not in GitHub), we can delete it from the database 
         if folder.addedFirstTime:
-            print ("Folder added for the first time")
             db.session.delete(folder)
 
             subfolders = Folder.query.filter_by(folderPath=folder.path+"/%").all()
             files = File.query.filter(File.folderPath.like(folder.path + "/%")).all()
 
-            print (f"Subfolders: {subfolders}")
-            print (f"Files: {files}")
-
             for f in files:
-                print (f"File: {f}")
                 f.deleted = True # set the file as deleted, and not deleted from the database until the user commits the changes
                 f.modified = False # the file is not modified anymore
 
@@ -181,10 +172,8 @@ def delete_folder(repo, path, name):
         subfolders = Folder.query.filter_by(folderPath=folder.path+"/%").all()
         files = File.query.filter(File.folderPath.like(folder.path + "/%")).all()
 
-        print (f"Subfolders: {subfolders}")
 
         for f in files:
-            print (f"File: {f}")
             f.deleted = True # set the file as deleted, and not deleted from the database until the user commits the changes
             f.modified = False # the file is not modified anymore
 
@@ -202,5 +191,4 @@ def delete_folder(repo, path, name):
         return 0
 
     except Exception as e:
-        print (e)
         return 6

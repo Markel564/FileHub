@@ -34,5 +34,4 @@ def get_invitations():
 
         return invites
     except Exception as e:
-        print(e)
         return 2

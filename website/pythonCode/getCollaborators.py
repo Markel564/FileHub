@@ -49,8 +49,7 @@ def get_collaborators(repo):
         collaborators = []
 
         for collaborator in collabs:
-            
-            print (collaborator['login'])
+
             permissions = collaborator['permissions']
 
             isAdmin, isWrite, isRead = permissions.get('admin'), permissions.get('push'), permissions.get('pull')
@@ -88,5 +87,4 @@ def get_collaborators(repo):
 
         
     except Exception as e:
-        print (f"Error is {e}")
         return 3
