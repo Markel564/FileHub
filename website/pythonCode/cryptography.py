@@ -4,8 +4,10 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import os
+import random
+import string
 
-# Generar una clave de cifrado segura
+# generate a secure encryption key
 def generate_key(password: str, salt: bytes) -> bytes:
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
@@ -16,15 +18,17 @@ def generate_key(password: str, salt: bytes) -> bytes:
     )
     return kdf.derive(password.encode())
 
-# Cifrar el token
+# Encrypt the token
 def encrypt_token(token: str, key: bytes) -> (bytes, bytes):
-    iv = os.urandom(12)  # Genera un vector de inicialización (nonce) aleatorio
+    iv = os.urandom(12)  
     cipher = Cipher(algorithms.AES(key), modes.GCM(iv), backend=default_backend())
     encryptor = cipher.encryptor()
-    encrypted_token = encryptor.update(token.encode()) + encryptor.finalize()
+    token_bytes = token.encode('utf-8')
+    encrypted_token = encryptor.update(token_bytes) + encryptor.finalize()
+
     return encrypted_token, iv, encryptor.tag
 
-# Desencriptar el token
+# Decrypt the token
 def decrypt_token(encrypted_token: bytes, key: bytes, iv: bytes, tag: bytes) -> str:
     cipher = Cipher(algorithms.AES(key), modes.GCM(iv, tag), backend=default_backend())
     decryptor = cipher.decryptor()
@@ -33,8 +37,7 @@ def decrypt_token(encrypted_token: bytes, key: bytes, iv: bytes, tag: bytes) -> 
 
 # Ejemplo de uso
 
-import random
-import string
+
 if __name__ == "__main__":
     # contraseña aleatoria
     password = "".join(random.choice(string.ascii_letters) for i in range(16))

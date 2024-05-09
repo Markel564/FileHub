@@ -8,16 +8,17 @@ from flask import session
 import os
 from sqlalchemy.exc import SQLAlchemyError
 import base64
+from .getToken import get_token
+
 
 
 
 def commit_changes(repoName, folderpath):
     
-    user_id = session.get('user_id')
-    userDB = User.query.filter_by(id=user_id).first()
+    token = get_token()
 
-    if not userDB:
-        return 1
+    if not token:
+        return False
     
     repoDB = Repository.query.filter_by(name=repoName).first()
 
@@ -29,7 +30,7 @@ def commit_changes(repoName, folderpath):
     
     try:
         
-        g = github.Github(userDB.githubG)
+        g = github.Github(token)
         user = g.get_user()
 
         repositories = user.get_repos()
@@ -43,7 +44,7 @@ def commit_changes(repoName, folderpath):
         base_url = f"https://api.github.com/repos/{owner}/{repoName}"
 
         headers = {
-            'Authorization': f'token {userDB.githubG}',
+            'Authorization': f'token {token}',
             'Accept': 'application/vnd.github.v3+json'
         }
 

@@ -20,3 +20,4 @@ hay problema si repo esta vacio
 shaHash puede ser no unico porque puedes el mismo archivos en distintas carpetas
 
 un usuario que modifique un repo, se verá reflejado en el otro
+no puedo guardar en os.environ porque cuando se produce un error, se pierde

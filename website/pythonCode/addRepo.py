@@ -11,6 +11,8 @@ import yaml
 from flask import session
 from datetime import datetime
 from sqlalchemy.exc import SQLAlchemyError
+from .getToken import get_token
+
 
 
 
@@ -26,13 +28,11 @@ def add_repo(project_name, project_description, isPrivate=False):
     This function adds the repo to github account and database
     """
 
-    # obtain the user's id from the session
-    user_id = session.get('user_id')
-    user = User.query.filter_by(id=user_id).first()
+    # obtain the user's token
+    token = get_token()
 
-    # if the user is not in the database, return False
-    if not user:
-        return 1
+    if not token:
+        return False
 
     # check if there are other repos with the same name
     repo = Repository.query.filter_by(name=project_name).first()
@@ -43,7 +43,7 @@ def add_repo(project_name, project_description, isPrivate=False):
     try:
 
         # authenticate the user
-        g = github.Github(user.githubG)
+        g = github.Github(token)
         user = g.get_user()
 
         # create the repository (with project name, description and private/public)

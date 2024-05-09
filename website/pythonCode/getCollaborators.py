@@ -7,19 +7,20 @@ from flask import session
 import os
 from .reformatDate import change_format_date
 import requests
+from .getToken import get_token
 
 
 def get_collaborators(repo):
 
-    user_id = session.get('user_id')
-    userDB = User.query.filter_by(id=user_id).first()
-    
-    if not userDB:
+    token = get_token()
+
+    if not token:
+        print ("Token not found")
         return 1
 
     try:
         
-        g = github.Github(userDB.githubG)
+        g = github.Github(token)
         user = g.get_user()
         # obtain the owner of the repository
         repositories = user.get_repos()
@@ -32,16 +33,18 @@ def get_collaborators(repo):
         # URL for the list of collaborators in the repository
         url = f"https://api.github.com/repos/{owner}/{repo}/collaborators"
 
-
+        print (url)
         # Headers with the authorization token
         headers = {
-            "Authorization": f"token {userDB.githubG}",
+            "Authorization": f"token {token}",
             "Accept": "application/vnd.github.v3+json"
         }
 
+        print (headers)
         # Make the request to the GitHub API
         response = requests.get(url, headers=headers)
 
+        print (response.status_code)
         if response.status_code != 200:
             return 2
             
@@ -71,8 +74,9 @@ def get_collaborators(repo):
         response = requests.get(url_invitations, headers=headers)
         invitations = response.json()
 
+        print (response.status_code)
         if response.status_code != 200:
-            return 2
+            return collaborators # return the collaborators that were found. It could be that the user does not have permission to see the invitations
 
 
         for invitation in invitations:
@@ -87,4 +91,5 @@ def get_collaborators(repo):
 
         
     except Exception as e:
+        print (e)
         return 3

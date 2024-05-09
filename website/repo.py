@@ -450,6 +450,7 @@ def repo(subpath):
         elif type_message == "add-people":
             
             repoName = data.get('repoName')
+            print ("Redirecting to the collaboration page")
             return jsonify({"status": "ok", "url": url_for('collabPage.collaboration', repoName=repoName)})
 
             

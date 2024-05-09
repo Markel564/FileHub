@@ -4,20 +4,19 @@ import github
 import yaml
 from flask import session
 import requests
-
+from .getToken import get_token
+from github import GithubException
 
 def handle_invitation(repoName, owner, action):
 
-    user_id = session.get('user_id')
-    userDB = User.query.filter_by(id=user_id).first()
+    token = get_token()
 
-    if not userDB:
+    if not token:
         return 1
 
     try:
 
-        # g = github.Github(user.githubG)
-        g = Github(userDB.githubG)
+        g = Github(token)
         user = g.get_user()
 
 
@@ -32,7 +31,7 @@ def handle_invitation(repoName, owner, action):
         url = f"https://api.github.com/user/repository_invitations/{id}"
 
         headers = {
-            "Authorization": f"token {userDB.githubG}",
+            "Authorization": f"token {token}",
             "Accept": "application/vnd.github.v3+json"
         }
 

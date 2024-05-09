@@ -5,20 +5,20 @@ import github
 import yaml
 from flask import session
 import requests
+from .getToken import get_token
+
 
 
 def eliminate_collaborator(repo, collaborator):
 
-    user_id = session.get('user_id')
-    
-    userDB = User.query.filter_by(id=user_id).first()
-    
-    if not userDB:
+    token = get_token()
+
+    if not token:
         return 1
 
     try:
         
-        g = github.Github(userDB.githubG)
+        g = github.Github(token)
         user = g.get_user()
         # obtain the owner of the repository
         repositories = user.get_repos()
@@ -34,7 +34,7 @@ def eliminate_collaborator(repo, collaborator):
         url = f"https://api.github.com/repos/{owner}/{repo}/collaborators/{collaborator}"
 
         headers = {
-            "Authorization": f"token {userDB.githubG}",
+            "Authorization": f"token {token}",
             "Accept": "application/vnd.github.v3+json"
         }
 

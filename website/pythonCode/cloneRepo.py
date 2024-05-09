@@ -8,15 +8,16 @@ from git import Repo
 from .getHash import sign_file
 from sqlalchemy.exc import SQLAlchemyError
 import requests
+from .getToken import get_token
+
 
 
 
 def clone_repo(repoName, path):
 
-    user_id = session.get('user_id')
-    userDB = User.query.filter_by(id=user_id).first()
+    token = get_token()
 
-    if not userDB:
+    if not token:
         return 1
 
     repo = Repository.query.filter_by(name=repoName).first()
@@ -46,7 +47,7 @@ def clone_repo(repoName, path):
         return 6
 
     try:
-        g = github.Github(userDB.githubG)
+        g = github.Github(token)
         user = g.get_user()
 
         # obtain the owner
@@ -61,21 +62,24 @@ def clone_repo(repoName, path):
         url = f"https://api.github.com/repos/{owner}/{repoName}"
 
         headers = { 
-            "Authorization": f"token {userDB.githubG}",
+            "Authorization": f"token {token}",
             "Accept": "application/vnd.github.v3+json"
         }
 
         response = requests.get(url, headers=headers)
         
+        print (response.status_code)
+        print ("URL: ", url)
         if response.status_code != 200:
             return 7
         
         repo = response.json()
 
         clone_url = repo['clone_url']
-        
+        print (f"Clone URL: {clone_url}")
         # clone the repository
         Repo.clone_from(clone_url, path + repoName)
+
         
         # update the database adding the path and the cloned status
         repoDB = Repository.query.filter_by(name=repoName).first()
@@ -92,9 +96,11 @@ def clone_repo(repoName, path):
 
 
     except github.GithubException as e:
+        print (e)
         return 7
 
     except Exception as e:
+        print (e)
         return 8
 
 

@@ -22,11 +22,11 @@ def validate_token(token):
         }
 
         response = requests.get(url, headers=headers)
-
+        print (response.status_code)
         if response.status_code != 200:
             return False
         return True
 
     except Exception as e:
-
+        print ("In validate token", e)
         return False

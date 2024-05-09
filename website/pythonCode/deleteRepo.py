@@ -13,6 +13,8 @@ import yaml
 from flask import session
 from sqlalchemy.exc import SQLAlchemyError
 import shutil
+from .getToken import get_token
+
 
 
 def delete_repo():
@@ -41,7 +43,12 @@ def delete_repo():
     try:
 
         # authenticate the user
-        g = github.Github(user.githubG)
+        token = get_token()
+
+        if not token:
+            return False
+
+        g = github.Github(token)
         user = g.get_user()
         
         repositories = user.get_repos()

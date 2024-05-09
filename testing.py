@@ -47,6 +47,7 @@ if __name__ == "__main__":
     # Token original
     token = "mi_token_secreto"
 
+    print (type(token), type(key))
     # Cifrar el token
     encrypted_token, iv, tag = encrypt_token(token, key)
     print("Token cifrado:", encrypted_token)

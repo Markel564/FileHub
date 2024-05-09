@@ -6,18 +6,19 @@ import yaml
 from flask import session
 import os
 from .reformatDate import change_format_date
+from .getToken import get_token
+
 
 
 
 def get_invitations():
-    user_id = session.get('user_id')
-    user = User.query.filter_by(id=user_id).first()
+    token = get_token()
 
-    if not user:
+    if not token:
         return 1
 
     try:
-        g = Github(user.githubG)
+        g = Github(token)
         user = g.get_user()
 
         invitations = user.get_invitations()

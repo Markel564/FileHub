@@ -15,6 +15,7 @@ from . import db
 from .models import User, Repository
 from .pythonCode import add_user, get_repos, delete_repo
 from flask_login import login_required, logout_user
+import os
 
 
 homePage = Blueprint('homePage', __name__)
@@ -27,20 +28,6 @@ homePage = Blueprint('homePage', __name__)
 def home():
 
     if request.method == 'GET':
-        
-        ack = add_user()
-
-        if ack == 0: # user added successfully
-            pass
-            
-        elif ack == 1: # user not identified
-            flash("User not identified!", category='error')
-        elif ack == 2: # error with database
-            flash("Error identifying user!", category='error')
-        elif ack == 3:
-            flash("Error loading projects from GitHub", category='error')
-        else:
-            flash("An unexpected error occurred!", category='error')
              
         # get the user from the database
         user_id = session.get('user_id')
@@ -50,6 +37,7 @@ def home():
         repositories = get_repos()
 
         if not repositories:
+            print ("Error getting repos")
             return render_template("error.html")
         
         # render template with the user's name, photo and repositories
@@ -102,6 +90,10 @@ def home():
             session.pop('user_id', None)
             session.pop('repo_to_remove', None)
             session.pop('token', None)
+            session.pop('key', None)
+            session.pop('iv', None)
+            session.pop('tag', None)
+            print ("User logged out")
 
             db.session.commit()
             logout_user()

@@ -4,6 +4,8 @@ import github
 import yaml
 from flask import session
 import requests
+from .getToken import get_token
+
 
 def add_collaborator(repoName, collaboratorName, isAdmin, isReader, isWriter):
 
@@ -35,7 +37,12 @@ def add_collaborator(repoName, collaboratorName, isAdmin, isReader, isWriter):
 
     try:
 
-        g = Github(userDB.githubG)
+        token = get_token()
+
+        if not token:
+            return 1 # user not in the database
+
+        g = Github(token)
         user = g.get_user()
 
         repositories = user.get_repos()
@@ -47,7 +54,7 @@ def add_collaborator(repoName, collaboratorName, isAdmin, isReader, isWriter):
         url = f"https://api.github.com/repos/{owner}/{repoName}/collaborators/{collaboratorName}"
 
         headers = {
-            "Authorization": f"token {userDB.githubG}",
+            "Authorization": f"token {token}",
             "Accept": "application/vnd.github.v3+json"
         }
 

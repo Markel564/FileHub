@@ -11,7 +11,8 @@ import github
 import yaml
 from flask import session
 from sqlalchemy.exc import SQLAlchemyError
-
+from .cryptography import decrypt_token
+from .getToken import get_token
 
 def get_repos():
     """
@@ -23,13 +24,15 @@ def get_repos():
     and returns a list with the names of the repos. It is used to 
     display the repos in the home page
     """
-    # obtain the user from the database
-    user_id = session.get('user_id')
-    user = User.query.filter_by(id=user_id).first()
-    try:
 
+    try:
+        
         # authenticate the user
-        g = Github(user.githubG)
+        token = get_token()
+
+        if not token:
+            return False
+        g = Github(token)
 
 
         user = g.get_user()
@@ -51,7 +54,9 @@ def get_repos():
         return repo_names
     
     except github.GithubException as e:
+        print ("In get repos", e)
         return False
 
     except Exception as e:
+        print ("In get repos", e)
         return False

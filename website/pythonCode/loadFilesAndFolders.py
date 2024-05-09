@@ -20,6 +20,7 @@ from .getHash import sign_file
 import os
 from sqlalchemy.exc import SQLAlchemyError
 import requests
+from .getToken import get_token
 
 
 # Define a cache with a time-to-live (TTL) of 1 hour
@@ -34,19 +35,17 @@ def load_files_and_folders(repoName, path=""):
     It is important to mention that the database will be updated every time the user clicks on the repository,
     and that it stores the files and folders in the / (not recursively)
     """
-    user_id = session.get('user_id')
-    userDB = User.query.filter_by(id=user_id).first()
-    
-    # if the user is not in the database, return False
-    if not userDB:
-        return 1
+    token = get_token()
+
+    if not token:
+        return False
     
     
     try:
 
         # authenticate the user
 
-        g = github.Github(userDB.githubG)
+        g = github.Github(token)
         user = g.get_user()
 
         # obtain the owner of the repo
@@ -60,7 +59,7 @@ def load_files_and_folders(repoName, path=""):
         # make the API call
         url = f"https://api.github.com/repos/{owner}/{repoName}/contents/{path}"
         headers = {
-            "Authorization": f"token {userDB.githubG}",
+            "Authorization": f"token {token}",
             "Accept": "application/vnd.github.v3+json"
         }
 
@@ -95,7 +94,7 @@ def load_files_and_folders(repoName, path=""):
                     # given that there is an issue with last_modified attribute (see https://github.com/PyGithub/PyGithub/issues/629)
                     # we will see the most recent commit of the file and get the last modified date from there
 
-                    last_modified = get_last_modified(content_file['path'], repoName, owner, userDB.githubG)
+                    last_modified = get_last_modified(content_file['path'], repoName, owner)
                     
                     # the folder path is the path of the file without the file name
                     folder_path = repoName + '/' + content_file['path'].split(content_file['name'])[0] 
@@ -145,7 +144,7 @@ def load_files_and_folders(repoName, path=""):
                     
                 else: # if the file is already in db, check if it has been updated and change modified to True if it has
                     
-                    last_commit_utc = get_last_modified(content_file['path'], repoName, owner, userDB.githubG)
+                    last_commit_utc = get_last_modified(content_file['path'], repoName, owner)
                     last_commit_str = last_commit_utc.strftime("%Y-%m-%d %H:%M:%S")
 
                     file_last_updated_utc = file.lastUpdated.replace(tzinfo=None).strftime("%Y-%m-%d %H:%M:%S")
@@ -211,7 +210,7 @@ def load_files_and_folders(repoName, path=""):
                 
                 if not folder: # if the folder is not in the database, add it
                     
-                    last_modified = get_last_modified(content_file['path'], repoName, owner, userDB.githubG)
+                    last_modified = get_last_modified(content_file['path'], repoName, owner)
 
                     # the folder path is the path of the folder without the folder name
                 
@@ -229,7 +228,7 @@ def load_files_and_folders(repoName, path=""):
 
                 else: # if the folder is already in db, check if it has been updated and change modified to True if it has
                     
-                    last_commit_utc = get_last_modified(content_file['path'], repoName, owner, userDB.githubG)
+                    last_commit_utc = get_last_modified(content_file['path'], repoName, owner)
                     last_commit_str = last_commit_utc.strftime("%Y-%m-%d %H:%M:%S")
 
                     folder_last_updated_utc = folder.lastUpdated.replace(tzinfo=None).strftime("%Y-%m-%d %H:%M:%S")
@@ -265,7 +264,7 @@ def load_files_and_folders(repoName, path=""):
             for folder in folders_in_db:
                 db.session.delete(folder)
             
-            last_updated = get_last_modified(path, repoName, owner, userDB.githubG)
+            last_updated = get_last_modified(path, repoName, owner)
             repository.lastUpdated = last_updated
             db.session.commit()
 
@@ -351,7 +350,12 @@ def get_files_and_folders(repoName, father_dir):
     return files, folders
 
 
-def get_last_modified(path, repoName, owner, token):
+def get_last_modified(path, repoName, owner):
+
+    token = get_token()
+
+    if not token:
+        return None
 
     url = f"https://api.github.com/repos/{owner}/{repoName}/commits?path={path}"
 
