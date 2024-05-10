@@ -7,10 +7,7 @@ database
 from ..models import User
 from .. import db
 from github import Github, Auth
-import github
-import yaml
 from flask import session
-from .getRepos import get_repos
 from sqlalchemy.exc import SQLAlchemyError
 from .cryptography import generate_key, encrypt_token, decrypt_token
 import random
@@ -19,25 +16,27 @@ import os
 import base64
 
 
-def add_user(token):
+def add_user(token: str):
     """
-    input: none
-    output: True if user has been added to the database, False if not
+    input: token
+    output: 0 if user has been added to the database, other number otherwise
 
-    This function adds a user to the database
+    This function adds a user to the database, as well as a series of session variables,
+    such as the key, iv and tag used to encrypt the token. The function also checks if the user
+    is already in the database, and if so, updates the token.
     """
-
 
     try:
         
-        print ("Adding user to the database")
         # we are going to save the token encrypted in the database
-        password = "".join(random.choice(string.ascii_letters) for i in range(16)) # random password
+        password = "".join(random.choice(string.ascii_letters) for i in range(16)) # random password to encrypt the token
         salt = os.urandom(16) # random salt
-        key = generate_key(password, salt)
-            
+        key = generate_key(password, salt) # generate the key
+        
+        # encrypt the token
         encrypted_token, iv, tag = encrypt_token(token, key)
 
+        # save the key, iv and tag in the session in base64 format
         key_to_save = base64.b64encode(key).decode() 
         tag_to_save = base64.b64encode(tag).decode()  
         iv_to_save = base64.b64encode(iv).decode()
@@ -47,48 +46,40 @@ def add_user(token):
         session['tag'] = tag_to_save
 
         
-
+        # authenticate the user
         auth = Auth.Token(token)
-        g = Github(auth=auth, base_url="https://api.github.com") 
+        g = Github(auth=auth, base_url="https://api.github.com")  # open a connection to the github api
             
-        user = g.get_user()
+        user = g.get_user() # get the user
 
-        name = user.name
-        username = user.login
-        email = user.email
-        avatar = user.avatar_url
+        username = user.login 
+        avatar = user.avatar_url # we will save the user's avatar since it is will be displayed
 
-        session['user_id'] = user.id
+        session['user_id'] = user.id # save the user's id in the session
 
         # add user to database
         user_to_check = User.query.filter_by(id=user.id).first()
 
         if user_to_check:
-            print ("User already in the database")
             # if the user is already in the database, update the token
             user_to_check.githubG = encrypted_token
-        else:
-            print ("User not in the database")
-            new_user = User(id=user.id, githubG=encrypted_token, name=name, username=username, email=email, avatarUrl=avatar)
+        else: 
+            # if the user is not in the database, add the user
+            new_user = User(id=user.id, githubG=encrypted_token, username=username, avatarUrl=avatar)
             db.session.add(new_user)
         db.session.commit()
-        print ("User added to the database")
 
-        g.close()
-
-        print ("User added successfully")
+        g.close() # close the connection
+ 
         return 0
 
-    except SQLAlchemyError as e:
-        print (e)
+    except SQLAlchemyError:
+        return 1
+    
+    except github.GithubException:
         return 2
     
-    except github.GithubException as e:
-        print (e)
-        return 5
-    
-    except Exception as e:
-        print (e)
-        return 4
+    except Exception:
+        return 3
     
 

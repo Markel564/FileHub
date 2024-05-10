@@ -1,23 +1,35 @@
+""" 
+This module contains a function that adds a collaborator to a repository
+
+"""
 from ..models import User
 from github import Github, Auth
 import github
-import yaml
 from flask import session
 import requests
 from .getToken import get_token
 
 
-def add_collaborator(repoName, collaboratorName, isAdmin, isReader, isWriter):
+def add_collaborator(repoName: str, collaboratorName: str, isAdmin: bool, isReader: bool, isWriter: bool):
+    """ 
+    input:
+        - repoName (string): name of the repository
+        - collaboratorName (string): name of the collaborator
+        - isAdmin (bool): True if the collaborator is an admin, False otherwise
+        - isReader (bool): True if the collaborator is a reader, False otherwise
+        - isWriter (bool): True if the collaborator is a writer, False otherwise
 
-    user_id = session.get('user_id')
+    output: 0 if the collaborator has been added, other number otherwise
+    """
 
+    user_id = session.get('user_id') # get the user's id from the session
     userDB = User.query.filter_by(id=user_id).first()
 
-    if not userDB:
+    if not userDB: # if the user is not authenticated, return 1
         return 1
     
-    if not isAdmin and not isReader and not isWriter:
-        return 2 # no role was selected
+    if not isAdmin and not isReader and not isWriter: # no role was selected
+        return 2 
     
     # check if the user is already a collaborator
     if collaboratorName == userDB.username:
@@ -26,8 +38,9 @@ def add_collaborator(repoName, collaboratorName, isAdmin, isReader, isWriter):
     # check if there is more than 1 role selected
     roles = [isAdmin, isReader, isWriter]
     if roles.count(True) > 1:
-        return 4 # more than 1 role was selected
+        return 4 
 
+    # set the type of permission of the collaborator
     if isAdmin:
         permission = "admin"
     elif isWriter:
@@ -37,23 +50,24 @@ def add_collaborator(repoName, collaboratorName, isAdmin, isReader, isWriter):
 
     try:
 
-        token = get_token()
+        token = get_token() # get the user's token
 
         if not token:
             return 1 # user not in the database
 
-        g = Github(token)
+        g = Github(token) # authenticate the user
         user = g.get_user()
 
-        repositories = user.get_repos()
-        for repo in repositories:
-            if repo.name == repoName:
-                owner = repo.owner.login
+        # since the url needs the owner of the repository, we need to find it
+        repositories = user.get_repos() # get the repositories of the user
+        for repo in repositories: # find the repository
+            if repo.name == repoName: 
+                owner = repo.owner.login 
                 break
                 
         url = f"https://api.github.com/repos/{owner}/{repoName}/collaborators/{collaboratorName}"
 
-        headers = {
+        headers = { # headers to be sent to the API
             "Authorization": f"token {token}",
             "Accept": "application/vnd.github.v3+json"
         }
@@ -67,12 +81,11 @@ def add_collaborator(repoName, collaboratorName, isAdmin, isReader, isWriter):
         if response.status_code == 204:
             return 5 # collaborator already exists
 
-        if response.status_code == 201:
+        elif response.status_code == 201:
             return 0 # collaborator invited
 
         return 6 # error
     
     except Exception as e: 
-        print(e)
         return 7
     

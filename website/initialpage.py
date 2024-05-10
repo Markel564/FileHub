@@ -26,13 +26,10 @@ def create_token():
 
             token = data.get('token')
             valid = validate_token(token)
-
-            
+     
             if valid:
-                print ("Token is valid")
                 ack = add_user(token)
                 if ack != 0:
-                    print("User failed to be added to the database")
                     flash("An unexpected error occurred!", category='error')
                 
                 else:

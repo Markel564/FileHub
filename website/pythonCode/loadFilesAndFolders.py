@@ -22,6 +22,8 @@ from sqlalchemy.exc import SQLAlchemyError
 import requests
 from .getToken import get_token
 
+import time
+
 
 # Define a cache with a time-to-live (TTL) of 1 hour
 cache = TTLCache(maxsize=1000, ttl=3600)
@@ -78,6 +80,7 @@ def load_files_and_folders(repoName, path=""):
         if not repository:
             return 2
 
+        start = time.time()
         for content_file in contents:
 
             if content_file['type'] == "file":
@@ -93,12 +96,13 @@ def load_files_and_folders(repoName, path=""):
                 if not file: # if the file is not in the database, add it
                     # given that there is an issue with last_modified attribute (see https://github.com/PyGithub/PyGithub/issues/629)
                     # we will see the most recent commit of the file and get the last modified date from there
-
+                    
                     last_modified = get_last_modified(content_file['path'], repoName, owner)
                     
                     # the folder path is the path of the file without the file name
                     folder_path = repoName + '/' + content_file['path'].split(content_file['name'])[0] 
 
+                    
                     file = File(name=content_file['name'], repository_name=repoName, lastUpdated=last_modified, 
                     modified=False, path=str(repoName+'/'+content_file['path']), folderPath=folder_path)
 
@@ -247,7 +251,8 @@ def load_files_and_folders(repoName, path=""):
                 lastupdates.append(folder.lastUpdated)
                 folders.append(content_file['name'])
 
-
+        end = time.time()
+        print("Time taken to load files and folders: ", end-start)
         # the size of the repo might be empty, but it should return a valid response
         # repo.size does not work always as the cache might be empty and it takes time to update
 
@@ -376,6 +381,7 @@ def get_last_modified(path, repoName, owner):
 
     try:
         
+        now = time.time()
         response = requests.get(url, headers=headers, params=params)
 
         if response.status_code != 200:
@@ -395,6 +401,7 @@ def get_last_modified(path, repoName, owner):
         last_modified = last_modified.replace(tzinfo=None)
         cache[path] = last_modified # store the last modified date in the cache
 
+        print("Time taken to get last modified: ", time.time()-now)
         return last_modified
 
 

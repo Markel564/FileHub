@@ -13,9 +13,9 @@ from sqlalchemy.sql import func
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     githubG = db.Column(db.String(100), nullable=False)
-    name = db.Column(db.String(100), nullable=True, unique=False)
+    # name = db.Column(db.String(100), nullable=True, unique=False)
     username = db.Column(db.String(100), nullable=False, unique=True)
-    email = db.Column(db.String(100), nullable=True, unique=True)
+    # email = db.Column(db.String(100), nullable=True, unique=True)
     avatarUrl = db.Column(db.String(255), nullable=False, unique=False)
     
     repositories = db.relationship('Repository', backref='owner', lazy=True)

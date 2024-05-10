@@ -1,58 +1,49 @@
-from cryptography.hazmat.primitives.ciphers import algorithms, modes
-from cryptography.hazmat.primitives.ciphers import Cipher
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from github import Github, Auth
+import github
+from datetime import datetime
+import pytz
+from tzlocal import get_localzone
+import time
+from cachetools import TTLCache
 import os
+from sqlalchemy.exc import SQLAlchemyError
+import requests
+from datetime import datetime, timedelta
 
-# Generar una clave de cifrado segura
-def generate_key(password: str, salt: bytes) -> bytes:
-    kdf = PBKDF2HMAC(
-        algorithm=hashes.SHA256(),
-        length=32,
-        salt=salt,
-        iterations=100000,
-        backend=default_backend()
-    )
-    return kdf.derive(password.encode())
 
-# Cifrar el token
-def encrypt_token(token: str, key: bytes) -> (bytes, bytes):
-    iv = os.urandom(12)  # Genera un vector de inicialización (nonce) aleatorio
-    cipher = Cipher(algorithms.AES(key), modes.GCM(iv), backend=default_backend())
-    encryptor = cipher.encryptor()
-    encrypted_token = encryptor.update(token.encode()) + encryptor.finalize()
-    return encrypted_token, iv, encryptor.tag
 
-# Desencriptar el token
-def decrypt_token(encrypted_token: bytes, key: bytes, iv: bytes, tag: bytes) -> str:
-    cipher = Cipher(algorithms.AES(key), modes.GCM(iv, tag), backend=default_backend())
-    decryptor = cipher.decryptor()
-    decrypted_token = decryptor.update(encrypted_token) + decryptor.finalize()
-    return decrypted_token.decode()
 
-# Ejemplo de uso
+repo = "TestingClone"
+token = "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"
+owner = "Markel564"
 
-import random
-import string
+
+def func(repo, token, owner):
+
+    g = github.Github(token)
+    user = g.get_user()
+
+
+    url = f"https://api.github.com/repos/{owner}/{repo}/contents/"
+    headers = {
+        "Authorization": f"token {token}",
+        "Accept": "application/vnd.github.v3+json"
+    }
+
+    response = requests.get(url, headers=headers)
+
+    contents = response.json()
+
+   
+    start = time.time()
+    for content in contents:
+        # print the last modified time of the file
+        print (content.keys())
+
+    print ("Time taken: ", time.time()-start)
+
+
+
+
 if __name__ == "__main__":
-    # contraseña aleatoria
-    password = "".join(random.choice(string.ascii_letters) for i in range(16))
-    print("Contraseña:", password)
-    # Sal para derivar la clave (debe ser único y seguro)
-    salt = os.urandom(16)
-    # Generar la clave de cifrado
-    key = generate_key(password, salt)
-
-    # Token original
-    token = "mi_token_secreto"
-
-    print (type(token), type(key))
-    # Cifrar el token
-    encrypted_token, iv, tag = encrypt_token(token, key)
-    print("Token cifrado:", encrypted_token)
-
-    # Desencriptar el token
-    decrypted_token = decrypt_token(encrypted_token, key, iv, tag)
-    print("Token desencriptado:", decrypted_token)
-
+    func(repo, token, owner)
