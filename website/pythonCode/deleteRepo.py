@@ -75,15 +75,23 @@ def delete_repo():
                 shutil.rmtree(f"{repo.FileSystemPath}/{repo_name}")
             except:
                 return 6
+        
+        repo_folders = repo.repository_folders
+        repo_files = repo.repository_files
+
+        for folder in repo_folders:
+            db.session.delete(folder)
+        
+        for file in repo_files:
+            db.session.delete(file)
 
         db.session.delete(repo)
         # eliminate associated files and folders of the db
 
-        db.session.commit()
-
         # remove the repo to be deleted from the session
         session['repo_to_remove'] = None
-        
+        db.session.commit()
+
         g.close()
         return 0
     

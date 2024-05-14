@@ -51,7 +51,7 @@ def repo(subpath):
                     return render_template("error.html")
                 else:
                     flash("There was an error!", category='error')
-                    return render_template("error.html")
+                    return redirect(url_for('homePage.home'))
          
                 files, folders = get_files_and_folders(repoName, subpath) # at first the path of the repository is the same as the name of the repository + '/'
                 
@@ -348,7 +348,7 @@ def repo(subpath):
                 flash("No changes detected!", category='error')
                 return jsonify({"status": "errorNoFiles"})
 
-            ack = commit_changes(repoName, folderPath)
+            ack = commit_changes(repoName)
 
             if ack == 0:
                 flash("Changes sent to GitHub successfully", category='success')

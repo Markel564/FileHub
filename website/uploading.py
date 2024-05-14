@@ -1,6 +1,7 @@
 from flask import Blueprint, flash, request, jsonify
 from .pythonCode import add_file
 from flask_login import login_required
+import os
 
 
 uploading = Blueprint('uploading', __name__)
@@ -40,6 +41,8 @@ def upload_file():
         else:
             flash ("An unexpected error occurred!", category='error')
         
+        # delete the file from the uploads folder
+        os.remove('uploads/' + file.filename)
         return jsonify({'status': 'ok'})
 
     else:

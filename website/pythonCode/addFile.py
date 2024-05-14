@@ -6,7 +6,6 @@ from ..models import User, Repository, File, Folder
 from .. import db
 from flask import session
 from datetime import datetime
-import os
 from .getHash import sign_file
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -59,8 +58,6 @@ def add_file(repoName: str, file_name: str, file_path: str):
                 file.close()
 
         
-        os.remove("./uploads/"+file_name) # remove the file from the uploads folder
-        
         # add the file to the database
         repo = Repository.query.filter_by(name=repoName).first()
 
@@ -102,6 +99,7 @@ def add_file(repoName: str, file_name: str, file_path: str):
         file.shaHash = sign_file(file.FileSystemPath)
 
         if not file.shaHash:
+            print("Error signing the file")
             return 4
         db.session.commit() # commit the changes to the database
 
@@ -109,6 +107,7 @@ def add_file(repoName: str, file_name: str, file_path: str):
         return 0
 
     except FileNotFoundError as e:
+        print(e)
         return 4
     
     except PermissionError:

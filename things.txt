@@ -5,8 +5,6 @@ explicar en memoria que intente watchdogs pero no funciona
 
 uso de cache para reducir tiempo de ejecucion
 
-puse mi correo publico en github
-
 poner que se va a hacer uso del token
 
 empecé con pygithub, pero luego no
@@ -24,6 +22,12 @@ no puedo guardar en os.environ porque cuando se produce un error, se pierde
 
 si user borra repo en fs, este sigue clonado
 
+necesario añadir un archivo cada vez que creas una carpeta desde fs.Si no, no se añade a db
+
+SE PONDRÁ EN EL README QUE SE USARÁ SU ZONA HORARIA PARA EL TIMESTAMP
+SE PONDRÁ QUE MODIFIQUE LA CONTRASEÑA DE SESION
+
+no se puede poner carpetas con espacio (al menos desde interfaz)
 
 CONFLICTS:
 Si user modifica repo remoto y local, pasa lo siguiente:

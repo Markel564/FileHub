@@ -15,5 +15,3 @@ def sign_file(file_path):
     
     except:
         return False
-
-

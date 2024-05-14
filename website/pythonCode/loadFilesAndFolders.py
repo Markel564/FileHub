@@ -11,7 +11,7 @@ from github import Github, Auth
 import github
 import yaml
 from flask import session
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 from tzlocal import get_localzone
 import time
@@ -21,12 +21,9 @@ import os
 from sqlalchemy.exc import SQLAlchemyError
 import requests
 from .getToken import get_token
-
+from .cloneRepo import windows_to_unix_path
 import time
 
-
-# Define a cache with a time-to-live (TTL) of 1 hour
-cache = TTLCache(maxsize=1000, ttl=3600)
 
 
 def load_files_and_folders(repoName, path=""):
@@ -40,7 +37,7 @@ def load_files_and_folders(repoName, path=""):
     token = get_token()
 
     if not token:
-        return False
+        return 6
     
     
     try:
@@ -104,7 +101,7 @@ def load_files_and_folders(repoName, path=""):
 
                     
                     file = File(name=content_file['name'], repository_name=repoName, lastUpdated=last_modified, 
-                    modified=False, path=str(repoName+'/'+content_file['path']), folderPath=folder_path)
+                    modified=True, path=str(repoName+'/'+content_file['path']), folderPath=folder_path)
 
                     db.session.add(file)
 
@@ -153,7 +150,8 @@ def load_files_and_folders(repoName, path=""):
 
                     file_last_updated_utc = file.lastUpdated.replace(tzinfo=None).strftime("%Y-%m-%d %H:%M:%S")
 
-                    if file_last_updated_utc != last_commit_str: # if the file has been updated
+                    if time_difference(last_commit_str, file_last_updated_utc): # if the file has been updated
+                        print (f"FILE {file.name} MODIFIED")
                         file.modified = True
                         file.lastUpdated = last_commit_utc
 
@@ -186,11 +184,10 @@ def load_files_and_folders(repoName, path=""):
 
                     
                     else: # if the file has not been updated
-                        file.modified = False
+                        # file.modified = False
 
                         if repository.isCloned:
-                            file.modified = False
-
+                            print (f"FILE {file.name} SAME")
                             file.FileSystemPath = repository.FileSystemPath + repoName + "/" + content_file['path']
                             file.shaHash = sign_file(repository.FileSystemPath + repoName + "/" + content_file['path'])
 
@@ -224,57 +221,48 @@ def load_files_and_folders(repoName, path=""):
                     
 
                     folder = Folder(name=content_file['name'], repository_name=repoName, 
-                    lastUpdated=last_modified, modified=False, path=str(repoName+'/'+ content_file['path']), folderPath=folder_path) 
+                    lastUpdated=last_modified, modified=True, path=str(repoName+'/'+ content_file['path']), folderPath=folder_path) 
 
                     db.session.add(folder)
                     # the last updated date of the repository will be the last updated date of the file
                 
 
-                else: # if the folder is already in db, check if it has been updated and change modified to True if it has
+                else: # if the folder is already in db, 
                     
+                    # check if it has been updated and change modified to True if it has
+                    # for this, we will check the files within the folder and see if they have been updated
+
                     last_commit_utc = get_last_modified(content_file['path'], repoName, owner)
                     last_commit_str = last_commit_utc.strftime("%Y-%m-%d %H:%M:%S")
 
                     folder_last_updated_utc = folder.lastUpdated.replace(tzinfo=None).strftime("%Y-%m-%d %H:%M:%S")
 
-                    if folder_last_updated_utc != last_commit_str:
+                    if time_difference(last_commit_str, folder_last_updated_utc):
                         folder.modified = True
                         folder.lastUpdated = last_commit_utc
                         
-                        if repository.isCloned:
-                            folder.modified = False
+                        # update the last updated date of the files within the folder
+                        update_dates(folder.path, repoName, last_commit_utc)
+
+                        # if repository.isCloned:
+                        #     folder.modified = False
 
                     else:
-                        folder.modified = False
+                        # folder.modified = False
+                        pass
                         
                 db.session.commit()
                 lastupdates.append(folder.lastUpdated)
                 folders.append(content_file['name'])
 
-        end = time.time()
-        print("Time taken to load files and folders: ", end-start)
         # the size of the repo might be empty, but it should return a valid response
         # repo.size does not work always as the cache might be empty and it takes time to update
 
 
         if files == [] and folders == []: # if the repository is empty
 
-            # clear the files and folders in the database of that path
-            files_in_db = File.query.filter_by(repository_name=repoName, folderPath=repoName + '/' + path).all()
-            folders_in_db = Folder.query.filter_by(repository_name=repoName, folderPath=repoName + '/' + path).all()
-
-            for file in files_in_db:
-                db.session.delete(file)
-            
-            for folder in folders_in_db:
-                db.session.delete(folder)
-            
-            last_updated = get_last_modified(path, repoName, owner)
-            repository.lastUpdated = last_updated
-            db.session.commit()
-
-            g.close()
-            return 0
+            g.close() # close the connection
+            return 0 # return 0
 
         # update the last updated date of the repository
         if repository.lastUpdated < max(lastupdates):
@@ -292,24 +280,7 @@ def load_files_and_folders(repoName, path=""):
                     folder.lastUpdated = repository.lastUpdated # update the last updated date of the folder to the one calculated before
                 else:
                     
-                    folder.modified = False
-                
-
-
-        # eliminate the files and folders that are not in the github repository
-        files_in_db = File.query.filter_by(repository_name=repoName, folderPath=repoName + '/' + content_file['path'].split(content_file['name'])[0]).all()
-        folders_in_db = Folder.query.filter_by(repository_name=repoName, folderPath=repoName + '/' + content_file['path'].split(content_file['name'])[0]).all()
-
-
-        if len(files_in_db) > len(files):
-            for file in files_in_db:
-                if file.name not in files:
-                    db.session.delete(file)
-        
-        if len(folders_in_db) > len(folders):
-            for folder in folders_in_db:
-                if folder.name not in folders:
-                    db.session.delete(folder)
+                    folder.modified = False # if the folder has not been updated, we set modified to False
 
         
         db.session.commit()
@@ -318,13 +289,16 @@ def load_files_and_folders(repoName, path=""):
 
         return 0
         
-    except github.GithubException as e: 
+    except github.GithubException as e:
+        print(e) 
         return 4
     
     except SQLAlchemyError as e:
+        print(e) 
         return 5
     
     except Exception as e:
+        print(e) 
         return 6
 
 
@@ -374,11 +348,6 @@ def get_last_modified(path, repoName, owner):
         "Accept": "application/vnd.github.v3+json"
     }
 
-
-    cached_last_modified = cache.get(path)
-    if cached_last_modified:
-        return cached_last_modified
-
     try:
         
         now = time.time()
@@ -389,7 +358,6 @@ def get_last_modified(path, repoName, owner):
         
         commit = response.json()[0]
         last_commit = commit['commit']['author']['date']
-
         
         last_commit_datetime = datetime.fromisoformat(last_commit.rstrip('Z'))
         gmt = pytz.timezone('GMT')
@@ -399,9 +367,7 @@ def get_last_modified(path, repoName, owner):
         last_modified = last_modified_gmt.astimezone(timezone)
 
         last_modified = last_modified.replace(tzinfo=None)
-        cache[path] = last_modified # store the last modified date in the cache
 
-        print("Time taken to get last modified: ", time.time()-now)
         return last_modified
 
 
@@ -410,3 +376,52 @@ def get_last_modified(path, repoName, owner):
 
 
 
+
+
+def update_dates(father_dir, repo_name, last_modified):
+    """ 
+    This function updates the dates of the folders where the file is located and the repository
+    input:
+        - father_dir (string): path of the folder where the file is located
+        - repo_name (string): name of the repository
+    output: None
+
+    """
+    repo = Repository.query.filter_by(name=repo_name).first()  
+
+    
+    while father_dir != repo.name + "/": # while we have not reached the repository
+        folder = Folder.query.filter_by(path=father_dir[:-1], repository_name=repo.name).first() # find the folder in the database
+
+        if not folder:  
+            pass # it will be added later in the function load_files_and_folders
+        
+        else:
+            folder.lastUpdated = last_modified # just update the date of the folder to now
+            folder.modified = True
+        
+        father_dir = father_dir.rsplit("/",2)[0] + "/" # go to its father directory
+    
+    repo.lastUpdated = last_modified # update the last updated date of the repository
+    db.session.commit() 
+
+
+
+def time_difference(time1: str, time2: str):
+    """ 
+    input:
+        - time1: string representing a time
+        - time2: string representing a time
+    output:
+        - True if the difference between the 2 strings is greater than 1 minute, False otherwise
+    This function returns True if the difference between the 2 strings is greater than 1 minute
+    """ 
+
+    time1 = datetime.strptime(time1, "%Y-%m-%d %H:%M:%S")
+    time2 = datetime.strptime(time2, "%Y-%m-%d %H:%M:%S")
+
+    difference = abs(time1-time2)
+
+    if difference.total_seconds() > 60:
+        return True
+    return False
