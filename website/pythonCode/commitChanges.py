@@ -59,7 +59,6 @@ def commit_changes(repoName: str):
 
 
         for file in repoDB.repository_files: # iterate over the files of the repository
-            print (file.name)
             # path to pass corresponds to the path of the file relative to the repository. It is needed 
             # for commiting the changes to the correct file in Github
             paths = file.folderPath.split('/')[1:]  # split the path to the file in the local file system. This basically removes the first element, 
@@ -96,7 +95,7 @@ def commit_changes(repoName: str):
 
                     # delete from github
                     payload_delete = {
-                        'message': 'Deleted file',
+                        'message': f'Deleted file {file.name}',
                         'sha': sha
                     }
 
@@ -119,7 +118,7 @@ def commit_changes(repoName: str):
                 encoded_content = base64.b64encode(content).decode('utf-8') # change the content to base64 as binary files are not allowed in a http json request
 
                 payload_create = {
-                    'message': 'Uploaded file',
+                    'message': f'Uploaded file {file.name}',
                     'content': encoded_content
                 }
 
@@ -146,7 +145,7 @@ def commit_changes(repoName: str):
                 
                 encoded_content = base64.b64encode(content).decode('utf-8') # change the content just as the addedFirstTime case
                 payload_update = {
-                    'message': 'Updated file',
+                    'message': f'Updated file {file.name}',
                     'content': encoded_content,
                     'sha': sha
                 }

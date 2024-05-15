@@ -114,6 +114,7 @@ def repo(subpath):
             
             files, folders = get_files_and_folders(repoName, subpath +'/')
 
+            print (repoName, subpath)
             folder = Folder.query.filter_by(repository_name=repoName, path=subpath).first()
             last_updated = folder.lastUpdated
 

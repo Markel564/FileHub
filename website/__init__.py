@@ -9,8 +9,8 @@ def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'your secret key' # Change this to a random string
     app.permanent_session_lifetime = 3600 # 1 hour (if the session is not used for 1 hour, it will be deleted)
-    app.config['SESSION_COOKIE_SECURE'] = True # The session cookies will only be sent over HTTPS
-    app.config['SESSION_COOKIE_HTTPONLY'] = True # The session cookies will not be accessible by JavaScript
+    # app.config['SESSION_COOKIE_SECURE'] = True # The session cookies will only be sent over HTTPS
+    # app.config['SESSION_COOKIE_HTTPONLY'] = True # The session cookies will not be accessible by JavaScript
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
     db.init_app(app)
 
