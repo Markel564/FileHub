@@ -13,6 +13,7 @@ from flask import session
 from sqlalchemy.exc import SQLAlchemyError
 from .cryptography import decrypt_token
 from .getToken import get_token
+import os
 
 def get_repos():
     """
@@ -50,6 +51,25 @@ def get_repos():
                 db.session.commit()
         
         g.close()
+
+        for repo in repositories: # check if the user deleted a repo from the local filesystem
+            repo = Repository.query.filter_by(name=repo.name).first()
+            
+            if repo.isCloned: # check if it exists in the local filesystem
+
+                if not os.path.exists(repo.FileSystemPath+f"/{repo.name}"): # if it does not exist, set isCloned to False
+
+                    repo.isCloned = False
+                    db.session.commit()
+        
+        # finally, delete the repositories that are in the database but not in the user's account
+        repo_db = Repository.query.all()
+
+        for repo in repo_db: # check if the user deleted a repo from the github account
+            if repo.name not in [repo.name for repo in repositories]:
+                db.session.delete(repo)
+                db.session.commit()
+
         repo_names = [repo.name for repo in repositories]
         return repo_names
     

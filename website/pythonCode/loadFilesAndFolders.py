@@ -63,7 +63,7 @@ def load_files_and_folders(repoName, path=""):
         }
 
         response = requests.get(url, headers=headers)
-
+        print (url)
         if response.status_code != 200:
             return 4
         
@@ -71,7 +71,6 @@ def load_files_and_folders(repoName, path=""):
 
         
         files, folders, lastupdates = [], [], []
-
         repository = Repository.query.filter_by(name=repoName).first()
 
         if not repository:
@@ -101,10 +100,9 @@ def load_files_and_folders(repoName, path=""):
 
                     
                     file = File(name=content_file['name'], repository_name=repoName, lastUpdated=last_modified, 
-                    modified=True, path=str(repoName+'/'+content_file['path']), folderPath=folder_path)
+                    modified=False, path=str(repoName+'/'+content_file['path']), folderPath=folder_path)
 
                     db.session.add(file)
-
 
                     # also, if the repository is cloned, we have to add the file to the file system
 
@@ -151,8 +149,7 @@ def load_files_and_folders(repoName, path=""):
                     file_last_updated_utc = file.lastUpdated.replace(tzinfo=None).strftime("%Y-%m-%d %H:%M:%S")
 
                     if time_difference(last_commit_str, file_last_updated_utc): # if the file has been updated
-                        print (f"FILE {file.name} MODIFIED")
-                        file.modified = True
+                        # file.modified = True
                         file.lastUpdated = last_commit_utc
 
                         # again, if the repository is cloned, we have to add the file to the file system
@@ -184,10 +181,8 @@ def load_files_and_folders(repoName, path=""):
 
                     
                     else: # if the file has not been updated
-                        # file.modified = False
 
                         if repository.isCloned:
-                            print (f"FILE {file.name} SAME")
                             file.FileSystemPath = repository.FileSystemPath + repoName + "/" + content_file['path']
                             file.shaHash = sign_file(repository.FileSystemPath + repoName + "/" + content_file['path'])
 
@@ -225,7 +220,6 @@ def load_files_and_folders(repoName, path=""):
 
                     db.session.add(folder)
                     # the last updated date of the repository will be the last updated date of the file
-                
 
                 else: # if the folder is already in db, 
                     
@@ -238,7 +232,7 @@ def load_files_and_folders(repoName, path=""):
                     folder_last_updated_utc = folder.lastUpdated.replace(tzinfo=None).strftime("%Y-%m-%d %H:%M:%S")
 
                     if time_difference(last_commit_str, folder_last_updated_utc):
-                        folder.modified = True
+                        # folder.modified = True
                         folder.lastUpdated = last_commit_utc
                         
                         # update the last updated date of the files within the folder
@@ -268,6 +262,25 @@ def load_files_and_folders(repoName, path=""):
         if repository.lastUpdated < max(lastupdates):
             repository.lastUpdated = max(lastupdates)
 
+        # moreover, we have to eliminate the files and folders that are not in the repository anymore
+        # we will do this by checking the files and folders in the database and see if they are in the files and folders list
+        # if they are not, we will delete them
+        files_db = File.query.filter_by(repository_name=repoName).all()
+        folders_db = Folder.query.filter_by(repository_name=repoName).all()
+
+        for file in files_db:
+            if file.name not in files:
+                db.session.delete(file)
+                db.session.commit()
+
+                # if the repository is cloned, we have to delete the file from the file system
+                if repository.isCloned:
+                    os.remove(file.FileSystemPath)
+            
+        for folder in folders_db:
+            if folder.name not in folders:
+                db.session.delete(folder)
+                db.session.commit()
 
         # also, if we are in a folder, we need to update the last updated date of the folder
         if path != "":
@@ -282,23 +295,41 @@ def load_files_and_folders(repoName, path=""):
                     
                     folder.modified = False # if the folder has not been updated, we set modified to False
 
-        
         db.session.commit()
+
+        # finally, there is a chance that a directory is left empty, so we will delete it
+        if repository.isCloned:
+            # list all the folders in the repo.filesystemPath
+            complete_path = os.path.join(repository.FileSystemPath, repoName, path)
+
+            # obtain all folders in the path
+            foldersAndFiles = os.listdir(complete_path)
+            # Filtrar solo los directorios
+            directories = [d for d in foldersAndFiles if os.path.isdir(os.path.join(complete_path, d))]
+            print("Directories", directories)
+            # eliminate the empty ones
+            for directory in directories:
+                files = os.listdir(os.path.join(complete_path, directory))
+                print ("Files", files)
+                if files == []:
+                    # remove from the file system the empty directory
+                    print ("Removing directory", os.path.join(complete_path, directory))
+                    os.rmdir(os.path.join(complete_path, directory))
+    
 
         g.close()
 
         return 0
         
     except github.GithubException as e:
-        print(e) 
+        print (e)
         return 4
     
     except SQLAlchemyError as e:
-        print(e) 
         return 5
     
     except Exception as e:
-        print(e) 
+        print (e)
         return 6
 
 
@@ -337,7 +368,6 @@ def get_last_modified(path, repoName, owner):
         return None
 
     url = f"https://api.github.com/repos/{owner}/{repoName}/commits?path={path}"
-
     params = {
         "path": path,
         "per_page": 1 # we only want the last commit

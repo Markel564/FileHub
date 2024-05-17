@@ -68,7 +68,6 @@ def check_file_system(repo: str):
                     # ADDING NEW FILES TO THE DATABASE
                     if not fileDB: # if file not in database, that means the user has added a new file manually
 
-                        print("File not in database: ", file, )
 
                         # we add the file to the database
                         folderPath = relative_file_path_with_repo.rsplit("/",1)[0] + "/" # the folder path of the file
@@ -83,7 +82,7 @@ def check_file_system(repo: str):
                         file = File(name=file, path=relative_file_path_with_repo, repository_name=repo.name, 
                         lastUpdated=datetime.now(), modified=True, folderPath=folderPath, FileSystemPath=FileSystemPath, 
                         shaHash=hash_of_file, addedFirstTime=True)
-                        print (f"File {file.name} added to the database with path {file.path}")
+                        print (f"File {file.name} added to the database with path {file.path} and folder path {file.folderPath}")
                         db.session.add(file)
 
                         # we have to update the date of the folder where the file is located and the repository
@@ -177,8 +176,6 @@ def update_dates(father_dir, repo_name):
 
     """
     repo = Repository.query.filter_by(name=repo_name).first()  
-    print ("\n")
-    print ("UPDATE DATES FOR FOLDER: ", father_dir)
     
     while father_dir != repo.name + "/": # while we have not reached the repository
         folder = Folder.query.filter_by(path=father_dir[:-1], repository_name=repo.name).first() # find the folder in the database

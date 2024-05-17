@@ -1,17 +1,27 @@
+""" 
+This module contains a function to eliminate a collaborator from a repository
+"""
 from ..models import User
 from .. import db
 from github import Github, Auth
 import github
-import yaml
 from flask import session
 import requests
 from .getToken import get_token
 
 
 
-def eliminate_collaborator(repo, collaborator):
+def eliminate_collaborator(repo: str, collaborator: str):
+    """ 
+    input:
+        - repo: the name of the repository
+        - collaborator: the collaborator to be eliminated
+    output:
+        - 0 if the collaborator has been eliminated, another number otherwise
+    eliminates a collaborator from a repository
+    """
 
-    token = get_token()
+    token = get_token() # get the token from the session
 
     if not token:
         return 1
@@ -23,7 +33,7 @@ def eliminate_collaborator(repo, collaborator):
         # obtain the owner of the repository
         repositories = user.get_repos()
 
-        for repository in repositories:
+        for repository in repositories: # obtain the owner of the repository for the url
             if repository.name == repo:
                 owner = repository.owner.login
                 break
@@ -38,15 +48,14 @@ def eliminate_collaborator(repo, collaborator):
             "Accept": "application/vnd.github.v3+json"
         }
 
-        response = requests.delete(url, headers=headers)
+        response = requests.delete(url, headers=headers) # make request to eliminate the collaborator
 
-        if response.status_code != 204:
+        if response.status_code != 204: # if the collaborator has not been eliminated
             return 2
         
         return 0
         
-    except Exception as e:
-        
+    except Exception:
         return 3
 
 

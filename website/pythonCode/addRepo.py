@@ -55,7 +55,7 @@ def add_repo(project_name: str, project_description: str, isPrivate=False):
 
         # create the readme file with default text. In this case, we have to create it because the API returns
         # an error if we open a repository without any file
-        repo.create_file("DescriptiveFile.txt", "Initial file!", "New Project Created!", branch="main")
+        repo.create_file(f"Description_of_{project_name}.txt", "Initial file!", "New Project Created!", branch="main")
         
         g.close() # close the connection
         return 0

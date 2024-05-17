@@ -9,7 +9,6 @@ from ..models import User, Repository
 from .. import db
 from github import Github, Auth
 import github
-import yaml
 from flask import session
 from sqlalchemy.exc import SQLAlchemyError
 import shutil
@@ -59,7 +58,7 @@ def delete_repo():
                 break
         
         if owner != user.login: # if the owner is not the same, user cannot delete the repo
-            session['repo_to_remove'] = None
+            session['repo_to_remove'] = None # remove the repo to be deleted from the session
             return 5
 
         # if the owner is the same, delete the repo from the user's github account
@@ -69,24 +68,23 @@ def delete_repo():
         # delete the repo from the database
         repo = Repository.query.filter_by(name=repo_name).first()
 
-        if repo.isCloned:
+        if repo.isCloned: # if the repo is cloned, delete the folder from the file system
 
             try:
                 shutil.rmtree(f"{repo.FileSystemPath}/{repo_name}")
             except:
                 return 6
         
-        repo_folders = repo.repository_folders
-        repo_files = repo.repository_files
+        repo_folders = repo.repository_folders # get the associated folders of the db
+        repo_files = repo.repository_files # and the associated files of the db
 
-        for folder in repo_folders:
+        for folder in repo_folders: # delete the associated folders of the db
             db.session.delete(folder)
         
-        for file in repo_files:
+        for file in repo_files: # delete the associated files of the db
             db.session.delete(file)
 
-        db.session.delete(repo)
-        # eliminate associated files and folders of the db
+        db.session.delete(repo) # delete the repo from the db
 
         # remove the repo to be deleted from the session
         session['repo_to_remove'] = None

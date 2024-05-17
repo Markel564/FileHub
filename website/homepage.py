@@ -35,6 +35,7 @@ def home():
 
         # get the user's repositories
         repositories = get_repos()
+        print ("GOT REPOS")
 
         if not repositories:
             print ("Error getting repos")

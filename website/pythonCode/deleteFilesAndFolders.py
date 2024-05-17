@@ -153,10 +153,8 @@ def delete_folder(repo: str, path: str, name: str):
             shutil.rmtree(folder.FileSystemPath)
         
         folder_path = folder.folderPath[:-1] # remove the last character
-        print (f"Folder path {folder_path}")
-        while folder_path != repoDB.name:    # update the date of previous folders
-            print (f"Folder path {folder_path}")
-                        
+
+        while folder_path != repoDB.name:    # update the date of previous folders                        
             # open all the folders that have that folder_path as their path
             prior_folder = Folder.query.filter_by(path=folder_path, repository_name=repoDB.name).first()
             prior_folder.lastUpdated = datetime.now() # update the last updated date of the folder
@@ -164,18 +162,16 @@ def delete_folder(repo: str, path: str, name: str):
             folder_path = folder_path[:folder_path.rfind("/")]
 
         for f in subfolders: 
-            print (f"folder {f.name} deleted")
             db.session.delete(f) # delete the subfolders from the database
             
         # if the folder was added for the first time (it is not in GitHub), we can delete it from the database 
     
         for f in files: 
-            if f.addedFirstTime:  # if it is not in github, we can delete it from the database
-                db.session.delete(f)
-            else:
-                f.deleted = True # if it is in github, we set it as deleted, and not deleted from the database until the user commits the changes
-                f.modified = False
-        print (f"folder {folder.name} finally deleted")
+            # if f.addedFirstTime:  # if it is not in github, we can delete it from the database
+            #     db.session.delete(f)
+            f.deleted = True # if it is in github, we set it as deleted, and not deleted from the database until the user commits the changes
+            f.modified = False
+            print (f"file {f.name} is deleted")
         db.session.delete(folder) # delete the folder from the database (it is not in GitHub)
         db.session.commit()    
          

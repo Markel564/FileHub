@@ -40,7 +40,7 @@ def repo(subpath):
             if not repo.loadedInDB: # if the repository is not loaded in the database, we load it
                 
                 ack = load_files_and_folders(repoName) # load the files and folders of the repository into the db
-
+                print ("ACK from load is", ack)
                 if ack == 0:
                     pass
                 elif ack == 1:
@@ -62,9 +62,12 @@ def repo(subpath):
                 folder_paths = []
 
                 for folder in folders:
-                    relative_path = folder[3].split('/',1)
-                    folders_to_add.append(relative_path[1] + folder[0])
-                    folder_paths.append(folder[3] + folder[0] + "/")
+                    f = Folder.query.filter_by(repository_name=repoName, folderPath=folder[3]).first()
+
+                    if not f.addedFirstTime:
+                        relative_path = folder[3].split('/',1)
+                        folders_to_add.append(relative_path[1] + folder[0])
+                        folder_paths.append(folder[3] + folder[0] + "/")
 
 
                 while len(folders_to_add) > 0: # we are going to load into the db the files and folders of the repository for the folders that are in the path
@@ -114,7 +117,6 @@ def repo(subpath):
             
             files, folders = get_files_and_folders(repoName, subpath +'/')
 
-            print (repoName, subpath)
             folder = Folder.query.filter_by(repository_name=repoName, path=subpath).first()
             last_updated = folder.lastUpdated
 
@@ -173,7 +175,6 @@ def repo(subpath):
             absolute_path = data.get('absolutePath')
 
             repo = Repository.query.filter_by(name=repoName).first()
-
 
             ack = clone_repo(repoName, absolute_path)
 
@@ -316,15 +317,17 @@ def repo(subpath):
             return jsonify({"status": "ok"})
 
         elif type_message == "commit":
-
-            repoName, folderPath = data.get('repoName'), data.get('folderPath') 
+            
+            repoName= data.get('repoName')
 
             # check that there is at least one file with a modification or that was added for the first time
-            files = File.query.filter_by(repository_name=repoName, folderPath=folderPath).all()
-            folders = Folder.query.filter_by(repository_name=repoName, folderPath=folderPath).all()
-            
+            files = File.query.filter_by(repository_name=repoName).filter(File.folderPath.like(repoName + '%')).all()
+            folders = Folder.query.filter_by(repository_name=repoName).filter(Folder.folderPath.like(repoName + '%')).all()
+
+
             modifications, insertions, deletions = False, False, False
             for file in files:
+                print (file.name, file.modified, file.addedFirstTime, file.deleted)
                 if file.modified:
                     modifications = True
                 if file.addedFirstTime:
@@ -333,6 +336,7 @@ def repo(subpath):
                     deletions = True
             
             for folder in folders:
+                print (folder.name, folder.modified, folder.addedFirstTime, folder.deleted)
                 if folder.modified:
                     modifications = True
                 if folder.deleted:

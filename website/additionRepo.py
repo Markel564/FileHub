@@ -48,7 +48,9 @@ def add():
             
             if ack == 0:
                 
-                if pathOfRepo != None:
+                if pathOfRepo != '':
+                    print (f"PathOfRepo:", pathOfRepo)
+                    print (type(pathOfRepo))
                     ack = clone_repo(project_name, pathOfRepo)
                     
                     if ack == 0:

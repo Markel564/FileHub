@@ -1,36 +1,11 @@
-windows-to-unix estoy considerando tambien WSL y no solo linux
 
 
-explicar en memoria que intente watchdogs pero no funciona 
 
-uso de cache para reducir tiempo de ejecucion
-
-poner que se va a hacer uso del token
-
-empecé con pygithub, pero luego no
-
-readme obligarorio
-
-dropzone solo me deja algunos documentos
-
-hay problema si repo esta vacio
-
-shaHash puede ser no unico porque puedes el mismo archivos en distintas carpetas
-
-un usuario que modifique un repo, se verá reflejado en el otro
-no puedo guardar en os.environ porque cuando se produce un error, se pierde
-
-si user borra repo en fs, este sigue clonado
-
-necesario añadir un archivo cada vez que creas una carpeta desde fs.Si no, no se añade a db
-
+README
 SE PONDRÁ EN EL README QUE SE USARÁ SU ZONA HORARIA PARA EL TIMESTAMP
 SE PONDRÁ QUE MODIFIQUE LA CONTRASEÑA DE SESION
+poner que se va a hacer uso del token EN README
 
 no se puede poner carpetas con espacio (al menos desde interfaz)
+si se hace commit con folder vacio, no se crea
 
-CONFLICTS:
-Si user modifica repo remoto y local, pasa lo siguiente:
-
--> se hace pull --> local se actualiza y tiene cambios de remoto
--> se hace push --> remoto se actualiza y tiene cambios de local

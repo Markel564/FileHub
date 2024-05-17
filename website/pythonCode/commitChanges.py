@@ -64,7 +64,6 @@ def commit_changes(repoName: str):
             paths = file.folderPath.split('/')[1:]  # split the path to the file in the local file system. This basically removes the first element, 
                                                            # which is the name of the repository
 
-            
             if paths[0] == '': # if it is empty, it means that the file is in the root of the repository
                 path_to_pass = file.name # therefore the it is the name of the file
                 inRoot = True # flag to know if the file is in the root of the repository (for later use)
@@ -103,11 +102,14 @@ def commit_changes(repoName: str):
 
                     # delete from the database 
                     db.session.delete(file)
+                    repoDB.lastUpdated = datetime.now() # update the repositories' last update date
                     db.session.commit()
 
                 # to eliminate it from the file system
                 if os.path.exists(file.FileSystemPath):
                     os.remove(file.FileSystemPath)
+                
+                
 
             # if the user created a file for the first time, upload it to Github
             elif file.addedFirstTime:
@@ -126,6 +128,7 @@ def commit_changes(repoName: str):
                 file.addedFirstTime = False # change the status of the file, as it is now in Github
                 file.modified = False # no longer modified, for representation purposes
                 file.lastUpdated = datetime.now() # update the date of the file
+                repoDB.lastUpdated = datetime.now() # update the date of the repository
                 db.session.commit() 
 
     
@@ -149,19 +152,19 @@ def commit_changes(repoName: str):
                     'content': encoded_content,
                     'sha': sha
                 }
-                requests.put(file_path, headers=headers, json=payload_update) # make a request to Github to update the file
+                ack = requests.put(file_path, headers=headers, json=payload_update) # make a request to Github to update the file
+                print ("ACK", ack)
                 file.modified = False # no longer modified
                 file.lastUpdated = datetime.now() # update the date of the file
-                
+                repoDB.lastUpdated = datetime.now() # update the repositories' last update date
                 db.session.commit()
 
             # obtain the folder of the file
-            if not inRoot:
-                print(file.folderPath)
-                father_dir = file.folderPath
-                
-                folder = Folder.query.filter_by(path=father_dir[:-1], repository_name=repoName).first()
-                folder.addedFirstTime = False
+            if file.folderPath != file.repository_name + "/" and not file.deleted: # if the file is not in the root of the repository
+                print ("Folder path", file.folderPath)
+                folder = Folder.query.filter_by(path=file.folderPath[:-1], repository_name= file.repository_name).first()
+                folder.addedFirstTime = False # no longer added for the first time
+                folder.modified = False # no longer modified
 
         db.session.commit()
         return 0
@@ -173,6 +176,6 @@ def commit_changes(repoName: str):
         return 5
         
     except Exception as e:
-        print(e)
+        print("Error -->", e)
         return 6
     

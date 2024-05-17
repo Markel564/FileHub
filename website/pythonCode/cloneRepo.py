@@ -46,6 +46,7 @@ def clone_repo(repoName: str, path: str):
     # convert the path to unix in case it is windows
     path = windows_to_unix_path(path, directory=True)
     
+    print ("PATH converted right")
     # revise that the path exists
     if not doesPathExist(path):
         return 4
@@ -79,6 +80,7 @@ def clone_repo(repoName: str, path: str):
 
         response = requests.get(url, headers=headers) # make request
         
+        print (response.status_code)
         if response.status_code != 200: # if response is not correct, return error
             return 7
 
@@ -87,6 +89,7 @@ def clone_repo(repoName: str, path: str):
         clone_url = repo['clone_url'] # obtain the clone url given by the response 
                                     # which is the url needed for permissions to clone the repository
         # clone the repository
+        print (f"Cloning {clone_url} to {path + repoName}")
         Repo.clone_from(clone_url, path + repoName) # + repoName so the folder has the name of the repository
 
         
@@ -109,6 +112,7 @@ def clone_repo(repoName: str, path: str):
         return 7
 
     except Exception as e:
+        print (e)
         return 8
 
 
@@ -170,7 +174,10 @@ def windows_to_unix_path(windows_path: str, directory=False):
     in unix format, the return will not modify nothing
     """
     # check if there are any / in the path 
+    print (f"PATh {windows_path}")
     if windows_path.count('/') != 0: # if there are, it is already in unix format
+        if windows_path[-1] != "/": # if it does not end with /, add it so it is a folder path
+            return windows_path + "/"
         return windows_path
 
     # Convert backslashes to forward slashes
@@ -184,7 +191,9 @@ def windows_to_unix_path(windows_path: str, directory=False):
 
     if directory: # if the path is a directory
         if unix_path[-1] != "/": #if it does not end with /, add it so it is a folder path
+            print (f"unix_path {unix_path}")
             return unix_path + "/"
+    print (f"unix_path {unix_path}")
     return unix_path
 
 
