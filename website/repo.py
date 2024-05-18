@@ -55,6 +55,7 @@ def repo(subpath):
          
                 files, folders = get_files_and_folders(repoName, subpath) # at first the path of the repository is the same as the name of the repository + '/'
                 
+                print (f"Folders: {folders}")
                 if not files and not folders:
                     return render_template("error.html")
         
@@ -75,7 +76,7 @@ def repo(subpath):
                     folder = folders_to_add.pop(0)
 
                     ack = load_files_and_folders(repoName, folder)
-
+                    print ("ACK from load is", ack)
                     if ack == 0:
                         pass
                     elif ack == 1:
@@ -91,6 +92,7 @@ def repo(subpath):
                     
                     files_in_db, folders_in_db = get_files_and_folders(repoName, folder_paths.pop(0))
                     if not files_in_db and not folders_in_db:
+                        print ("No files or folders")
                         return render_template("error.html")
 
                     for folder in folders_in_db:

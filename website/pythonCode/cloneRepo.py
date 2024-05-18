@@ -176,8 +176,9 @@ def windows_to_unix_path(windows_path: str, directory=False):
     # check if there are any / in the path 
     print (f"PATh {windows_path}")
     if windows_path.count('/') != 0: # if there are, it is already in unix format
-        if windows_path[-1] != "/": # if it does not end with /, add it so it is a folder path
+        if windows_path[-1] != "/" and directory: # if it does not end with /, add it so it is a folder path
             return windows_path + "/"
+        print (f"unix_path {windows_path}")
         return windows_path
 
     # Convert backslashes to forward slashes

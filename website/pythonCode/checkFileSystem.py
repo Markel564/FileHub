@@ -71,7 +71,8 @@ def check_file_system(repo: str):
 
                         # we add the file to the database
                         folderPath = relative_file_path_with_repo.rsplit("/",1)[0] + "/" # the folder path of the file
-                        FileSystemPath = windows_to_unix_path(full_file_path) # convert the path to unix format
+                        FileSystemPath = windows_to_unix_path(full_file_path, directory=False) # convert the path to unix format
+                        print (f"filesystem path {FileSystemPath}")
                         hash_of_file = sign_file(FileSystemPath) # and sign the file
 
                         if not hash_of_file: # if the file cannot be hashed, it means it was not found
@@ -104,7 +105,15 @@ def check_file_system(repo: str):
 
             # DELETING FILES FROM THE DATABASE
             elif not hash_of_file: # if the file is not found, it has been deleted from the fs, so we have to delete it from the database
-                file.deleted = True # set the property deleted to True
+
+                if file.addedFirstTime: # not in GitHub
+                    print (f"Deleteing completely {file.name}")
+                    db.session.delete(file) # delete the file from the database
+                else:
+                    print (f"Deleting for the first time {file.name}")
+                    file.deleted = True # set the property deleted to True
+                    file.modified = False
+                    file.addedFirstTime = False
 
                 # we have to update the date of the folder where the file is located and the repository
                 father_dir = file.folderPath
@@ -134,35 +143,39 @@ def check_file_system(repo: str):
 
             # check if the folder's path exists in the file system
 
+            
             if not os.path.exists(folder.FileSystemPath):
 
                 # if the folder is no longer in the file system, it means we must eliminate it from the database
                 # regardless of whether it is renamed or deleted completely, we will delete it by putting
                 # the attribute deleted to True, and later when the user commits the changes, we will delete it from the database
-                folder.deleted = True
-
+                if folder.addedFirstTime:
+                    print (f"Folder {folder.name} deleted")
+                    db.session.delete(folder)
+                else:
+                    print (f"Folder {folder.name} deleted for the first time")
+                    folder.deleted = True
+                    folder.modified = False
+                    folder.addedFirstTime = False
                 # we will put these files as deleted as well
-
-                folders = Folder.query.filter_by(folderPath=folder.path+"/").all()
-                files = File.query.filter_by(folderPath=folder.path+"/").all()
-
-                for f in folders:
-                    f.deleted = True
-                
-                for f in files:
-                    f.deleted = True
 
                 # we have to update the date of the folder where the folder is located and the repository
                 father_dir = folder.folderPath
                 update_dates(father_dir, repo.name)
                 db.session.commit()
-            
+
+        db.session.commit()
+
+        for folder in Folder.query.filter_by(repository_name=repo.name).all():
+            print (f"Folder {folder.name} with path {folder.path} and deleted {folder.deleted} and addedFirstTime {folder.addedFirstTime} and modified {folder.modified}")
         return 0
 
     except SQLAlchemyError as e:
+        print (e)
         return 5
 
     except Exception as e:
+        print (e)
         return 6
 
 
@@ -181,17 +194,14 @@ def update_dates(father_dir, repo_name):
         folder = Folder.query.filter_by(path=father_dir[:-1], repository_name=repo.name).first() # find the folder in the database
 
         if not folder:  # there is a chance that the user created the directory manually, so we have to add it to the database
-            print ("FOLDER NOT IN DATABASE: ", father_dir)
             FileSystemPath = windows_to_unix_path(str(repo.FileSystemPath) + father_dir, True)
             folder = Folder(path=father_dir[:-1], repository_name=repo.name, lastUpdated=datetime.now(),
                             name=father_dir.rsplit("/",2)[1], modified=True,
                             folderPath=father_dir.rsplit("/",2)[0] + "/",
                             FileSystemPath=FileSystemPath, addedFirstTime=True)
             db.session.add(folder)
-            print (f"Folder created")
         
         else:
-            print ("FOLDER IN DATABASE: ", father_dir)
             folder.lastUpdated = datetime.now() # just update the date of the folder to now and put it as modified
             folder.modified = True
             father_dir = father_dir.rsplit("/",2)[0] + "/" # go to its father directory

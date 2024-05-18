@@ -7,7 +7,7 @@ import hashlib
 import os
 
 
-def sign_file(file_path:str):
+def sign_file(file_path: str):
     """ 
     input:
         - file_path: the path to the file to be signed (within the filesystem)
