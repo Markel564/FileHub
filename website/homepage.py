@@ -1,13 +1,7 @@
 """
-This section contains the views of the website
+This section contains the views for the home page of the website
 
-Each view is a function for a specific route
-
-The views are:
-
-    - home: the main page of the website where the user can see his/her repositories
-    - add: page that allows the user to add a new repository
-
+it is displayed when the user logs in and it displays the user's repositories
 """
 
 from flask import Blueprint, render_template, flash, request, jsonify, session
@@ -35,16 +29,14 @@ def home():
 
         # get the user's repositories
         repositories = get_repos()
-        print ("GOT REPOS")
 
         if not repositories:
-            print ("Error getting repos")
-            return render_template("error.html")
+            return render_template("error.html") # if there are no repositories, redirect to the error page
         
         # render template with the user's name, photo and repositories
         return render_template("home.html", header_name=user.username, avatar=user.avatarUrl, repositories=repositories)
 
-    if request.method == 'POST':
+    if request.method == 'POST': # things that the user can do inside the home page
 
         data = request.get_json()  # Get JSON data from the request (done through js)
         
@@ -54,15 +46,15 @@ def home():
         type_message = data.get('type')
 
 
-        if type_message == "eliminate":
-            
+        if type_message == "eliminate": # if the user wants to delete a repository
+             
             # we save the repo name to delete it later
             repo_name = data.get('repo_name') 
             session['repo_to_remove'] = repo_name
 
-            return jsonify({"status": "ok"})
+            return jsonify({"status": "ok"}) # return ok to js. It will show a modal to confirm the deletion
 
-        elif type_message == "eliminate-confirm":
+        elif type_message == "eliminate-confirm": # if the user confirms the deletion of the repository
 
             # delete the repository
             ack = delete_repo()
@@ -71,7 +63,7 @@ def home():
                 flash("Project deleted successfully", category='success')
                 
             elif ack == 1:
-                flash("User not identified!", category='error')
+                return jsonify({"status": "error"})
             elif ack == 2:
                 flash("The Project does not exist!", category='error')
             elif ack == 3 or ack == 4:
@@ -86,7 +78,7 @@ def home():
             return jsonify({"status": "ok"})
 
 
-        elif type_message == "logout":
+        elif type_message == "logout": # if the user wants to log out
 
             session.pop('user_id', None)
             session.pop('repo_to_remove', None)
@@ -94,7 +86,6 @@ def home():
             session.pop('key', None)
             session.pop('iv', None)
             session.pop('tag', None)
-            print ("User logged out")
 
             db.session.commit()
             logout_user()

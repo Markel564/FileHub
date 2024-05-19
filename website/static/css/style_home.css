@@ -9,7 +9,6 @@
     margin: 20px auto;
 }
 
-
 .btn {
   padding: 10px 20px; 
   font-size: 1rem; 
@@ -27,8 +26,6 @@
     color: white;
     border: none;
 }
-
-
 
 .btn:hover {
     background-color: #a50b50; 

@@ -2,10 +2,8 @@
 This module contains a function that adds a collaborator to a repository
 
 """
-from ..models import User
-from github import Github, Auth
+from github import Github
 import github
-from flask import session
 import requests
 from .getToken import get_token
 
@@ -22,11 +20,10 @@ def add_collaborator(repoName: str, collaboratorName: str, isAdmin: bool, isRead
     output: 0 if the collaborator has been added, other number otherwise
     """
 
-    user_id = session.get('user_id') # get the user's id from the session
-    userDB = User.query.filter_by(id=user_id).first()
+    token = get_token() # get the user's token
 
-    if not userDB: # if the user is not authenticated, return 1
-        return 1
+    if not token:
+        return 1 # user not in the database
     
     if not isAdmin and not isReader and not isWriter: # no role was selected
         return 2 
@@ -49,11 +46,6 @@ def add_collaborator(repoName: str, collaboratorName: str, isAdmin: bool, isRead
         permission = "pull"
 
     try:
-
-        token = get_token() # get the user's token
-
-        if not token:
-            return 1 # user not in the database
 
         g = Github(token) # authenticate the user
         user = g.get_user()
@@ -86,6 +78,6 @@ def add_collaborator(repoName: str, collaboratorName: str, isAdmin: bool, isRead
 
         return 6 # error
     
-    except Exception as e: 
+    except Exception: 
         return 7
     

@@ -3,12 +3,8 @@ This module contains a function that returns the invitations of a user
 using the GitHub API
 """
 
-from ..models import User
-from .. import db
-from github import Github, Auth
+from github import Github
 import github
-from flask import session
-import os
 from .reformatDate import change_format_date
 from .getToken import get_token
 

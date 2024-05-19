@@ -1,3 +1,9 @@
+""" 
+This section contains the view of the repository page
+
+It represents each repository once the user has selected it
+"""
+
 from flask import Blueprint, render_template, flash, request, jsonify, session, redirect, url_for
 from . import db
 from .models import User, Repository, Folder, File
@@ -17,9 +23,9 @@ def repo(subpath):
     # the path could be the name of the repository or a folder path such as 'repoName/folder1/folder2'
     repoName = subpath.split("/")[0]
 
-    if request.method == 'GET':
+    if request.method == 'GET': # if the user is accessing the repository page, show the files and folders of the repository
 
-        if repoName is None:
+        if repoName is None: # if the repository does not exist (it will always be the first part of the subpath)
             return render_template("error.html")
         
         # get the user's name and photo
@@ -27,25 +33,23 @@ def repo(subpath):
         user = User.query.filter_by(id=user_id).first()
 
             
-        root_of_project = False
-        directory = '/'.join(subpath.split("/")[1:]).rstrip('/')
+        root_of_project = False # if we are in the root of the repository
+        directory = '/'.join(subpath.split("/")[1:]).rstrip('/') # the directory is the path of the folder in the repository
 
         if directory == '': # we are in a folder, if not, we are in the repository main page
             root_of_project = True
         
-        if root_of_project:
+        if root_of_project: # we are in the root of the repository
             
-            repo = Repository.query.filter_by(name=repoName).first()
+            repo = Repository.query.filter_by(name=repoName).first() # get the repository from the database
 
             if not repo.loadedInDB: # if the repository is not loaded in the database, we load it
                 
                 ack = load_files_and_folders(repoName) # load the files and folders of the repository into the db
-                print ("ACK from load is", ack)
                 if ack == 0:
                     pass
                 elif ack == 1:
-                    flash("User not identified!", category='error')
-                    return render_template("error.html")
+                    return render_template("error.html") 
                 elif ack == 2:
                     flash("The Project does not exist!", category='error')
                     return render_template("error.html")
@@ -55,17 +59,18 @@ def repo(subpath):
          
                 files, folders = get_files_and_folders(repoName, subpath) # at first the path of the repository is the same as the name of the repository + '/'
                 
-                print (f"Folders: {folders}")
-                if not files and not folders:
-                    return render_template("error.html")
-        
-                folders_to_add = []
+                if not files and not folders: # if there are no files or folders in the repository
+                    flash ("There was an error!", category='error')
+                    return redirect(url_for('homePage.home'))
+
+                # when a get is produced, all the files and folders of the repository are loaded into the db (unless they are already loaded)
+                folders_to_add = [] 
                 folder_paths = []
 
                 for folder in folders:
-                    f = Folder.query.filter_by(repository_name=repoName, folderPath=folder[3]).first()
+                    f = Folder.query.filter_by(repository_name=repoName, folderPath=folder[3]).first() # get the folder from the db
 
-                    if not f.addedFirstTime:
+                    if not f.addedFirstTime: # if the folder is not loaded in the db, we add it to the list of folders to load
                         relative_path = folder[3].split('/',1)
                         folders_to_add.append(relative_path[1] + folder[0])
                         folder_paths.append(folder[3] + folder[0] + "/")
@@ -73,14 +78,12 @@ def repo(subpath):
 
                 while len(folders_to_add) > 0: # we are going to load into the db the files and folders of the repository for the folders that are in the path
                 
-                    folder = folders_to_add.pop(0)
+                    folder = folders_to_add.pop(0) # get the folder to load
 
-                    ack = load_files_and_folders(repoName, folder)
-                    print ("ACK from load is", ack)
+                    ack = load_files_and_folders(repoName, folder) # load the files and folders of the folder into the db
                     if ack == 0:
                         pass
                     elif ack == 1:
-                        flash("User not identified!", category='error')
                         return render_template("error.html")
                     elif ack == 2:
                         flash("The Project does not exist!", category='error')
@@ -90,71 +93,71 @@ def repo(subpath):
                         return render_template("error.html")
 
                     
-                    files_in_db, folders_in_db = get_files_and_folders(repoName, folder_paths.pop(0))
+                    files_in_db, folders_in_db = get_files_and_folders(repoName, folder_paths.pop(0)) # get the files and folders of the folder
                     if not files_in_db and not folders_in_db:
-                        print ("No files or folders")
                         return render_template("error.html")
 
-                    for folder in folders_in_db:
+                    for folder in folders_in_db: # for each folder in the folder, add it to the list of folders to load
                         relative_path = folder[3].split('/',1)
                         folders_to_add.append(relative_path[1] + folder[0])
                         folder_paths.append(folder[3] + folder[0] + "/")
 
-                last_updated = Repository.query.filter_by(name=repoName).first().lastUpdated
+                last_updated = Repository.query.filter_by(name=repoName).first().lastUpdated # get the last updated date of the repository
 
-                repo.loadedInDB = True
-
+                repo.loadedInDB = True # set the property of loaded asTrue
                 db.session.commit()
 
 
             else: # the repository is already loaded in the database, so no need to be loaded again
 
-                files, folders = get_files_and_folders(repoName, subpath)
+                files, folders = get_files_and_folders(repoName, subpath) # get the files and folders of the repository
                 last_updated = Repository.query.filter_by(name=repoName).first().lastUpdated
 
-            title = repoName
+            title = repoName # the title of the page is the name of the repository
 
 
         else: # we are in a folder, and not in the root of the repository
             
-            files, folders = get_files_and_folders(repoName, subpath +'/')
+            files, folders = get_files_and_folders(repoName, subpath +'/') # get the files and folders of the folder
 
             folder = Folder.query.filter_by(repository_name=repoName, path=subpath).first()
-            last_updated = folder.lastUpdated
+            last_updated = folder.lastUpdated # the last updated shown will be the last updated of the folder
 
-            title = subpath.split("/")[-1]
+            title = subpath.split("/")[-1] # the title of the page is the name of the folder, and not the repository
 
 
         for file in files:
-            file[1] = reformat_date(file[1])
+            file[1] = reformat_date(file[1]) # reformat the dates (instead of a date, we will have X time ago)
                 
             
-        for folder in folders:
+        for folder in folders: # reformat the dates of the folders
             folder[1] = reformat_date(folder[1])
 
             
         #  change the date format to a more readable one
         last_updated = reformat_date(last_updated)
         
+        # render the repository page
         return render_template("repo.html", title=title, header_name=repoName,avatar=user.avatarUrl, whole_path=subpath,
         files=files, folders=folders, last_updated=last_updated)
 
 
-    else: # POST
+    else: # POST; a user has selected an option in the repository page
         
         data = request.get_json()  
         
         if data is None: # if no data was sent
             return jsonify({"status": "error"})
         
-        type_message = data.get('type')
+        type_message = data.get('type') # get the type of message
         
-        if type_message == "back":
+        if type_message == "back": # if the user wants to go back to the previous folder
 
-            return jsonify({"status": "ok"})
+            return jsonify({"status": "ok"}) # we will return the status ok, and the front end will redirect to the previous folder
 
-        elif type_message == "open":
-
+        elif type_message == "open": # if the user wants to open a file
+            
+            # obtain the folder he/she wants to open
             folder = data.get('folder')
             folder_path = data.get('folderPath')
             
@@ -164,35 +167,33 @@ def repo(subpath):
             if folder is None:
                 return jsonify({"status": "error"})
             
-            folders = Folder.query.filter_by(repository_name=repoName, folderPath=folder_path).all()
+            folders = Folder.query.filter_by(repository_name=repoName, folderPath=folder_path).all() # get the folders of the folder
     
-            if folder not in [f.name for f in folders]:
+            if folder not in [f.name for f in folders]: # if the folder is not in the list of folders
                 return jsonify({"status": "error"})
             
-            return jsonify({"status": "ok", "path": folder_path + folder})
+            return jsonify({"status": "ok", "path": folder_path + folder}) # return the status ok and the path of the folder to open (js will redirect to the folder)
 
-        elif type_message == "clone-confirm":
- 
+        elif type_message == "clone-confirm": # if the user wants to clone a repository
+            
+            # get the repository name and the path where the repository will be cloned
             repoName = data.get('repoName')
             absolute_path = data.get('absolutePath')
-
-            repo = Repository.query.filter_by(name=repoName).first()
 
             ack = clone_repo(repoName, absolute_path)
 
             if ack == 0:
-                flash("Project downloaded successfully", category='success')
-                repo = Repository.query.filter_by(name=repoName).first()
+                repo = Repository.query.filter_by(name=repoName).first()  # get the repository from the db
                 repo.loadedInDB = False # we will change the loaded attribute and when a GET is made, the repository will be loaded again
                 db.session.commit()
             elif ack == 1:
-                flash("User not identified!", category='error')
+                return jsonify({"status": "error"})
             elif ack == 2:
                 flash("The Project does not exist!", category='error')
             elif ack == 3:
                 flash("The Project is already downloaded!", category='error')
             elif ack == 4 or ack == 5 or ack == 7:
-                flash("Couldn't download the project", category='error')
+                flash("Unable to download the project", category='error')
             elif ack == 6:
                 flash ("The path is not a directory!", category='error')
             else:
@@ -232,7 +233,6 @@ def repo(subpath):
             if ack == 0:
                 pass
             elif ack == 1:
-                flash("User not identified!", category='error')
                 return jsonify({"status": "error"})
             elif ack == 2:
                 flash("The Project does not exist!", category='error')
@@ -243,9 +243,10 @@ def repo(subpath):
         
             files, folders = get_files_and_folders(repoName, folderPath) # get the files and folders of the folder
 
-            if not files and not folders:
+            if not files and not folders: # if there are no files or folders in the folder, return an error
                 return jsonify({"status": "error"})
 
+            # load the files and folders of the folder
             folders_to_add = []
             folder_paths = []
 
@@ -257,12 +258,11 @@ def repo(subpath):
             while len(folders_to_add) > 0:
                 folder = folders_to_add.pop(0)
 
-                ack = load_files_and_folders(repoName, folder)
+                ack = load_files_and_folders(repoName, folder) # load the files and folders of the folder into the db
 
                 if ack == 0:
                     pass
                 elif ack == 1:
-                    flash("User not identified!", category='error')
                     return jsonify({"status": "error"})
                 elif ack == 2:
                     flash("The Project does not exist!", category='error')
@@ -271,12 +271,12 @@ def repo(subpath):
                     flash("An unexpected error occurred!", category='error')
                     return jsonify({"status": "error"})
                 
-                files_in_db, folders_in_db = get_files_and_folders(repoName, folder_paths.pop(0))
+                files_in_db, folders_in_db = get_files_and_folders(repoName, folder_paths.pop(0)) # get the files and folders of the folder
 
                 if not files_in_db and not folders_in_db:
                     return jsonify({"status": "error"})
 
-                for folder in folders_in_db:
+                for folder in folders_in_db: # for each folder in the folder, add it to the list of folders to load
                     relative_path = folder[3].split('/',1)
                     folders_to_add.append(relative_path[1] + folder[0])
                     folder_paths.append(folder[3] + folder[0] + "/")
@@ -298,16 +298,16 @@ def repo(subpath):
             return jsonify({"status": "ok"})
 
         
-        elif type_message == "refresh-filesystem":
+        elif type_message == "refresh-filesystem": # to refresh the data based on the one in the file system
 
-            repoName = data.get('repoName')
+            repoName = data.get('repoName') # get the repository name
             
-            ack = check_file_system(repoName)
+            ack = check_file_system(repoName) # check the file system for new changes
 
             if ack == 0:
                 flash("File system checked successfully", category='success')
             elif ack == 1:
-                flash("User not identified!", category='error')
+                return jsonify({"status": "error"})
             elif ack == 2:
                 flash("The Project does not exist!", category='error')
             elif ack == 3:
@@ -318,7 +318,7 @@ def repo(subpath):
                 flash("An unexpected error occurred!", category='error')
             return jsonify({"status": "ok"})
 
-        elif type_message == "commit":
+        elif type_message == "commit": # to commit the changes to the repository to the GitHub repository (like a push)
             
             repoName= data.get('repoName')
 
@@ -327,9 +327,8 @@ def repo(subpath):
             folders = Folder.query.filter_by(repository_name=repoName).filter(Folder.folderPath.like(repoName + '%')).all()
 
 
-            modifications, insertions, deletions = False, False, False
+            modifications, insertions, deletions = False, False, False # flags to check if there are modifications, insertions or deletions
             for file in files:
-                print (file.name, file.modified, file.addedFirstTime, file.deleted)
                 if file.modified:
                     modifications = True
                 if file.addedFirstTime:
@@ -338,7 +337,6 @@ def repo(subpath):
                     deletions = True
             
             for folder in folders:
-                print (folder.name, folder.modified, folder.addedFirstTime, folder.deleted)
                 if folder.modified:
                     modifications = True
                 if folder.deleted:
@@ -346,7 +344,7 @@ def repo(subpath):
                 if folder.addedFirstTime:
                     insertions = True
 
-            if len(files) == 0 and len(folders) == 0:
+            if len(files) == 0 and len(folders) == 0: # if there are no files or folders in the repository
                 flash("No changes detected!", category='error')
                 return jsonify({"status": "errorNoFiles"})
             
@@ -355,12 +353,12 @@ def repo(subpath):
                 flash("No changes detected!", category='error')
                 return jsonify({"status": "errorNoFiles"})
 
-            ack = commit_changes(repoName)
+            ack = commit_changes(repoName) # commit the changes to the repository
 
             if ack == 0:
                 flash("Changes sent to GitHub successfully", category='success')
             elif ack == 1:
-                flash("User not identified!", category='error')
+                return jsonify({"status": "error"})
             elif ack == 2:
                 flash("The Project does not exist!", category='error')
             elif ack == 3:
@@ -370,22 +368,23 @@ def repo(subpath):
             return jsonify({"status": "ok"})
 
         
-        elif type_message == "delete-file":
+        elif type_message == "delete-file": # to delete a file
             
+            # get the repository name, the folder path and the file name
             repoName, folderPath, fileName = data.get('repoName'), data.get('folderPath'), data.get('fileName')
 
             if folderPath == "/": # if we are in the root of the repository
-                path = repoName+"/"+fileName
+                path = repoName+"/"+fileName # the path is the repository name + the file name. E.g. repoName/file1
                 inRoot = True
             else:
-                path = repoName+"/"+folderPath+fileName
+                path = repoName+"/"+folderPath+fileName # the path is the repository name + the folder path + the file name. E.g. repoName/folder1/file1
 
-            ack = delete_file(repoName, path, fileName)
-
+            ack = delete_file(repoName, path, fileName) # delete the file
+ 
             if ack == 0:
                 flash("File deleted successfully", category='success')
             elif ack == 1:
-                flash("User not identified!", category='error')
+                return jsonify({"status": "error"})
             elif ack == 2:
                 flash("The Project does not exist!", category='error')
             elif ack == 3:
@@ -398,21 +397,22 @@ def repo(subpath):
                 flash("An unexpected error occurred!", category='error')
             return jsonify({"status": "ok"})
 
-        elif type_message == "delete-folder":
-  
+        elif type_message == "delete-folder": # to delete a folder
+            
+            # get the repository name, the folder path and the folder name
             repoName, folderPath, folderName = data.get('repoName'), data.get('folderPath'), data.get('folderName')
 
-            if folderPath == "/":
-                path = repoName+"/"+folderName
+            if folderPath == "/": # if we are in the root of the repository
+                path = repoName+"/"+folderName # the path is the repository name + the folder name. E.g. repoName/folder1
             else:
-                path = repoName+"/"+folderPath+folderName
+                path = repoName+"/"+folderPath+folderName # the path is the repository name + the folder path + the folder name. E.g. repoName/folder1/folder2
             
-            ack = delete_folder(repoName, path, folderName)
+            ack = delete_folder(repoName, path, folderName) # delete the folder
 
             if ack == 0:
                 flash("Folder deleted successfully", category='success')
             elif ack == 1:
-                flash("User not identified!", category='error')
+                return jsonify({"status": "error"})
             elif ack == 2:
                 flash("The Project does not exist!", category='error')
             elif ack == 3:
@@ -426,21 +426,22 @@ def repo(subpath):
             return jsonify({"status": "ok"})
 
         
-        elif type_message == "create-folder":
-
+        elif type_message == "create-folder": # to create a folder
+            
+            # get the repository name, the folder name and the folder path
             folderName, repoName, folderPath = data.get('folderName'), data.get('repoName'), data.get('folderPath')
 
-            if folderPath == "/":
-                path = repoName + "/" + folderName
+            if folderPath == "/": # if we are in the root of the repository
+                path = repoName + "/" + folderName # the path is the repository name + the folder name. E.g. repoName/folder1
             else:
-                path = repoName + "/" + folderPath + folderName
+                path = repoName + "/" + folderPath + folderName # if not, the path is the repository name + the folder path + the folder name. E.g. repoName/folder1/folder2
 
-            ack = create_folder(repoName, folderName, path)
+            ack = create_folder(repoName, folderName, path) # create the folder
 
             if ack == 0:
                 flash("Folder created successfully", category='success')   
             elif ack == 1:
-                flash("User not identified!", category='error')
+                return jsonify({"status": "error"})
             elif ack == 2:
                 flash("The Project does not exist!", category='error')
             elif ack == 3:
@@ -453,11 +454,11 @@ def repo(subpath):
                 flash("An unexpected error occurred!", category='error')
 
             return jsonify({"status": "ok"})
-
-        elif type_message == "add-people":
+ 
+        elif type_message == "add-people": # to add people to the repository
             
             repoName = data.get('repoName')
-            print ("Redirecting to the collaboration page")
+            # just return the url of the collaboration page
             return jsonify({"status": "ok", "url": url_for('collabPage.collaboration', repoName=repoName)})
 
             

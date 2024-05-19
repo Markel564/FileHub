@@ -1,8 +1,20 @@
+"""
+This module contains functions to reformat a date and change the format of a date
+
+ """
 from datetime import datetime
 import pytz
 from tzlocal import get_localzone
 
-def reformat_date(last_updated):
+def reformat_date(last_updated: datetime):
+    """ 
+    input:
+        - last_updated: a datetime object
+    output:
+        - a string with the time since the last update
+    In essence, this function takes a datetime object and returns a string with the time since the last update
+    The goal is to have a more human-readable format for the date
+    """
 
     # if the date is None, return None
     if last_updated is None:
@@ -55,22 +67,29 @@ def reformat_date(last_updated):
             return "1 minute ago"
         return str(minutes) + " minutes ago"
     
-    else:
+    else: # if the difference is less than 60 seconds, return 'just now'
         return "just now"
 
 
-def change_format_date(date):
+def change_format_date(date: datetime):
+    """ 
+    input:
+        - date: a datetime object
+    output:
+        - a string with the date in the format 'dd/mm/yyyy hh:mm', or False if an error occurred
+    This function takes a datetime object and returns a string with the date in the format 'dd/mm/yyyy hh:mm'
+    """
 
     try:
 
-        date = date.astimezone(pytz.utc)
+        date = date.astimezone(pytz.utc) # change the date to UTC
 
-        local_timezone = get_localzone()
-        converted_date = date.astimezone(local_timezone)
+        local_timezone = get_localzone() # get the local timezone
+        converted_date = date.astimezone(local_timezone) # change the date to the local timezone
 
-        converted_date = converted_date.replace(tzinfo=None)
+        converted_date = converted_date.replace(tzinfo=None) # remove the timezone information
 
-        return reformat_date(converted_date)
+        return reformat_date(converted_date) # return the date in the new format
     
-    except Exception as e:
+    except Exception:
         return False

@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 window.location.reload();
             }  
             else{ 
-                window.location.reload();       
+                window.location.href = "/error"      
             }       
         })
         .catch(function (error) {
@@ -108,21 +108,26 @@ document.addEventListener("DOMContentLoaded", function () {
                 throw new Error("Network response was not ok");
             }
         })
-        .then(function () {
+        .then(function (data) {
             
-            folderWindow = document.getElementById("modal-folder");
+            if (data.status == "ok"){
+                folderWindow = document.getElementById("modal-folder");
 
-            var state = false;
-            function toggleState() {
-                if (!state){ 
-                    folderWindow.classList.remove("modal-folder");
-                    folderWindow.classList.add("hide")
-                }else{
-                    folderWindow.classList.remove("hide");
-                    folderWindow.classList.add("modal-folder");
+                var state = false;
+                function toggleState() {
+                    if (!state){ 
+                        folderWindow.classList.remove("modal-folder");
+                        folderWindow.classList.add("hide")
+                    }else{
+                        folderWindow.classList.remove("hide");
+                        folderWindow.classList.add("modal-folder");
+                    }
                 }
+                toggleState();
             }
-            toggleState();
+            else{
+                window.location.href = "/error"
+            }
 
             window.location.href = window.location.href;
 

@@ -2,13 +2,8 @@
 This module contains a function that returns the collaborators of a repository
 """ 
 
-from ..models import User
-from .. import db
-from github import Github, Auth
+from github import Github
 import github
-from flask import session
-import os
-from .reformatDate import change_format_date
 import requests
 from .getToken import get_token
 

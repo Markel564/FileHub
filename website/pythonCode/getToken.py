@@ -6,7 +6,6 @@ from flask import session
 import base64
 from .cryptography import decrypt_token
 from ..models import User
-import os
 
 def get_token():
 
@@ -39,7 +38,7 @@ def get_token():
 
         return token
 
-    except Exception as e:
+    except Exception:
         return False
 
 

@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
             toggleState();
             window.location.replace("/home");
         }else{
-            window.location.replace("/home");
+            window.location.href = "/error";
         }
     })
     .catch(function (error) {

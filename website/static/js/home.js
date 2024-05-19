@@ -104,7 +104,7 @@ repositories.forEach(repository => {
     repository.addEventListener("click", () => {
         // obtain the repository name
         const repositoryName = repository.textContent.trim();
-        window.location.replace("/repo/"+repositoryName+"/");
+        window.location.replace("/repo/"+repositoryName+"/"); // just move to the repository page, no need to make a POST request
     });
 });
 

@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (data.status == "ok"){
                     window.location.reload();
                 }else{
-                    window.location.reload();
+                    window.location.href = "/error";
                 }
             }).catch(function (error) {
                 console.error("Fetch error:", error);

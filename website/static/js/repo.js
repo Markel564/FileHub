@@ -109,6 +109,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (data.status == "ok"){
                     window.location.replace("/repo/"+path);
                 }
+                else{
+                    window.location.href = "/error"
+                }
             })
             .catch(function (error) {
                 console.error("Fetch error:", error);
@@ -214,7 +217,6 @@ if (!document.querySelector('.dropzone').classList.contains('dz-clickable')) {
 
     // even when it is a failure to upload the file, we reload the page
     myDropzone.on("error", function() {
-        console.log("ERROR")
         window.location.reload();
     });
 }
@@ -330,7 +332,7 @@ refreshGitHubButton.addEventListener("click", () => {
         if (data.status == "ok"){
             window.location.reload();
         } else{
-            window.location.reload();
+            window.location.href = "/error"
         }
 
     })
@@ -362,7 +364,7 @@ refreshFileSystemButton.addEventListener("click", () => {
         if (data.status == "ok"){
             window.location.reload();
         }else{
-            window.location.reload();
+            window.location.href = "/error"
         }
     })
     .catch(function (error) {
@@ -399,7 +401,7 @@ pushButton.addEventListener("click", () => {
         if (data.status == "ok"){
             window.location.reload();
         }else{
-            window.location.reload();
+            return jsonify({"status": "error"})
         }
 
     })

@@ -3,9 +3,9 @@ This module contains a function that adds a repository to the
 database and to the user's github account
 
 """
-from ..models import User, Repository
+from ..models import Repository
 from .. import db
-from github import Github, Auth
+from github import Github
 import github
 from flask import session
 from datetime import datetime

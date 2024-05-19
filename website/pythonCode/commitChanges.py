@@ -1,7 +1,7 @@
 """ 
 Thus module contains the function that commits the changes made by the user to the Github repository.
 """ 
-from ..models import User, Repository, File, Folder
+from ..models import Repository, File, Folder
 from .. import db
 from github import Github, Auth
 import github
@@ -153,7 +153,6 @@ def commit_changes(repoName: str):
                     'sha': sha
                 }
                 ack = requests.put(file_path, headers=headers, json=payload_update) # make a request to Github to update the file
-                print ("ACK", ack)
                 file.modified = False # no longer modified
                 file.lastUpdated = datetime.now() # update the date of the file
                 repoDB.lastUpdated = datetime.now() # update the repositories' last update date
@@ -161,7 +160,6 @@ def commit_changes(repoName: str):
 
             # obtain the folder of the file
             if file.folderPath != file.repository_name + "/" and not file.deleted: # if the file is not in the root of the repository
-                print ("Folder path", file.folderPath)
                 folder = Folder.query.filter_by(path=file.folderPath[:-1], repository_name= file.repository_name).first()
                 folder.addedFirstTime = False # no longer added for the first time
                 folder.modified = False # no longer modified
@@ -169,13 +167,12 @@ def commit_changes(repoName: str):
         db.session.commit()
         return 0
 
-    except FileNotFoundError as e:
+    except FileNotFoundError:
         return 4
 
-    except github.GithubException as e:
+    except github.GithubException:
         return 5
         
-    except Exception as e:
-        print("Error -->", e)
+    except Exception:
         return 6
     

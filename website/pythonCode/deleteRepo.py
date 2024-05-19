@@ -5,9 +5,9 @@ database and to the user's github account
 Bare in mind it is only done after the user has confirmed the deletion
 """
 
-from ..models import User, Repository
+from ..models import Repository
 from .. import db
-from github import Github, Auth
+from github import Github
 import github
 from flask import session
 from sqlalchemy.exc import SQLAlchemyError
@@ -21,12 +21,10 @@ def delete_repo():
     input: none
     output: True if repo has been deleted from the database and Github account, False if not
     """
+    # authenticate the user
+    token = get_token()
 
-    # obtain the user from the database
-    user_id = session.get('user_id')
-    user = User.query.filter_by(id=user_id).first()
-
-    if not user:
+    if not token:
         session['repo_to_remove'] = None
         return 1
     # get the repo to be deleted previously saved in the session
@@ -40,12 +38,6 @@ def delete_repo():
     
 
     try:
-
-        # authenticate the user
-        token = get_token()
-
-        if not token:
-            return False
 
         g = github.Github(token)
         user = g.get_user()
@@ -96,8 +88,8 @@ def delete_repo():
     except github.GithubException:
         return 3
     
-    except SQLAlchemyError as e:
+    except SQLAlchemyError:
         return 4
     
-    except Exception as e:
+    except Exception:
         return 7

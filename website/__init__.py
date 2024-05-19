@@ -1,3 +1,8 @@
+""" 
+This init file is the main file of the website. It is responsible for creating the app and the database,
+as well as registering the blueprints of the website.
+"""
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from os import path
@@ -9,8 +14,6 @@ def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'your secret key' # Change this to a random string
     app.permanent_session_lifetime = 3600 # 1 hour (if the session is not used for 1 hour, it will be deleted)
-    # app.config['SESSION_COOKIE_SECURE'] = True # The session cookies will only be sent over HTTPS
-    # app.config['SESSION_COOKIE_HTTPONLY'] = True # The session cookies will not be accessible by JavaScript
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
     db.init_app(app)
 
@@ -21,6 +24,7 @@ def create_app():
     from .repo import repository
     from .invitations import invitations
     from .collaborators import collabPage
+    from .error import errorPage
 
     
     app.register_blueprint(initialPage, url_prefix='/')
@@ -30,6 +34,7 @@ def create_app():
     app.register_blueprint(repository, url_prefix='/repo')
     app.register_blueprint(invitations, url_prefix='/')
     app.register_blueprint(collabPage, url_prefix='/repo')
+    app.register_blueprint(errorPage, url_prefix='/')
 
     return app
 

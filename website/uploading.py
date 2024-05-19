@@ -1,3 +1,10 @@
+""" 
+This file contains the code for the uploading blueprint.
+
+It is used to upload files to the server and add them to the database.
+
+"""
+
 from flask import Blueprint, flash, request, jsonify
 from .pythonCode import add_file
 from flask_login import login_required
@@ -19,15 +26,14 @@ def upload_file():
         # add the file to the database
         path = request.form.get('path')
         
-        repoName = request.form.get('repoName')
+        repoName = request.form.get('repoName') # get the repository name from the form
 
-        ack = add_file(repoName, file.filename, path) 
+        ack = add_file(repoName, file.filename, path)  # add the file to the database
 
-        print ("REceived ack: ", ack)
         if ack == 0:
             flash ("File uploaded successfully", category='success')
         elif ack == 1:
-            flash ("User not identified!", category='error')
+            return jsonify({'status': 'error'})
         elif ack == 2:
             flash ("The Project does not exist!", category='error')
         elif ack == 3:

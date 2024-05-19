@@ -4,7 +4,6 @@ a hash of a file (SHA-256). It will be used to sign the file and
 keep track of changes made to it.
 """
 import hashlib
-import os
 
 
 def sign_file(file_path: str):

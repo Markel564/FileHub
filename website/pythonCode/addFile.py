@@ -2,12 +2,13 @@
 This module contains a function that adds a file to the 
 database when a user uploads a file to the website
 """
-from ..models import User, Repository, File, Folder
+from ..models import Repository, File, Folder
 from .. import db
 from flask import session
 from datetime import datetime
 from .getHash import sign_file
 from sqlalchemy.exc import SQLAlchemyError
+from .getToken import get_token
 
 
 def add_file(repoName: str, file_name: str, file_path: str):
@@ -23,12 +24,11 @@ def add_file(repoName: str, file_name: str, file_path: str):
     This function adds a file to the database. Since the repository is cloned (mandatory), the file is also added to the file system
     """
     
-    user_id = session.get('user_id')
-    user = User.query.filter_by(id=user_id).first()
-    
-    if not user: # if the user is not authenticated, return 1
+    token = get_token() # obtain the token
+
+    if not token: # if the token does not exist, return 1
         return 1
-    
+
     repo = Repository.query.filter_by(name=repoName).first()
 
     if repo is None: # if the repository does not exist, return 2
@@ -99,22 +99,20 @@ def add_file(repoName: str, file_name: str, file_path: str):
         file.shaHash = sign_file(file.FileSystemPath)
 
         if not file.shaHash:
-            print("Error signing the file")
             return 4
         db.session.commit() # commit the changes to the database
 
    
         return 0
 
-    except FileNotFoundError as e:
-        print(e)
+    except FileNotFoundError:
         return 4
     
     except PermissionError:
         return 5
     
-    except SQLAlchemyError as e: 
+    except SQLAlchemyError: 
         return 6
         
-    except Exception as e:
+    except Exception:
         return 8

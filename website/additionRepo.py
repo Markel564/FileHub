@@ -1,3 +1,9 @@
+"""
+This section contains the view for the add page of the website
+
+The view is a function for the route /add (used to add a repository)
+"""
+
 from flask import Blueprint, render_template, flash, request, jsonify, session
 from . import db
 from .models import User
@@ -5,8 +11,6 @@ from .pythonCode import add_repo, clone_repo
 from flask_login import login_required
 
 additionRepo = Blueprint('additionRepo', __name__)
-
-
 
 # ADD page
 @login_required
@@ -29,12 +33,12 @@ def add():
         
         type_message = data.get('type')
 
-        if type_message == "back":
+        if type_message == "back": # if the user wants to go back
 
             # js handles the redirection to /
             return jsonify({"status": "ok"})
 
-        elif type_message == "create":
+        elif type_message == "create": # if the user wants to create a new repository
             
             # get the data from the POST request
             project_name = data.get('projectName')
@@ -42,16 +46,13 @@ def add():
             isPrivate = data.get('private')
             pathOfRepo = data.get('repoPath')
 
-            print(project_name, project_description, isPrivate, pathOfRepo)
             # create the repo
-            ack = add_repo(project_name, project_description, isPrivate)
+            ack = add_repo(project_name, project_description, isPrivate) # create the repo
             
             if ack == 0:
                 
-                if pathOfRepo != '':
-                    print (f"PathOfRepo:", pathOfRepo)
-                    print (type(pathOfRepo))
-                    ack = clone_repo(project_name, pathOfRepo)
+                if pathOfRepo != '': # if the path provided is not empty
+                    ack = clone_repo(project_name, pathOfRepo) # clone the repo
                     
                     if ack == 0:
                         flash("Project created successfully", category='success')
@@ -60,7 +61,7 @@ def add():
                 else:
                     flash("Project created successfully", category='success')
             elif ack == 1:
-                flash("User not identified!", category='error')
+                return jsonify({"status": "error"})
             elif ack == 2:
                 flash("There is already a project with the same name!", category='error')
             else:

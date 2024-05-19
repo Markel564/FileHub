@@ -2,7 +2,7 @@
 This module contains the function that creates a folder in the repository and in the file system of the repository.
 
 """
-from ..models import User, Repository, Folder
+from ..models import Repository, Folder
 from .. import db
 from flask import session
 from sqlalchemy.exc import SQLAlchemyError
@@ -53,7 +53,6 @@ def create_folder(repoName: str,folder_name: str, path: str):
 
         # we also have to update the dates of the folders where the folder is located
         while folderPath != repo.name+"/":
-            print (f"Folder path: {folderPath}")
             # open all the folders that have that folder_path as their path
             fatherFolder = Folder.query.filter_by(path=folderPath[:-1], repository_name=repo.name).first()
 
@@ -77,11 +76,10 @@ def create_folder(repoName: str,folder_name: str, path: str):
 
         return 0
 
-    except SQLAlchemyError as e:
+    except SQLAlchemyError:
         return 6
 
-    except Exception as e:
-        print(e)
+    except Exception:
         return 7
 
 

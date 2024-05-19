@@ -4,12 +4,11 @@ github account and adds them to the database (if they are not already there)
 
 """
 
-from ..models import User, Repository
+from ..models import Repository
 from .. import db
-from github import Github, Auth
+from github import Github
 import github
 from flask import session
-from sqlalchemy.exc import SQLAlchemyError
 from .cryptography import decrypt_token
 from .getToken import get_token
 import os

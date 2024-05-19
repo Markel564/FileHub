@@ -1,7 +1,6 @@
 submitButton = document.querySelector("#submitToken");
 
 // send the token
-
 submitButton.addEventListener("click", () => {
 
     const inptutToken = document.getElementById('token');

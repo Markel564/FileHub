@@ -5,8 +5,7 @@ Basically, it accepts or declines the invitation to join a repository
 which the user has been invited to.
 """
 
-from ..models import User
-from github import Github, Auth
+from github import Github
 import github
 from flask import session
 import requests
@@ -61,8 +60,8 @@ def handle_invitation(repoName: str, owner:str, action : str):
             return 2
 
         
-    except GithubException as e: # if an exception occurred, return an error code
+    except GithubException: # if an exception occurred, return an error code
         return 3
 
-    except Exception as e: # if an exception occurred, return an error code
+    except Exception: # if an exception occurred, return an error code
         return 4

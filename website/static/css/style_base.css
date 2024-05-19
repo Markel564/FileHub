@@ -49,12 +49,12 @@ body {
 
 #flash-messages {
     position: fixed;
-    top: 0px; /* Adjust as needed */
+    top: 0px; 
     width: 100%;
-    z-index: 1000; /* Ensure messages appear on top of other content */
+    z-index: 1000; 
 }
 
 
 .alert {
-    margin-bottom: 10px; /* Adjust as needed */
+    margin-bottom: 10px; 
 }

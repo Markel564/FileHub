@@ -3,7 +3,7 @@ This module contains the functions to delete files and folders from the reposito
 """
 
 from github import Github
-from ..models import User, Repository, File, Folder
+from ..models import Repository, File, Folder
 from .. import db
 import github
 from flask import session
@@ -97,8 +97,7 @@ def delete_file(repo, path, name):
         return 0
 
         
-    except Exception as e:
-        print (e)
+    except Exception:
         return 6
 
 
@@ -141,20 +140,14 @@ def delete_folder(repo: str, path: str, name: str):
         if folder.deleted: # if the folder is already deleted, the user will not be able to delete it again
             return 5
 
-        print (f"Folder to delete {folder.name}")
         repoDB.lastUpdated = datetime.now() # update the last updated date of the repository
 
         subfolders = Folder.query.filter(Folder.folderPath.like(f"{folder.path}/%")).all() # filter the subfolders
         files = File.query.filter(File.folderPath.like(folder.path + "/%")).all() # filter the files
 
-        print (f"Subfolders {subfolders}")
-        print (f"Files {[f.name for f in files]}")
         # since the folder is in the file system, delete it (no need to delete subfolders and files, as they will be deleted when the folder is deleted)
-        print (folder.FileSystemPath)
         if os.path.exists(folder.FileSystemPath):
-            print ("Folder exists in file system")
             shutil.rmtree(folder.FileSystemPath)
-            print ("Deleted folder in file system")
         
         folder_path = folder.folderPath[:-1] # remove the last character
 
@@ -175,13 +168,10 @@ def delete_folder(repo: str, path: str, name: str):
                 db.session.delete(f)
             f.deleted = True # if it is in github, we set it as deleted, and not deleted from the database until the user commits the changes
             f.modified = False
-            print (f"file {f.name} is deleted")
         db.session.delete(folder) # delete the folder from the database (it is not in GitHub)
-        print (f"DELETE FOLDER {folder.name}")
         db.session.commit()    
          
         return 0
 
-    except Exception as e:
-        print (e)
+    except Exception:
         return 6

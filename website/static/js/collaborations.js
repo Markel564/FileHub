@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (data.status == "ok"){
                     window.location.reload();
                 }else{
-                    window.location.reload();
+                    window.location.href = "/error";
                 }
             })
             .catch(function (error) {
@@ -139,7 +139,7 @@ sendCollaborator.addEventListener("click", () => {
         if (data.status == "ok"){
             window.location.reload();
         }else{
-            window.location.reload();
+            window.location.href = "/error";
         }
     }).catch(function (error) {
         console.error("Fetch error:", error);

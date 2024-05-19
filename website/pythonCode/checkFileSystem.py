@@ -4,7 +4,7 @@ deletions or additions of files and folders
 """
 
 import os
-from ..models import User, Folder, File, Repository
+from ..models import Folder, File, Repository
 from .getHash import sign_file
 from .. import db
 from datetime import datetime
@@ -72,18 +72,15 @@ def check_file_system(repo: str):
                         # we add the file to the database
                         folderPath = relative_file_path_with_repo.rsplit("/",1)[0] + "/" # the folder path of the file
                         FileSystemPath = windows_to_unix_path(full_file_path, directory=False) # convert the path to unix format
-                        print (f"filesystem path {FileSystemPath}")
                         hash_of_file = sign_file(FileSystemPath) # and sign the file
 
                         if not hash_of_file: # if the file cannot be hashed, it means it was not found
-                            print ("Unable to hash")
                             return 4
                         
                         # create the file with the attributes
                         file = File(name=file, path=relative_file_path_with_repo, repository_name=repo.name, 
                         lastUpdated=datetime.now(), modified=True, folderPath=folderPath, FileSystemPath=FileSystemPath, 
                         shaHash=hash_of_file, addedFirstTime=True)
-                        print (f"File {file.name} added to the database with path {file.path} and folder path {file.folderPath}")
                         db.session.add(file)
 
                         # we have to update the date of the folder where the file is located and the repository
@@ -107,10 +104,8 @@ def check_file_system(repo: str):
             elif not hash_of_file: # if the file is not found, it has been deleted from the fs, so we have to delete it from the database
 
                 if file.addedFirstTime: # not in GitHub
-                    print (f"Deleteing completely {file.name}")
                     db.session.delete(file) # delete the file from the database
                 else:
-                    print (f"Deleting for the first time {file.name}")
                     file.deleted = True # set the property deleted to True
                     file.modified = False
                     file.addedFirstTime = False
@@ -150,10 +145,8 @@ def check_file_system(repo: str):
                 # regardless of whether it is renamed or deleted completely, we will delete it by putting
                 # the attribute deleted to True, and later when the user commits the changes, we will delete it from the database
                 if folder.addedFirstTime:
-                    print (f"Folder {folder.name} deleted")
                     db.session.delete(folder)
                 else:
-                    print (f"Folder {folder.name} deleted for the first time")
                     folder.deleted = True
                     folder.modified = False
                     folder.addedFirstTime = False
@@ -166,16 +159,12 @@ def check_file_system(repo: str):
 
         db.session.commit()
 
-        for folder in Folder.query.filter_by(repository_name=repo.name).all():
-            print (f"Folder {folder.name} with path {folder.path} and deleted {folder.deleted} and addedFirstTime {folder.addedFirstTime} and modified {folder.modified}")
         return 0
 
-    except SQLAlchemyError as e:
-        print (e)
+    except SQLAlchemyError:
         return 5
 
-    except Exception as e:
-        print (e)
+    except Exception:
         return 6
 
 

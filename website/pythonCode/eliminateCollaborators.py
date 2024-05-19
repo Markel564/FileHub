@@ -1,11 +1,8 @@
 """ 
 This module contains a function to eliminate a collaborator from a repository
 """
-from ..models import User
-from .. import db
-from github import Github, Auth
+from github import Github
 import github
-from flask import session
 import requests
 from .getToken import get_token
 

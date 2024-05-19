@@ -50,7 +50,7 @@ createButton.addEventListener("click", (event) => {
     const path_of_repo = document.getElementById('path-of-repo');
     const repoPath = path_of_repo.value;
     
-    console.log(path_of_repo, repoPath);
+    // console.log(path_of_repo, repoPath);
     fetch("/add", {
         method: "POST",
         headers: {
@@ -74,8 +74,8 @@ createButton.addEventListener("click", (event) => {
         if (data.status == "ok"){
             window.location.replace("/home");
         }
-        else {
-            window.location.replace("/error");
+        else{
+            window.location.href = "/error"
         }
     })
     .catch(function (error) {
