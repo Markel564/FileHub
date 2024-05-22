@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: space-between;
   background-color: #1a1a1d;
-  width: 70vw; 
+  width: 70%; 
   margin: 20px auto;
   flex-wrap: wrap;
 }
@@ -42,10 +42,14 @@
   border: 2px solid #ccc; 
   border-radius: 5px; 
   padding: 5px 10px; 
+  width: 33%;
+}
+
+#path, #formAddFolder, #folder-name{
   width: 21vw;
 }
 
-  
+
 
 .btn {
   padding: 10px 20px; 
@@ -82,7 +86,7 @@
 
 .container{
   margin-top: 20px;
-  width: 60vw;
+  width: 60%;
   background-color: #4e4050;
   border-radius: 50px;
   padding: 30px;
@@ -228,7 +232,7 @@
   justify-content: space-between;
   padding: 25px; 
   background-color: #1a1a1d;
-  width: 50vw; 
+  width: 80%; 
   margin: 30px auto;
   border-radius: 25px;
   background-color: #d9d9d9;
@@ -262,15 +266,34 @@
 
 
 
-/* for smaller sceens*/
-@media (max-width: 1200px) {
-  .grid-container {
-    grid-template-columns: repeat(2, 1fr); /* 2 cols */
+@media (max-width: 2000px) {
+  .top-options{
+    width: 80%;
   }
 }
 
-@media (max-width: 800px) {
+/* for smaller sceens*/
+@media (max-width: 1300px) {
+  .grid-container {
+    grid-template-columns: repeat(2, 1fr); /* 2 cols */
+  }
+
+  /* .form-control {
+    width: 20%;
+  } */
+
+  .container-buttons .btn{
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 900px) {
   .grid-container {
     grid-template-columns: 1fr; /* 1 col */
   }
+  .form-control{
+    display: none;
+  }
+
+
 }

@@ -5,7 +5,8 @@ It is displayed when there is a problem with the authentication of the user
 
 """
 
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
+
 
 
 errorPage = Blueprint('errorPage', __name__)

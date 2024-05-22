@@ -1,3 +1,9 @@
+.main{
+    width: 100%;
+    max-width: 2400px;
+    min-width: 600px;
+}
+
 .main-container{
 
     background-color: #950740;
@@ -5,8 +11,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 40vh;
-    width: 30vw;
+    height: 40%;
+    width: 30%;
     border-radius: 50px;
     margin: 100px auto;
     text-align: center;
@@ -17,6 +23,7 @@
     color: white;
     font-size: 2rem;
     margin-bottom: 20px;
+    box-sizing: border-box;
 }
 
 .main-container h2{
@@ -43,4 +50,27 @@
 .btn:hover {
     background-color: #a50b50; 
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); 
+}
+
+#token{
+    margin: 0 10px 0 10px;
+}
+
+
+@media screen and (max-width: 1280px){
+    .main-container{
+        width: 45%;
+    }
+}
+
+@media screen and (max-width: 780px){
+    .main-container{
+        width: 70%;
+    }
+    .main-container h1{
+        font-size: 1.5rem;
+    }
+    .main-container h2{
+        font-size: 0.8rem;
+    }
 }

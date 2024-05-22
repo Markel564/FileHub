@@ -5,6 +5,13 @@ const repositories = document.querySelectorAll('.repository-name');
 const viewInvitations = document.querySelector("#viewInvitations");
 const logoutButton = document.querySelector("#logout");
 
+
+var ancho = window.innerWidth;
+var alto = window.innerHeight;
+
+// Muestra la resolución de la pantalla en la consola del navegador
+console.log("Resolución de la pantalla: " + ancho + "x" + alto + " píxeles");
+
 // function to search for a repository
 searchInput.addEventListener("input", (e) => {
 

@@ -6,6 +6,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center; 
+    width: 100%;
 }
 .header {
     background-color: #c3073f;
@@ -57,4 +58,38 @@ body {
 
 .alert {
     margin-bottom: 10px; 
+}
+
+@media screen and (max-width: 1280px){
+
+    .header h1 {
+        font-size: 4rem;
+    }
+
+    .user-image {
+        height: 12vh;
+        width: 12vh;
+    }
+
+
+}
+
+@media screen and (max-width: 780px){
+    /* .header {
+        height: 20vh;
+    } */
+    .header h1 {
+        font-size: 2rem;
+    }
+    /* .user-image {
+        height: 10vh;
+        width: 10vh;
+    } */
+}
+
+@media screen and (max-width: 600px){
+
+    .user-image {
+        display: none;
+    }
 }

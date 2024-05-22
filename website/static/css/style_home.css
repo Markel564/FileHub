@@ -5,7 +5,7 @@
     justify-content: space-between;
     padding: 10px; 
     background-color: #1a1a1d;
-    width: 58vw; 
+    width: 60%; 
     margin: 20px auto;
 }
 
@@ -38,12 +38,12 @@
   border-radius: 5px; 
   padding: 5px 10px; 
   margin-right: 10px; 
-  width: 21vw;
+  width: 35%;
 }
 
 
 .container{
-    width: 60vw;
+    width: 60%;
     background-color: #4e4050;
     border-radius: 50px;
     padding: 30px;
@@ -57,7 +57,7 @@
     justify-content: space-between;
     padding: 25px; 
     background-color: #1a1a1d;
-    width: 50vw; 
+    width: 90%; 
     margin: 30px auto;
     border-radius: 25px;
     background-color: #d9d9d9;
@@ -103,7 +103,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 25px; 
-  width: 50vw; 
+  width: 80%; 
   margin: 30px auto;
   border-radius: 25px;
   background-color: #d9d9d9;
@@ -119,3 +119,53 @@
 }
 
 
+@media screen and (max-width: 1280px){
+    .top-options{
+        width: 80%;
+    }
+    /* .form-control{
+        width: 40vw;
+    }
+    .container{
+        width: 80vw;
+    }
+    .repository{
+        width: 80vw;
+    }
+    .no-results{
+        width: 80vw;
+    } */
+}
+
+@media screen and (max-width: 768px){
+    .top-options{
+        width: 70%;
+    }
+    .container{
+        width: 80vw;
+    }
+    .repository h1{
+        font-size: 1.5rem;
+    }
+    .form-control{
+      display: none;
+    }
+    .top-options .btn{
+      padding: 10px 15px;
+    }
+    /* .h1{
+        font-size: 1rem;
+    }
+    .form-control{
+        width: 60vw;
+    }
+    .container{
+        width: 90vw;
+    }
+    .repository{
+        width: 90vw;
+    }
+    .no-results{
+        width: 90vw;
+    } */
+}

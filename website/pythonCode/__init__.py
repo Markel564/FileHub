@@ -3,7 +3,6 @@ from ..models import User, Repository
 from .. import db
 from github import Github, Auth
 import github
-import yaml
 from flask import session
 
 

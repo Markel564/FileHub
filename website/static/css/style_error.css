@@ -3,7 +3,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh; /* Adjust as needed */
+    height: 100vh; 
     margin: 0;
 }
 
@@ -18,8 +18,8 @@ body {
 }
 
 .content > div {
-    display: block; /* Display each div as a block element */
-    margin-bottom: 10px; /* Add some spacing between the divs */
+    display: block; 
+    margin-bottom: 10px; 
 }
 
 .content h1 {

@@ -1,4 +1,3 @@
-import yaml
 from github import Github
 from website import create_app, DB_NAME, db
 from os import path

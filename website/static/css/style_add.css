@@ -1,8 +1,8 @@
 .new_repository {
   background-color: #4e4050;
   border-radius: 25px;
-  height: 70vh;
-  width: 35vw;
+  height: 60%;
+  width: 35%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -15,10 +15,11 @@
 .content {
   padding: 20px;
   width: 100%;
-  max-height: 100%;
-  overflow: auto; 
+  height: 90%;
+  /* max-height: 100; */
+  /* margin: 20px auto; */
+  /* overflow: auto;  */
 }   
-
 
 .content h2 {
   color: white;
@@ -27,18 +28,26 @@
   margin-top: 0;
 }
 
+.content-add-repo{
+  height: 50%;
+}
+
 .form-group {
   margin-bottom: 20px;
   color: #f8f0e5;
   display: flex; 
   align-items: center; 
+  justify-content: center;
+  width: 100%;
+  height: 10%;
+  margin: 70px auto
 }
 
 .form-group input[type="text"],
 .content textarea {
   width: 100%;
   padding: 10px;
-  margin-bottom: 10px;
+  /* margin-bottom: 10px; */
   border: 1px solid #ddd;
   border-radius: 20px;
   /* box-sizing: border-box;  */
@@ -62,10 +71,13 @@
 
 .checkbox-group {
   margin-bottom: 15px;
+  margin-top: px;
   display: flex;
   align-items: center;
   margin-left: 10px;
+  /* margin: 10 auto; */
 }
+
 
 .checkbox-group input[type="checkbox"] {
   margin-right: 5px;
@@ -83,11 +95,28 @@
   border: none;
   border-radius: 20px;
   margin-right: 20px;
-  width: 150px;
+  width: 20%;
 }
 
 
 .back-btn:hover, .create-btn:hover {
   cursor: pointer;
   opacity: 0.8;
+}
+
+@media screen and (max-width: 1280px){
+
+  .new_repository {
+    width: 70%;
+  }
+
+}
+
+/* for max height */
+@media screen and (max-height: 800px){
+
+  .new_repository {
+    height: 90%;
+  }
+
 }

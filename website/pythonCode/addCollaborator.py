@@ -6,7 +6,8 @@ from github import Github
 import github
 import requests
 from .getToken import get_token
-
+from flask import session
+from ..models import User
 
 def add_collaborator(repoName: str, collaboratorName: str, isAdmin: bool, isReader: bool, isWriter: bool):
     """ 
@@ -24,6 +25,13 @@ def add_collaborator(repoName: str, collaboratorName: str, isAdmin: bool, isRead
 
     if not token:
         return 1 # user not in the database
+    
+    user_id = session.get('user_id')
+    userDB = User.query.filter_by(id=user_id).first() # get the user from the database
+
+    if not userDB:
+        return 1
+
     
     if not isAdmin and not isReader and not isWriter: # no role was selected
         return 2 

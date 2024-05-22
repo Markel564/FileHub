@@ -1,0 +1,10 @@
+Flask==3.0.3
+Flask_Login==0.6.3
+flask_sqlalchemy==3.1.1
+GitPython==3.1.43
+PyGithub==2.3.0
+PyGithub==2.3.0
+pytz==2024.1
+Requests==2.32.1
+SQLAlchemy==2.0.25
+tzlocal==5.2

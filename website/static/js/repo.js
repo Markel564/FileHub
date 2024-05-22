@@ -11,6 +11,7 @@ const commitButton = document.querySelector("#pushButton");
 const newFolderButton = document.querySelector("#new-folder");
 const addPeopleButton = document.querySelector("#addPeopleButton");
 
+
 // function to go back to one page before
 backButton.addEventListener("click", () => {
 

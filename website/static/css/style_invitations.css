@@ -1,6 +1,6 @@
 .container{
     margin-top: 20px;
-    width: 60vw;
+    width: 60%;
     background-color: #4e4050;
     border-radius: 50px;
     padding: 30px;
@@ -29,7 +29,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 25px; 
-    width: 50vw; 
+    width: 80%; 
     margin: 30px auto;
     border-radius: 25px;
     background-color: #d9d9d9;
@@ -188,4 +188,11 @@ border-bottom: 3px solid white;
 
 .hide {
     display: none;
+}
+
+
+@media screen and (max-width: 1280px){
+    .container{
+        width: 80%;
+    }
 }
