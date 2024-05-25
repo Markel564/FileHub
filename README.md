@@ -69,7 +69,7 @@ follows:
 
 <br>
 <p align="center">
- <img src="https://github.com/Markel564/readme/blob/main/screenshots/initialPage.png" width="500" style="height: auto;">
+ <img src="https://github.com/Markel564/FileHub/blob/main/screenshots/initialPage.png" width="500" style="height: auto;">
 </p>
 
 <br>
@@ -78,7 +78,7 @@ After you place your PAT, a homepage such as this should pop up:
 
 <br>
 <p align="center">
-  <img src="https://github.com/Markel564/readme/blob/main/screenshots/mainPage.png" width=500" style="height: auto;">
+  <img src="https://github.com/Markel564/FileHub/blob/main/screenshots/mainPage.png" width=500" style="height: auto;">
 </p>
 <br>
 
@@ -96,7 +96,7 @@ If you click 'ADD NEW PROJECT', you will be redirected here:
 
 <br>
 <p align="center">
-  <img src="https://github.com/Markel564/readme/blob/main/screenshots/addRepoPage.png" width=500" style="height: auto;">
+  <img src="https://github.com/Markel564/FileHub/blob/main/screenshots/addRepoPage.png" width=500" style="height: auto;">
 </p>
 <br>
 
@@ -111,7 +111,7 @@ Back in the homepage, if you want to delete any repository, just click the trash
 
 <br>
 <p align="center">
-  <img src="https://github.com/Markel564/readme/blob/main/screenshots/trashIcon.png" width=400" style="height: auto;">
+  <img src="https://github.com/Markel564/FileHub/blob/main/screenshots/trashIcon.png" width=400" style="height: auto;">
 </p>
 <br>
 
@@ -120,7 +120,7 @@ A confirmation window will pop up asking you if you want to perform that action:
 
 <br>
 <p align="center">
-  <img src="https://github.com/Markel564/readme/blob/main/screenshots/confirmation.png" width=400" style="height: auto;">
+  <img src="https://github.com/Markel564/FileHub/blob/main/screenshots/confirmation.png" width=400" style="height: auto;">
 </p>
 <br>
 
@@ -128,7 +128,7 @@ If you want to see your invitations, click 'VIEW INVITATIONS', and your invitati
 
 <br>
 <p align="center">
-  <img src="https://github.com/Markel564/readme/blob/main/screenshots/invitationsPage.png" width=500" style="height: auto;">
+  <img src="https://github.com/Markel564/FileHub/blob/main/screenshots/invitationsPage.png" width=500" style="height: auto;">
 </p>
 <br>
 
@@ -140,7 +140,7 @@ Back in the homepage, to log out, just click the 'LOGOUT' page and it will take 
 
 <br>
 <p align="center">
-  <img src="https://github.com/Markel564/readme/blob/main/screenshots/logout.png" width=200" style="height: auto;">
+  <img src="https://github.com/Markel564/FileHub/blob/main/screenshots/logout.png" width=200" style="height: auto;">
 </p>
 <br>
 
@@ -149,7 +149,7 @@ and repository. In this example, we will select the repository 'Experimentation'
 
 <br>
 <p align="center">
-  <img src="https://github.com/Markel564/readme/blob/main/screenshots/searchRepo.png" width=400" style="height: auto;">
+  <img src="https://github.com/Markel564/FileHub/blob/main/screenshots/searchRepo.png" width=400" style="height: auto;">
 </p>
 <br>
 
@@ -157,7 +157,7 @@ The following page will load, showcasing the contents of the repository you acce
 
 <br>
 <p align="center">
-  <img src="https://github.com/Markel564/readme/blob/main/screenshots/repoPage.png" width=500" style="height: auto;">
+  <img src="https://github.com/Markel564/FileHub/blob/main/screenshots/repoPage.png" width=500" style="height: auto;">
 </p>
 <br>
 
@@ -179,7 +179,7 @@ and the following window will pop up:
 
 <br>
 <p align="center">
-  <img src="https://github.com/Markel564/readme/blob/main/screenshots/cloneRepo.png" width=400" style="height: auto;">
+  <img src="https://github.com/Markel564/FileHub/blob/main/screenshots/cloneRepo.png" width=400" style="height: auto;">
 </p>
 <br>
 
@@ -196,7 +196,7 @@ any file you want. If you want to see the changes in the app, click the followin
 
 <br>
 <p align="center">
-  <img src="https://github.com/Markel564/readme/blob/main/screenshots/changes.png" width=200" style="height: auto;">
+  <img src="https://github.com/Markel564/FileHub/blob/main/screenshots/changes.png" width=200" style="height: auto;">
 </p>
 <br>
 
@@ -206,7 +206,7 @@ or a file that has been deleted (no longer represented). The same applies for fo
 
 <br>
 <p align="center">
-  <img src="https://github.com/Markel564/readme/blob/main/screenshots/newFile.png" width=500" style="height: auto;">
+  <img src="https://github.com/Markel564/FileHub/blob/main/screenshots/newFile.png" width=500" style="height: auto;">
 </p>
 <br>
 
@@ -215,7 +215,7 @@ However, you can add also add a new file or folder from the app directly! Do thi
 
 <br>
 <p align="center">
-  <img src="https://github.com/Markel564/readme/blob/main/screenshots/dragndrop.png" width=200" style="height: auto;">
+  <img src="https://github.com/Markel564/FileHub/blob/main/screenshots/dragndrop.png" width=200" style="height: auto;">
 </p>
 <br>
 
@@ -224,7 +224,7 @@ You can also add a new folder by clicking the following:
 
 <br>
 <p align="center">
-  <img src="https://github.com/Markel564/readme/blob/main/screenshots/newFolder.png" width=200" style="height: auto;">
+  <img src="https://github.com/Markel564/FileHub/blob/main/screenshots/newFolder.png" width=200" style="height: auto;">
 </p>
 <br>
 
@@ -233,7 +233,7 @@ This will open up a window to write the name of the folder:
 
 <br>
 <p align="center">
-  <img src="https://github.com/Markel564/readme/blob/main/screenshots/newFolderWindow.png" width=400" style="height: auto;">
+  <img src="https://github.com/Markel564/FileHub/blob/main/screenshots/newFolderWindow.png" width=400" style="height: auto;">
 </p>
 <br>
 
@@ -241,7 +241,7 @@ If you however, want to delete any file/folder directly from the interface, just
 
 <br>
 <p align="center">
-  <img src="https://github.com/Markel564/readme/blob/main/screenshots/deleteFile.png" width=200" style="height: auto;">
+  <img src="https://github.com/Markel564/FileHub/blob/main/screenshots/deleteFile.png" width=200" style="height: auto;">
 </p>
 <br>
 
@@ -251,7 +251,7 @@ access, in my case, 'FirstFolder':
 
 <br>
 <p align="center">
-  <img src="https://github.com/Markel564/readme/blob/main/screenshots/firstFolder.png" width=200" style="height: auto;">
+  <img src="https://github.com/Markel564/FileHub/blob/main/screenshots/firstFolder.png" width=200" style="height: auto;">
 </p>
 <br>
 
@@ -262,7 +262,7 @@ Okay, let's go back to the basics. If you are willing to push the contents from 
 
 <br>
 <p align="center">
-  <img src="https://github.com/Markel564/readme/blob/main/screenshots/push.png" width=200" style="height: auto;">
+  <img src="https://github.com/Markel564/FileHub/blob/main/screenshots/push.png" width=200" style="height: auto;">
 </p>
 <br>
 
@@ -270,7 +270,7 @@ If that is not the case and instead, you want to do a pull, just click the butto
 
 <br>
 <p align="center">
-  <img src="https://github.com/Markel564/readme/blob/main/screenshots/pull.png" width=200" style="height: auto;">
+  <img src="https://github.com/Markel564/FileHub/blob/main/screenshots/pull.png" width=200" style="height: auto;">
 </p>
 <br>
 
@@ -278,7 +278,7 @@ Finally, to add/remove collaborators, click the button 'SHARE'
 
 <br>
 <p align="center">
-  <img src="https://github.com/Markel564/readme/blob/main/screenshots/share.png" width=200" style="height: auto;">
+  <img src="https://github.com/Markel564/FileHub/blob/main/screenshots/share.png" width=200" style="height: auto;">
 </p>
 <br>
 
@@ -286,7 +286,7 @@ A page with the collaborators will pop up:
 
 <br>
 <p align="center">
-  <img src="https://github.com/Markel564/readme/blob/main/screenshots/collabPage.png" width=500" style="height: auto;">
+  <img src="https://github.com/Markel564/FileHub/blob/main/screenshots/collabPage.png" width=500" style="height: auto;">
 </p>
 <br>
 
@@ -296,7 +296,7 @@ the collaborator. To add one, click the 'ADD' button and you will be asked to fi
 
 <br>
 <p align="center">
-  <img src="https://github.com/Markel564/readme/blob/main/screenshots/addCollab.png" width=400" style="height: auto;">
+  <img src="https://github.com/Markel564/FileHub/blob/main/screenshots/addCollab.png" width=400" style="height: auto;">
 </p>
 <br>
 
