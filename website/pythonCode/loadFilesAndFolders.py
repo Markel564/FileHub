@@ -317,13 +317,18 @@ def load_files_and_folders(repoName:str, path=""):
         else:
             # if the repository is not cloned, we have to check the folders in the database and compare them with the folders list
             # and delete those that are not in the folders list
-            for folder in folders:
+            for f in folders:
+                path_to_folder = None
                 if path == "": # if we are in the root directory
-                    path_of_folder = str(repoName + '/' + folder)
+                    path_of_folder = str(repoName + '/' + f)
                 else:
-                    path_of_folder = str(repoName + '/' + path + "/" + folder)
-                folder = Folder.query.filter_by(repository_name=repoName, path=path_to_folder).first()
-
+                    path_of_folder = str(repoName + '/' + path + "/" + f)
+                all_folders = Folder.query.filter_by(repository_name=repoName).all()
+                for fol in all_folders:
+                    if fol.path == path_of_folder:
+                        path_to_folder = fol.path
+                        break
+                folder = Folder.query.filter_by(repository_name=repoName, path=path_to_folder).first() # get the folder from the database
                 folders_in_DB = Folder.query.filter(Folder.folderPath.like(f"{folder.path}/")).all() # filter the subfolders
                 for folder in folders_in_DB:
                     if folder.name not in folders:

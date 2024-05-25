@@ -181,8 +181,8 @@ def repo(subpath):
             absolute_path = data.get('absolutePath')
 
             ack = clone_repo(repoName, absolute_path)
-
             if ack == 0:
+                flash("Project downloaded successfully", category='success')
                 repo = Repository.query.filter_by(name=repoName).first()  # get the repository from the db
                 repo.loadedInDB = False # we will change the loaded attribute and when a GET is made, the repository will be loaded again
                 db.session.commit()

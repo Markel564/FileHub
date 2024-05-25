@@ -399,10 +399,13 @@ pushButton.addEventListener("click", () => {
         }
     })
     .then(function (data) {
+        console.log(data);
         if (data.status == "ok"){
             window.location.reload();
+        }else if (data.status == "error"){
+            window.location.href = "/error"
         }else{
-            return jsonify({"status": "error"})
+            window.location.reload();
         }
 
     })

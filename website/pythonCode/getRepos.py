@@ -46,6 +46,7 @@ def get_repos():
         for repo in repositories:
             # if one repository from GitHub account is not in the database, add it
             if not Repository.query.filter_by(name=repo.name).first():
+                print ("NEW REPO")
                 new_repo = Repository(name=repo.name, lastUpdated=repo.updated_at) # create a new repository object
                 db.session.add(new_repo)
                 db.session.commit()
@@ -57,9 +58,9 @@ def get_repos():
             repo = Repository.query.filter_by(name=repo.name).first()
             
             if repo.isCloned: # check if it exists in the local filesystem
-
+                print (f"Repo {repo.name} is cloned")
                 if not os.path.exists(repo.FileSystemPath+f"/{repo.name}"): # if it does not exist, set isCloned to False
-
+                    print (f"Repo {repo.name} is not in the fs")
                     repo.isCloned = False
                     db.session.commit()
         
