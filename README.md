@@ -59,6 +59,8 @@ run
   python3 main.py
 ```
 
+and open a web browser. The app will be running in <strong>http://localhost:5000/</strong>
+
 ## Using FileHub
 
 
