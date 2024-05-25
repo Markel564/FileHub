@@ -50,7 +50,7 @@ def check_file_system(repo: str):
             if not root.startswith(repo.FileSystemPath+repo.name+"/.git"): # omit those files that are in the .git folder
 
                 for file in files:
-
+                    print (file)
                     if file.startswith('~$'): # if the file is a temporary file, we wont check it
                         continue
                     
@@ -67,7 +67,6 @@ def check_file_system(repo: str):
                     
                     # ADDING NEW FILES TO THE DATABASE
                     if not fileDB: # if file not in database, that means the user has added a new file manually
-
 
                         # we add the file to the database
                         folderPath = relative_file_path_with_repo.rsplit("/",1)[0] + "/" # the folder path of the file
