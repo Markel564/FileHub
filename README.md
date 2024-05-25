@@ -69,7 +69,7 @@ follows:
 
 <br>
 <p align="center">
- <img src="https://github.com/Markel564/FileHub/blob/main/screenshots/initialPage.png" width="500" style="height: auto;">
+ <img src="https://github.com/Markel564/FileHub/blob/master/screenshots/initialPage.png" width="500" style="height: auto;">
 </p>
 
 <br>
@@ -78,7 +78,7 @@ After you place your PAT, a homepage such as this should pop up:
 
 <br>
 <p align="center">
-  <img src="https://github.com/Markel564/FileHub/blob/main/screenshots/mainPage.png" width=500" style="height: auto;">
+  <img src="https://github.com/Markel564/FileHub/blob/master/screenshots/mainPage.png" width=500" style="height: auto;">
 </p>
 <br>
 
@@ -278,7 +278,7 @@ Finally, to add/remove collaborators, click the button 'SHARE'
 
 <br>
 <p align="center">
-  <img src="https://github.com/Markel564/FileHub/blob/main/screenshots/share.png" width=200" style="height: auto;">
+  <img src="https://github.com/Markel564/FileHub/blob/master/screenshots/share.png" width=200" style="height: auto;">
 </p>
 <br>
 
@@ -286,7 +286,7 @@ A page with the collaborators will pop up:
 
 <br>
 <p align="center">
-  <img src="https://github.com/Markel564/FileHub/blob/main/screenshots/collabPage.png" width=500" style="height: auto;">
+  <img src="https://github.com/Markel564/FileHub/blob/master/screenshots/collabPage.png" width=500" style="height: auto;">
 </p>
 <br>
 
