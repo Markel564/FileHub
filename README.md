@@ -255,7 +255,7 @@ access, in my case, 'FirstFolder':
 </p>
 <br>
 
-This will take you to folder were you can see the contents of it displayed.
+This will take you to the folder were you can see the contents of it displayed.
 
 Okay, let's go back to the basics. If you are willing to push the contents from your local repository to GitHub, click the button
 'UPLOAD TO GITHUB':
